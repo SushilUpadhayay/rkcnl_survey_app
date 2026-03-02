@@ -130,7 +130,7 @@ class _SurveysScreenState extends State<SurveysScreen> {
               height: 100,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(s.colorValue).withOpacity(0.9), Color(s.colorValue).withOpacity(0.5)],
+                  colors: [Color(s.colorValue).withValues(alpha: 0.9), Color(s.colorValue).withValues(alpha: 0.5)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -198,7 +198,7 @@ class _SurveysScreenState extends State<SurveysScreen> {
     
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
       child: Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
     );
   }
@@ -223,7 +223,7 @@ class _SurveysScreenState extends State<SurveysScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off, size: 64, color: AppColors.textMuted.withOpacity(0.3)),
+            Icon(Icons.search_off, size: 64, color: AppColors.textMuted.withValues(alpha: 0.3)),
             const SizedBox(height: 16),
             const Text('No surveys found', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textSub)),
             const SizedBox(height: 8),
