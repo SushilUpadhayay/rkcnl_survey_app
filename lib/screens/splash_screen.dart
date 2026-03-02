@@ -74,11 +74,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     ),
                   ],
                 ),
-                child: Image.network(
-                  'https://rastriyakrishi.com.np/wp-content/uploads/2024/07/Krishi_Logo-Tr.png',
+                child: Image.asset(
+                  'assets/images/Krishi_Logo-Tr.png',
                   width: 80,
                   height: 80,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.agriculture, size: 64, color: AppColors.green),
                 ),
               ),
               const SizedBox(height: 24),

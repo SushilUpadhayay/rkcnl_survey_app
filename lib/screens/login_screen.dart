@@ -75,11 +75,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Image.network(
-                  'https://rastriyakrishi.com.np/wp-content/uploads/2024/07/Krishi_Logo-Tr.png',
+                child: Image.asset(
+                  'assets/images/Krishi_Logo-Tr.png',
                   width: 24,
                   height: 24,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.agriculture, color: AppColors.green, size: 20),
                 ),
               ),
               const SizedBox(width: 12),
@@ -104,7 +103,12 @@ class _LoginScreenState extends State<LoginScreen> {
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white24),
             ),
-            child: const Icon(Icons.grass, color: Colors.white, size: 40),
+            child: Image.asset(
+              'assets/images/Krishi_Logo-Tr.png',
+              width: 40,
+              height: 40,
+              color: Colors.white,
+            ),
           ),
         ),
       ],

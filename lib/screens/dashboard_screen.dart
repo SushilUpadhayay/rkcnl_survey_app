@@ -51,11 +51,10 @@ class DashboardScreen extends StatelessWidget {
     return AppBar(
       leading: Padding(
         padding: EdgeInsets.only(left: 16),
-        child: Image.network(
-          'https://rastriyakrishi.com.np/wp-content/uploads/2024/07/Krishi_Logo-Tr.png',
+        child: Image.asset(
+          'assets/images/Krishi_Logo-Tr.png',
           width: 28,
           height: 28,
-          errorBuilder: (context, error, stackTrace) => const Icon(Icons.agriculture, color: AppColors.green, size: 24),
         ),
       ),
       title: const Text('Rastriye Krishi', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
