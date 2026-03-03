@@ -40,8 +40,12 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   void dispose() {
     _phoneController.dispose();
-    for (var c in _otpControllers) c.dispose();
-    for (var f in _focusNodes) f.dispose();
+    for (var c in _otpControllers) {
+      c.dispose();
+    }
+    for (var f in _focusNodes) {
+      f.dispose();
+    }
     super.dispose();
   }
 
@@ -64,7 +68,7 @@ class _OtpScreenState extends State<OtpScreen> {
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.greenLight,
                   shape: BoxShape.circle,
                 ),

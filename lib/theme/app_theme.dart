@@ -23,14 +23,14 @@ class AppColors {
 
 ThemeData buildAppTheme({bool dark = false}) {
   final colorScheme = dark
-      ? ColorScheme.dark(
+      ? const ColorScheme.dark(
           primary: AppColors.green,
           secondary: AppColors.greenLight,
-          surface: const Color(0xFF1A2E1A),
-          onSurface: const Color(0xFFE8F5E8),
-          surfaceContainerHighest: const Color(0xFF0D1F0D),
+          surface: Color(0xFF1A2E1A),
+          onSurface: Color(0xFFE8F5E8),
+          surfaceContainerHighest: Color(0xFF0D1F0D),
         )
-      : ColorScheme.light(
+      : const ColorScheme.light(
           primary: AppColors.green,
           secondary: AppColors.greenLight,
           surface: AppColors.surface,

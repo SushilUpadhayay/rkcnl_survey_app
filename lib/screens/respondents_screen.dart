@@ -55,7 +55,7 @@ class RespondentsScreen extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      color: AppColors.greenMid.withOpacity(0.1),
+      color: AppColors.greenMid.withValues(alpha: 0.1),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -100,7 +100,7 @@ class RespondentsScreen extends StatelessWidget {
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+              decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
               child: Text(statusLabel, style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold)),
             ),
           ],
@@ -114,7 +114,7 @@ class RespondentsScreen extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.people_outline, size: 64, color: AppColors.textMuted.withOpacity(0.3)),
+          Icon(Icons.people_outline, size: 64, color: AppColors.textMuted.withValues(alpha: 0.3)),
           const SizedBox(height: 16),
           const Text('No respondents yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textSub)),
           const SizedBox(height: 8),

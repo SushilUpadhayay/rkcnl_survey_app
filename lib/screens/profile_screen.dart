@@ -117,7 +117,7 @@ class ProfileScreen extends StatelessWidget {
       children: [
         ListTile(
           onTap: () {},
-          leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppColors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.help_center_outlined, color: AppColors.blue)),
+          leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppColors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.help_center_outlined, color: AppColors.blue)),
           title: const Text('Help & Support', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           trailing: const Icon(Icons.chevron_right, size: 20),
         ),

@@ -193,7 +193,11 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
             value: current.contains(opt),
             onChanged: (v) {
               setState(() {
-                if (v == true) current.add(opt); else current.remove(opt);
+                if (v == true) {
+                  current.add(opt);
+                } else {
+                  current.remove(opt);
+                }
                 _answers[q.id] = current;
               });
             },
@@ -257,7 +261,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
   Widget _buildFooter(bool isReview) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-      decoration: BoxDecoration(color: AppColors.surface, border: const Border(top: BorderSide(color: AppColors.border))),
+      decoration: const BoxDecoration(color: AppColors.surface, border: Border(top: BorderSide(color: AppColors.border))),
       child: Row(
         children: [
           if (_currentStep > 0) ...[

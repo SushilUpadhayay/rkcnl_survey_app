@@ -27,6 +27,7 @@ class StorageService {
     if (s == null) return null;
     return jsonDecode(s) as Map<String, dynamic>;
   }
+
   Future<void> saveAuth(Map<String, dynamic> data) =>
       _prefs.setString(_kAuth, jsonEncode(data));
   Future<void> clearAuth() => _prefs.remove(_kAuth);
@@ -35,8 +36,15 @@ class StorageService {
   List<Respondent> getRespondents(String surveyId) {
     final s = _prefs.getString(_respondentsKey(surveyId));
     if (s == null) return [];
-    final list = jsonDecode(s) as List;
-    return list.map((e) => Respondent.fromJson(e as Map<String, dynamic>)).toList();
+    try {
+      final list = jsonDecode(s) as List;
+      return list
+          .map((e) => Respondent.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      // Silently handle corrupted data
+      return [];
+    }
   }
 
   Future<void> saveRespondent(String surveyId, Respondent respondent) async {
@@ -47,8 +55,8 @@ class StorageService {
     } else {
       list.add(respondent);
     }
-    await _prefs.setString(
-        _respondentsKey(surveyId), jsonEncode(list.map((r) => r.toJson()).toList()));
+    await _prefs.setString(_respondentsKey(surveyId),
+        jsonEncode(list.map((r) => r.toJson()).toList()));
   }
 
   // ── PENDING SYNC ──
@@ -96,12 +104,16 @@ class StorageService {
   Future<void> addSyncHistory(SyncHistoryItem item) async {
     final list = getSyncHistory();
     list.add(item);
-    await _prefs.setString(_kHistory, jsonEncode(list.map((h) => h.toJson()).toList()));
+    await _prefs.setString(
+        _kHistory, jsonEncode(list.map((h) => h.toJson()).toList()));
   }
 
   // ── SETTINGS ──
   bool getDarkMode() => _prefs.getBool(_kDarkMode) ?? false;
   Future<void> setDarkMode(bool v) => _prefs.setBool(_kDarkMode, v);
+
+  bool getAutoSync() => _prefs.getBool('rkcnl_auto_sync') ?? true;
+  Future<void> setAutoSync(bool v) => _prefs.setBool('rkcnl_auto_sync', v);
 
   int storageUsedBytes() {
     int total = 0;
@@ -114,7 +126,10 @@ class StorageService {
   }
 
   Future<void> clearCache() async {
-    final keys = _prefs.getKeys().where((k) => k.startsWith('rkcnl_resp')).toList();
-    for (final k in keys) await _prefs.remove(k);
+    final keys =
+        _prefs.getKeys().where((k) => k.startsWith('rkcnl_resp')).toList();
+    for (final k in keys) {
+      await _prefs.remove(k);
+    }
   }
 }

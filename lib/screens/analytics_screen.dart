@@ -8,21 +8,34 @@ import '../theme/app_theme.dart';
 class AnalyticsScreen extends StatelessWidget {
   const AnalyticsScreen({super.key});
 
+  PreferredSizeWidget _buildAppBar(BuildContext context, AppState appState) {
+    return AppBar(
+      title: const Text('Field Insights', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+      centerTitle: false,
+      actions: [
+        IconButton(icon: const Icon(Icons.filter_list), onPressed: () {}),
+        GestureDetector(
+          onTap: () => context.push('/profile'),
+          child: CircleAvatar(
+            radius: 16,
+            backgroundColor: AppColors.green,
+            child: Text(appState.userInitials, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+          ),
+        ),
+        const SizedBox(width: 16),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Field Insights', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
-        actions: [
-          IconButton(icon: const Icon(Icons.filter_list), onPressed: () {}),
-          const SizedBox(width: 8),
-        ],
-      ),
+      appBar: _buildAppBar(context, appState),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -40,7 +53,7 @@ class AnalyticsScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(context),
+      bottomNavigationBar: _buildBottomNav(context, 3),
     );
   }
 
@@ -88,11 +101,11 @@ class AnalyticsScreen extends StatelessWidget {
       decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border)),
       child: Column(
         children: [
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Responses per Survey', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-              Text('Last 30 Days', style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600)),
+              Text('Responses per Survey', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+              Text('Last 30 Days', style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 32),
@@ -164,9 +177,9 @@ class AnalyticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNav(BuildContext context) {
+  Widget _buildBottomNav(BuildContext context, int currentIndex) {
     return BottomNavigationBar(
-      currentIndex: 3,
+      currentIndex: currentIndex,
       onTap: (i) {
         if (i == 0) context.go('/dashboard');
         if (i == 1) context.go('/surveys');

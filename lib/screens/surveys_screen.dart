@@ -167,7 +167,7 @@ class _SurveysScreenState extends State<SurveysScreen> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Icon(Icons.people_outline, size: 16, color: AppColors.green),
+                      const Icon(Icons.people_outline, size: 16, color: AppColors.green),
                       const SizedBox(width: 8),
                       Text('$count response${count != 1 ? 's' : ''} collected', style: const TextStyle(color: AppColors.green, fontWeight: FontWeight.w700, fontSize: 13)),
                     ],

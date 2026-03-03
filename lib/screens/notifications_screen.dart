@@ -48,16 +48,16 @@ class NotificationsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: n.read ? AppColors.surface : color.withOpacity(0.05),
+          color: n.read ? AppColors.surface : color.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: n.read ? AppColors.border : color.withOpacity(0.2)),
+          border: Border.all(color: n.read ? AppColors.border : color.withValues(alpha: 0.2)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
               child: Icon(icon, color: color, size: 20),
             ),
             const SizedBox(width: 16),
@@ -106,7 +106,7 @@ class NotificationsScreen extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.notifications_off_outlined, size: 64, color: AppColors.textMuted.withOpacity(0.3)),
+          Icon(Icons.notifications_off_outlined, size: 64, color: AppColors.textMuted.withValues(alpha: 0.3)),
           const SizedBox(height: 16),
           const Text('No notifications yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textSub)),
           const SizedBox(height: 8),

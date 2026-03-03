@@ -32,13 +32,17 @@ class Question {
       };
 
   factory Question.fromJson(Map<String, dynamic> j) => Question(
-        id: j['id'],
-        type: QuestionType.values.byName(j['type']),
-        text: j['text'],
-        description: j['description'],
-        options: j['options'] != null ? List<String>.from(j['options']) : null,
-        maxRating: j['maxRating'],
-        placeholder: j['placeholder'],
+        id: (j['id'] as dynamic).toString(),
+        type: QuestionType.values.byName((j['type'] as String?) ?? 'text'),
+        text: (j['text'] as dynamic).toString(),
+        description:
+            j['description'] != null ? j['description'].toString() : null,
+        options: j['options'] != null
+            ? (j['options'] as List).map((e) => e.toString()).toList()
+            : null,
+        maxRating: (j['maxRating'] as int?) ?? 5,
+        placeholder:
+            j['placeholder'] != null ? j['placeholder'].toString() : null,
       );
 }
 
@@ -129,22 +133,32 @@ class Respondent {
       };
 
   factory Respondent.fromJson(Map<String, dynamic> j) => Respondent(
-        id: j['id'],
-        surveyId: j['surveyId'],
-        name: j['name'],
-        phone: j['phone'],
-        age: j['age'],
-        gender: j['gender'],
-        status: RespondentStatus.values.byName(j['status'] ?? 'pending'),
+        id: (j['id'] as dynamic).toString(),
+        surveyId: (j['surveyId'] as dynamic).toString(),
+        name: (j['name'] as dynamic).toString(),
+        phone: j['phone'] != null ? j['phone'].toString() : null,
+        age: j['age'] != null ? j['age'].toString() : null,
+        gender: j['gender'] != null ? j['gender'].toString() : null,
+        status: RespondentStatus.values
+            .byName((j['status'] as String?) ?? 'pending'),
         answers: Map<String, dynamic>.from(j['answers'] ?? {}),
-        startedAt: j['startedAt'] ?? 0,
-        completedAt: j['completedAt'],
-        synced: j['synced'] ?? false,
+        startedAt: (j['startedAt'] as int?) ?? 0,
+        completedAt: j['completedAt'] as int?,
+        synced: (j['synced'] as bool?) ?? false,
       );
 
-  Respondent copyWith({RespondentStatus? status, Map<String, dynamic>? answers, int? completedAt, bool? synced}) {
+  Respondent copyWith(
+      {RespondentStatus? status,
+      Map<String, dynamic>? answers,
+      int? completedAt,
+      bool? synced}) {
     return Respondent(
-      id: id, surveyId: surveyId, name: name, phone: phone, age: age, gender: gender,
+      id: id,
+      surveyId: surveyId,
+      name: name,
+      phone: phone,
+      age: age,
+      gender: gender,
       status: status ?? this.status,
       answers: answers ?? this.answers,
       startedAt: startedAt,
@@ -164,8 +178,13 @@ class AppNotification {
   bool read;
 
   AppNotification({
-    required this.id, required this.title, required this.message,
-    required this.time, required this.icon, required this.colorType, this.read = false,
+    required this.id,
+    required this.title,
+    required this.message,
+    required this.time,
+    required this.icon,
+    required this.colorType,
+    this.read = false,
   });
 }
 
@@ -174,6 +193,7 @@ class SyncHistoryItem {
   final int timestamp;
   SyncHistoryItem({required this.count, required this.timestamp});
   Map<String, dynamic> toJson() => {'count': count, 'timestamp': timestamp};
-  factory SyncHistoryItem.fromJson(Map<String, dynamic> j) =>
-      SyncHistoryItem(count: j['count'], timestamp: j['timestamp']);
+  factory SyncHistoryItem.fromJson(Map<String, dynamic> j) => SyncHistoryItem(
+      count: (j['count'] as int?) ?? 0,
+      timestamp: (j['timestamp'] as int?) ?? 0);
 }
