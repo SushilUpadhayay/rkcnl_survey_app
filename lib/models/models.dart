@@ -36,13 +36,13 @@ class Question {
         type: QuestionType.values.byName((j['type']?.toString() ?? 'text')),
         text: (j['text'] as dynamic).toString(),
         description:
-            j['description'] != null ? j['description'].toString() : null,
+            j['description']?.toString(),
         options: j['options'] != null
             ? (j['options'] as List).map((e) => e.toString()).toList()
             : null,
         maxRating: (j['maxRating'] as int?) ?? 5,
         placeholder:
-            j['placeholder'] != null ? j['placeholder'].toString() : null,
+            j['placeholder']?.toString(),
       );
 }
 
@@ -136,9 +136,9 @@ class Respondent {
         id: (j['id'] as dynamic).toString(),
         surveyId: (j['surveyId'] as dynamic).toString(),
         name: (j['name'] as dynamic).toString(),
-        phone: j['phone'] != null ? j['phone'].toString() : null,
-        age: j['age'] != null ? j['age'].toString() : null,
-        gender: j['gender'] != null ? j['gender'].toString() : null,
+        phone: j['phone']?.toString(),
+        age: j['age']?.toString(),
+        gender: j['gender']?.toString(),
         status: RespondentStatus.values
             .byName((j['status']?.toString() ?? 'pending')),
         answers: Map<String, dynamic>.from(j['answers'] ?? {}),
