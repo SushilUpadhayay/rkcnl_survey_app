@@ -33,7 +33,7 @@ class Question {
 
   factory Question.fromJson(Map<String, dynamic> j) => Question(
         id: (j['id'] as dynamic).toString(),
-        type: QuestionType.values.byName((j['type'] as String?) ?? 'text'),
+        type: QuestionType.values.byName((j['type']?.toString() ?? 'text')),
         text: (j['text'] as dynamic).toString(),
         description:
             j['description'] != null ? j['description'].toString() : null,
@@ -140,7 +140,7 @@ class Respondent {
         age: j['age'] != null ? j['age'].toString() : null,
         gender: j['gender'] != null ? j['gender'].toString() : null,
         status: RespondentStatus.values
-            .byName((j['status'] as String?) ?? 'pending'),
+            .byName((j['status']?.toString() ?? 'pending')),
         answers: Map<String, dynamic>.from(j['answers'] ?? {}),
         startedAt: (j['startedAt'] as int?) ?? 0,
         completedAt: j['completedAt'] as int?,
