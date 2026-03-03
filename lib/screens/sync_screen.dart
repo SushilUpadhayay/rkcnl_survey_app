@@ -40,14 +40,7 @@ class _SyncScreenState extends State<SyncScreen> {
     final history = appState.syncHistory;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Data Synchronization',
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
-        actions: [
-          IconButton(icon: const Icon(Icons.help_outline), onPressed: () {}),
-          const SizedBox(width: 8),
-        ],
-      ),
+      appBar: _buildAppBar(context, appState),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -64,6 +57,37 @@ class _SyncScreenState extends State<SyncScreen> {
         ),
       ),
       bottomNavigationBar: _buildBottomNav(context),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context, AppState appState) {
+    return AppBar(
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 16),
+        child: Image.asset(
+          'assets/images/Krishi_Logo-Tr.png',
+          width: 28,
+          height: 28,
+        ),
+      ),
+      title: const Text('Data Synchronization',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+      actions: [
+        const SizedBox(width: 4),
+        GestureDetector(
+          onTap: () => context.push('/profile'),
+          child: CircleAvatar(
+            radius: 18,
+            backgroundColor: AppColors.green,
+            child: Text(appState.userInitials,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold)),
+          ),
+        ),
+        const SizedBox(width: 16),
+      ],
     );
   }
 

@@ -10,16 +10,25 @@ class AnalyticsScreen extends StatelessWidget {
 
   PreferredSizeWidget _buildAppBar(BuildContext context, AppState appState) {
     return AppBar(
-      title: const Text('Field Insights', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+      title: const Text(
+        'Field Insights',
+        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+      ),
       centerTitle: false,
       actions: [
-        IconButton(icon: const Icon(Icons.filter_list), onPressed: () {}),
         GestureDetector(
           onTap: () => context.push('/profile'),
           child: CircleAvatar(
             radius: 16,
             backgroundColor: AppColors.green,
-            child: Text(appState.userInitials, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+            child: Text(
+              appState.userInitials,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
         const SizedBox(width: 16),
@@ -30,7 +39,7 @@ class AnalyticsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
-    
+
     return Scaffold(
       appBar: _buildAppBar(context, appState),
       body: SafeArea(
@@ -41,11 +50,13 @@ class AnalyticsScreen extends StatelessWidget {
             children: [
               _buildOverviewCards(appState),
               const SizedBox(height: 32),
-              const Text('Collection Progress', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              const Text('Collection Progress',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
               const SizedBox(height: 16),
               _buildChartSection(appState),
               const SizedBox(height: 32),
-              const Text('Survey Breakdown', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              const Text('Survey Breakdown',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
               const SizedBox(height: 16),
               ...appState.surveys.map((s) => _buildSurveyProgress(s, appState)),
               const SizedBox(height: 80),
@@ -62,34 +73,61 @@ class AnalyticsScreen extends StatelessWidget {
       children: [
         Row(
           children: [
-            Expanded(child: _buildSmallInfoCard('Total Responses', '${appState.totalResponses}', Icons.groups_outlined, AppColors.blue)),
+            Expanded(
+                child: _buildSmallInfoCard(
+                    'Total Responses',
+                    '${appState.totalResponses}',
+                    Icons.groups_outlined,
+                    AppColors.blue)),
             const SizedBox(width: 16),
-            Expanded(child: _buildSmallInfoCard('Completed', '${appState.completedResponses}', Icons.check_circle_outlined, AppColors.green)),
+            Expanded(
+                child: _buildSmallInfoCard(
+                    'Completed',
+                    '${appState.completedResponses}',
+                    Icons.check_circle_outlined,
+                    AppColors.green)),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: _buildSmallInfoCard('Synced', '${appState.syncedCount}', Icons.cloud_done_outlined, AppColors.green)),
+            Expanded(
+                child: _buildSmallInfoCard('Synced', '${appState.syncedCount}',
+                    Icons.cloud_done_outlined, AppColors.green)),
             const SizedBox(width: 16),
-            Expanded(child: _buildSmallInfoCard('Pending Sync', '${appState.pendingCount}', Icons.cloud_upload_outlined, AppColors.orange)),
+            Expanded(
+                child: _buildSmallInfoCard(
+                    'Pending Sync',
+                    '${appState.pendingCount}',
+                    Icons.cloud_upload_outlined,
+                    AppColors.orange)),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildSmallInfoCard(String label, String val, IconData icon, Color color) {
+  Widget _buildSmallInfoCard(
+      String label, String val, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border)),
+      decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: color, size: 24),
           const SizedBox(height: 16),
-          Text(val, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
-          Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSub, fontWeight: FontWeight.w600)),
+          Text(val,
+              style:
+                  const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+          Text(label,
+              style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSub,
+                  fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -98,14 +136,22 @@ class AnalyticsScreen extends StatelessWidget {
   Widget _buildChartSection(AppState appState) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border)),
+      decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border)),
       child: Column(
         children: [
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Responses per Survey', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-              Text('Last 30 Days', style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600)),
+              Text('Responses per Survey',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+              Text('Last 30 Days',
+                  style: TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 32),
@@ -120,7 +166,8 @@ class AnalyticsScreen extends StatelessWidget {
                   final c = appState.getRespondents(sv.id).length;
                   return c > m ? c : m;
                 });
-                return _buildBar(s.id.split('-').last, count, max, Color(s.colorValue));
+                return _buildBar(
+                    s.id.split('-').last, count, max, Color(s.colorValue));
               }).toList(),
             ),
           ),
@@ -134,22 +181,31 @@ class AnalyticsScreen extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Text('$val', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+        Text('$val',
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
         Container(
           width: 24,
           height: height,
-          decoration: BoxDecoration(color: color, borderRadius: const BorderRadius.vertical(top: Radius.circular(4))),
+          decoration: BoxDecoration(
+              color: color,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(4))),
         ),
         const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.textSub)),
+        Text(label,
+            style: const TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textSub)),
       ],
     );
   }
 
   Widget _buildSurveyProgress(Survey s, AppState appState) {
     final respondents = appState.getRespondents(s.id);
-    final completed = respondents.where((r) => r.status == RespondentStatus.completed).length;
+    final completed =
+        respondents.where((r) => r.status == RespondentStatus.completed).length;
     final total = respondents.isEmpty ? 1 : respondents.length;
     final progress = completed / total;
 
@@ -161,17 +217,33 @@ class AnalyticsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: Text(s.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14))),
-              Text('${(progress * 100).toInt()}%', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.green)),
+              Expanded(
+                  child: Text(s.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w700, fontSize: 14))),
+              Text('${(progress * 100).toInt()}%',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: AppColors.green)),
             ],
           ),
           const SizedBox(height: 8),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(value: progress, minHeight: 8, backgroundColor: AppColors.border),
+            child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 8,
+                backgroundColor: AppColors.border),
           ),
           const SizedBox(height: 6),
-          Text('$completed completed of ${respondents.length} total', style: const TextStyle(fontSize: 11, color: AppColors.textSub, fontWeight: FontWeight.w600)),
+          Text('$completed completed of ${respondents.length} total',
+              style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textSub,
+                  fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -187,10 +259,22 @@ class AnalyticsScreen extends StatelessWidget {
         if (i == 3) context.go('/analytics');
       },
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), activeIcon: Icon(Icons.assignment), label: 'Surveys'),
-        BottomNavigationBarItem(icon: Icon(Icons.sync), activeIcon: Icon(Icons.sync), label: 'Sync'),
-        BottomNavigationBarItem(icon: Icon(Icons.insights), activeIcon: Icon(Icons.insights), label: 'Analytics'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Home'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.assignment_outlined),
+            activeIcon: Icon(Icons.assignment),
+            label: 'Surveys'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.sync),
+            activeIcon: Icon(Icons.sync),
+            label: 'Sync'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.insights),
+            activeIcon: Icon(Icons.insights),
+            label: 'Analytics'),
       ],
     );
   }
