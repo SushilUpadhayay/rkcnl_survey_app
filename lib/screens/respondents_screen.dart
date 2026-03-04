@@ -12,15 +12,20 @@ class RespondentsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+    final tc = context.appColors;
     final survey = appState.surveys.firstWhere((s) => s.id == surveyId);
     final list = appState.getRespondents(surveyId);
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        title: Text(survey.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        title: Text(survey.title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
         actions: [
-          IconButton(icon: const Icon(Icons.person_add_outlined), onPressed: () => _showAddModal(context, appState)),
+          IconButton(
+              icon: const Icon(Icons.person_add_outlined),
+              onPressed: () => _showAddModal(context, appState, tc)),
           const SizedBox(width: 8),
         ],
       ),
@@ -28,80 +33,116 @@ class RespondentsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSurveyHeader(survey),
+            _buildSurveyHeader(survey, tc),
             Expanded(
-              child: list.isEmpty 
-                ? _buildEmptyState() 
-                : ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    itemCount: list.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) => _buildRespondentTile(context, list[index]),
-                  ),
+              child: list.isEmpty
+                  ? _buildEmptyState(tc)
+                  : ListView.separated(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 8),
+                      itemCount: list.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) =>
+                          _buildRespondentTile(context, list[index], tc),
+                    ),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddModal(context, appState),
-        backgroundColor: AppColors.green,
-        foregroundColor: Colors.white,
+        onPressed: () => _showAddModal(context, appState, tc),
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _buildSurveyHeader(Survey s) {
+  Widget _buildSurveyHeader(Survey s, AppThemeColors tc) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      color: AppColors.greenMid.withValues(alpha: 0.1),
+      color: tc.isDark
+          ? AppColors.green.withValues(alpha: 0.1)
+          : AppColors.greenMid.withValues(alpha: 0.1),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${s.id}: ${s.title}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppColors.textPrimary)),
+          Text('${s.id}: ${s.title}',
+              style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 15,
+                  color: tc.textPrimary)),
           const SizedBox(height: 4),
-          Text('${s.region} • Due ${s.dueDate}', style: const TextStyle(color: AppColors.textSub, fontSize: 13)),
+          Text('${s.region} • Due ${s.dueDate}',
+              style: TextStyle(color: tc.textSub, fontSize: 13)),
         ],
       ),
     );
   }
 
-  Widget _buildRespondentTile(BuildContext context, Respondent r) {
-    final initials = r.name.length >= 2 ? r.name.substring(0, 2).toUpperCase() : r.name.toUpperCase();
-    final statusColor = r.status == RespondentStatus.completed ? AppColors.green : r.status == RespondentStatus.draft ? AppColors.blue : AppColors.orange;
-    final statusLabel = r.status == RespondentStatus.completed ? 'Done' : r.status == RespondentStatus.draft ? 'Draft' : 'Pending';
+  Widget _buildRespondentTile(
+      BuildContext context, Respondent r, AppThemeColors tc) {
+    final initials = r.name.length >= 2
+        ? r.name.substring(0, 2).toUpperCase()
+        : r.name.toUpperCase();
+    final statusColor = r.status == RespondentStatus.completed
+        ? AppColors.green
+        : r.status == RespondentStatus.draft
+            ? AppColors.blue
+            : AppColors.orange;
+    final statusLabel = r.status == RespondentStatus.completed
+        ? 'Done'
+        : r.status == RespondentStatus.draft
+            ? 'Draft'
+            : 'Pending';
 
     return InkWell(
-      onTap: r.status == RespondentStatus.completed ? null : () => context.push('/form/$surveyId/${r.id}'),
+      onTap: r.status == RespondentStatus.completed
+          ? null
+          : () => context.push('/form/$surveyId/${r.id}'),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: tc.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: tc.border),
         ),
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: AppColors.greenLight,
-              child: Text(initials, style: const TextStyle(color: AppColors.green, fontWeight: FontWeight.bold, fontSize: 13)),
+              backgroundColor: tc.greenLight,
+              child: Text(initials,
+                  style: const TextStyle(
+                      color: AppColors.green,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13)),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(r.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.textPrimary)),
-                  Text('${r.phone ?? 'No phone'} • ${r.age != null ? 'Age ${r.age}' : 'Age N/A'}', style: const TextStyle(color: AppColors.textSub, fontSize: 12)),
+                  Text(r.name,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                          color: tc.textPrimary)),
+                  Text(
+                      '${r.phone ?? 'No phone'} • ${r.age != null ? 'Age ${r.age}' : 'Age N/A'}',
+                      style: TextStyle(color: tc.textSub, fontSize: 12)),
                 ],
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
-              child: Text(statusLabel, style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold)),
+              decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4)),
+              child: Text(statusLabel,
+                  style: TextStyle(
+                      color: statusColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -109,22 +150,30 @@ class RespondentsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(AppThemeColors tc) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.people_outline, size: 64, color: AppColors.textMuted.withValues(alpha: 0.3)),
+          Icon(Icons.people_outline,
+              size: 64, color: tc.textMuted.withValues(alpha: 0.3)),
           const SizedBox(height: 16),
-          const Text('No respondents yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textSub)),
+          Text('No respondents yet',
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: tc.textSub)),
           const SizedBox(height: 8),
-          const Text('Tap the + button to add your first respondent', textAlign: TextAlign.center, style: TextStyle(color: AppColors.textMuted)),
+          Text('Tap the + button to add your first respondent',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: tc.textMuted)),
         ],
       ),
     );
   }
 
-  void _showAddModal(BuildContext context, AppState appState) {
+  void _showAddModal(
+      BuildContext context, AppState appState, AppThemeColors tc) {
     final nameCtrl = TextEditingController();
     final phoneCtrl = TextEditingController();
     final ageCtrl = TextEditingController();
@@ -135,36 +184,65 @@ class RespondentsScreen extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: Container(
-          decoration: const BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          decoration: BoxDecoration(
+              color: tc.surface,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24))),
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(2)))),
+                Center(
+                    child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                            color: tc.border,
+                            borderRadius: BorderRadius.circular(2)))),
                 const SizedBox(height: 24),
-                const Text('Add Respondent', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                Text('Add Respondent',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: tc.textPrimary)),
                 const SizedBox(height: 24),
-                _buildField('Full Name *', Icons.person_outline, nameCtrl, 'Respondent\'s full name'),
-                _buildField('Phone Number', Icons.phone_outlined, phoneCtrl, '+977 98XXXXXXXX', type: TextInputType.phone),
+                _buildField('Full Name *', Icons.person_outline, nameCtrl,
+                    'Respondent\'s full name', tc),
+                _buildField('Phone Number', Icons.phone_outlined, phoneCtrl,
+                    '+977 98XXXXXXXX', tc),
                 Row(
                   children: [
-                    Expanded(child: _buildField('Age', Icons.cake_outlined, ageCtrl, 'Age', type: TextInputType.number)),
+                    Expanded(
+                        child: _buildField(
+                            'Age', Icons.cake_outlined, ageCtrl, 'Age', tc,
+                            type: TextInputType.number)),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Gender', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary)),
+                          Text('Gender',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                  color: tc.textPrimary)),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            items: ['Male', 'Female', 'Other'].map((g) => DropdownMenuItem(value: g, child: Text(g))).toList(),
+                            items: ['Male', 'Female', 'Other']
+                                .map((g) =>
+                                    DropdownMenuItem(value: g, child: Text(g)))
+                                .toList(),
                             onChanged: (v) => gender = v,
-                            decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12)),
+                            decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 12)),
                             hint: const Text('Select'),
+                            dropdownColor: tc.surface,
                           ),
                         ],
                       ),
@@ -176,7 +254,11 @@ class RespondentsScreen extends StatelessWidget {
                   onPressed: () async {
                     if (nameCtrl.text.isEmpty) return;
                     final r = await appState.addRespondent(
-                      surveyId, name: nameCtrl.text.trim(), phone: phoneCtrl.text.trim(), age: ageCtrl.text, gender: gender,
+                      surveyId,
+                      name: nameCtrl.text.trim(),
+                      phone: phoneCtrl.text.trim(),
+                      age: ageCtrl.text,
+                      gender: gender,
                     );
                     if (context.mounted) {
                       Navigator.pop(context);
@@ -193,18 +275,25 @@ class RespondentsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildField(String label, IconData icon, TextEditingController ctrl, String hint, {TextInputType type = TextInputType.text}) {
+  Widget _buildField(String label, IconData icon, TextEditingController ctrl,
+      String hint, AppThemeColors tc,
+      {TextInputType type = TextInputType.text}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary)),
+          Text(label,
+              style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  color: tc.textPrimary)),
           const SizedBox(height: 8),
           TextField(
             controller: ctrl,
             keyboardType: type,
-            decoration: InputDecoration(prefixIcon: Icon(icon, size: 20), hintText: hint),
+            decoration: InputDecoration(
+                prefixIcon: Icon(icon, size: 20), hintText: hint),
           ),
         ],
       ),

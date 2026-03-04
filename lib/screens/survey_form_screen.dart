@@ -65,12 +65,13 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
         .submitRespondent(widget.surveyId, _respondent, _answers);
 
     if (mounted) {
-      Navigator.pop(context); // Close loader
+      Navigator.pop(context);
       _showSuccessDialog();
     }
   }
 
   void _showSuccessDialog() {
+    final tc = context.appColors;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -82,12 +83,15 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
             const SizedBox(height: 16),
             const Icon(Icons.check_circle, color: AppColors.green, size: 72),
             const SizedBox(height: 24),
-            const Text('Response Saved!',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+            Text('Response Saved!',
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: tc.textPrimary)),
             const SizedBox(height: 12),
             Text('Submission for ${_respondent.name} was successful.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.textSub)),
+                style: TextStyle(color: tc.textSub)),
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () {
@@ -108,6 +112,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    final tc = context.appColors;
     final isReview = _currentStep == _survey.questions.length;
 
     return Scaffold(
@@ -116,14 +121,16 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
             icon: const Icon(Icons.close), onPressed: () => _confirmExit()),
         title: Column(
           children: [
-            const Text('Survey Collection',
+            Text('Survey Collection',
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSub)),
+                    color: tc.textSub)),
             Text(_survey.id,
-                style:
-                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: tc.textPrimary)),
           ],
         ),
         centerTitle: true,
@@ -141,44 +148,44 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildProgressIndicator(),
+            _buildProgressIndicator(tc),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
                 child: isReview
-                    ? _buildReviewScreen()
-                    : _buildQuestionScreen(_survey.questions[_currentStep]),
+                    ? _buildReviewScreen(tc)
+                    : _buildQuestionScreen(_survey.questions[_currentStep], tc),
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: _buildFooter(isReview),
+      bottomNavigationBar: _buildFooter(isReview, tc),
     );
   }
 
-  Widget _buildProgressIndicator() {
+  Widget _buildProgressIndicator(AppThemeColors tc) {
     final progress = (_currentStep + 1) / (_survey.questions.length + 1);
     return Column(
       children: [
         LinearProgressIndicator(
-            value: progress, minHeight: 4, backgroundColor: AppColors.border),
+            value: progress, minHeight: 4, backgroundColor: tc.border),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Respondent: ${_respondent.name}',
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textSub)),
+                      color: tc.textSub)),
               Text(
                   'Step ${_currentStep + 1} of ${_survey.questions.length + 1}',
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textSub)),
+                      color: tc.textSub)),
             ],
           ),
         ),
@@ -186,15 +193,14 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
     );
   }
 
-  Widget _buildQuestionScreen(Question q) {
+  Widget _buildQuestionScreen(Question q, AppThemeColors tc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-              color: AppColors.greenLight,
-              borderRadius: BorderRadius.circular(4)),
+              color: tc.greenLight, borderRadius: BorderRadius.circular(4)),
           child: Text('Question ${_currentStep + 1}',
               style: const TextStyle(
                   color: AppColors.green,
@@ -203,22 +209,22 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
         ),
         const SizedBox(height: 16),
         Text(q.text,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary)),
+                color: tc.textPrimary)),
         if (q.description != null) ...[
           const SizedBox(height: 8),
           Text(q.description!,
-              style: const TextStyle(fontSize: 14, color: AppColors.textSub)),
+              style: TextStyle(fontSize: 14, color: tc.textSub)),
         ],
         const SizedBox(height: 32),
-        _buildInput(q),
+        _buildInput(q, tc),
       ],
     );
   }
 
-  Widget _buildInput(Question q) {
+  Widget _buildInput(Question q, AppThemeColors tc) {
     switch (q.type) {
       case QuestionType.radio:
         return Column(
@@ -226,12 +232,13 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
             final selected = _answers[q.id] == opt;
             return ListTile(
               title: Text(opt,
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600, color: tc.textPrimary)),
               leading: Icon(
                 selected
                     ? Icons.radio_button_checked
                     : Icons.radio_button_unchecked,
-                color: selected ? AppColors.green : AppColors.border,
+                color: selected ? AppColors.green : tc.border,
               ),
               onTap: () => setState(() => _answers[q.id] = opt),
               contentPadding: EdgeInsets.zero,
@@ -244,7 +251,9 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
           children: q.options!
               .map((opt) => CheckboxListTile(
                     title: Text(opt,
-                        style: const TextStyle(fontWeight: FontWeight.w600)),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: tc.textPrimary)),
                     value: current.contains(opt),
                     onChanged: (v) {
                       setState(() {
@@ -279,23 +288,25 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
             return GestureDetector(
               onTap: () => setState(() => _answers[q.id] = val),
               child: Icon(isActive ? Icons.star : Icons.star_border,
-                  color: isActive ? AppColors.orange : AppColors.border,
-                  size: 36),
+                  color: isActive ? AppColors.orange : tc.border, size: 36),
             );
           }),
         );
     }
   }
 
-  Widget _buildReviewScreen() {
+  Widget _buildReviewScreen(AppThemeColors tc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Review Submission',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+        Text('Review Submission',
+            style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: tc.textPrimary)),
         const SizedBox(height: 8),
-        const Text('Please verify all details before submitting.',
-            style: TextStyle(color: AppColors.textSub)),
+        Text('Please verify all details before submitting.',
+            style: TextStyle(color: tc.textSub)),
         const SizedBox(height: 32),
         ..._survey.questions.map((q) => Padding(
               padding: const EdgeInsets.only(bottom: 24),
@@ -303,8 +314,10 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(q.text,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 14)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: tc.textPrimary)),
                   const SizedBox(height: 8),
                   Text(_formatAnswer(q, _answers[q.id]),
                       style: TextStyle(
@@ -312,7 +325,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                               ? AppColors.green
                               : AppColors.red,
                           fontWeight: FontWeight.w600)),
-                  const Divider(height: 32),
+                  Divider(height: 32, color: tc.border),
                 ],
               ),
             )),
@@ -326,12 +339,11 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
     return ans.toString();
   }
 
-  Widget _buildFooter(bool isReview) {
+  Widget _buildFooter(bool isReview, AppThemeColors tc) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-      decoration: const BoxDecoration(
-          color: AppColors.surface,
-          border: Border(top: BorderSide(color: AppColors.border))),
+      decoration: BoxDecoration(
+          color: tc.surface, border: Border(top: BorderSide(color: tc.border))),
       child: Row(
         children: [
           if (_currentStep > 0) ...[
@@ -368,8 +380,8 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
               onPressed: () {
                 context.read<AppState>().saveRespondentDraft(
                     widget.surveyId, _respondent, _answers);
-                Navigator.pop(context); // Close dialog
-                context.pop(); // Go back
+                Navigator.pop(context);
+                context.pop();
               },
               child: const Text('Save & Exit')),
         ],

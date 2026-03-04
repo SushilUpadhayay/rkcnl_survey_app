@@ -13,23 +13,27 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreenState extends State<OtpScreen> {
   final _phoneController = TextEditingController();
-  final List<TextEditingController> _otpControllers = List.generate(4, (_) => TextEditingController());
+  final List<TextEditingController> _otpControllers =
+      List.generate(4, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
   bool _otpSent = false;
 
   void _sendOtp() {
     if (_phoneController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter your phone number')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter your phone number')));
       return;
     }
     setState(() => _otpSent = true);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('OTP sent to ${_phoneController.text}')));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('OTP sent to ${_phoneController.text}')));
   }
 
   void _verifyOtp() async {
     String code = _otpControllers.map((c) => c.text).join();
     if (code.length < 4) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter the 4-digit OTP')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter the 4-digit OTP')));
       return;
     }
 
@@ -51,13 +55,15 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tc = context.appColors;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Login with OTP', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+        title: const Text('Login with OTP',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -68,27 +74,34 @@ class _OtpScreenState extends State<OtpScreen> {
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(24),
-                decoration: const BoxDecoration(
-                  color: AppColors.greenLight,
+                decoration: BoxDecoration(
+                  color: tc.greenLight,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.sms, color: AppColors.green, size: 48),
               ),
               const SizedBox(height: 32),
-              const Text(
+              Text(
                 'Enter your phone number',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: tc.textPrimary),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 "We'll send a one-time password to verify your identity.",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, color: AppColors.textSub),
+                style: TextStyle(fontSize: 15, color: tc.textSub),
               ),
               const SizedBox(height: 48),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Phone Number', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                child: Text('Phone Number',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: tc.textPrimary)),
               ),
               const SizedBox(height: 8),
               TextField(
@@ -106,14 +119,19 @@ class _OtpScreenState extends State<OtpScreen> {
               ),
               if (_otpSent) ...[
                 const SizedBox(height: 48),
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Enter OTP', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                  child: Text('Enter OTP',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: tc.textPrimary)),
                 ),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(4, (index) => _buildOtpBox(index)),
+                  children:
+                      List.generate(4, (index) => _buildOtpBox(index, tc)),
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton(
@@ -128,7 +146,7 @@ class _OtpScreenState extends State<OtpScreen> {
     );
   }
 
-  Widget _buildOtpBox(int index) {
+  Widget _buildOtpBox(int index, AppThemeColors tc) {
     return SizedBox(
       width: 64,
       height: 64,
@@ -138,13 +156,14 @@ class _OtpScreenState extends State<OtpScreen> {
         textAlign: TextAlign.center,
         keyboardType: TextInputType.number,
         maxLength: 1,
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+        style: TextStyle(
+            fontSize: 24, fontWeight: FontWeight.w800, color: tc.textPrimary),
         decoration: InputDecoration(
           counterText: "",
-          fillColor: AppColors.surface,
+          fillColor: tc.surface,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.border, width: 2),
+            borderSide: BorderSide(color: tc.border, width: 2),
           ),
         ),
         onChanged: (value) {
