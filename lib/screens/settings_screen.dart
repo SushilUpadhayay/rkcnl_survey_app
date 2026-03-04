@@ -9,6 +9,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+    final tc = context.appColors;
 
     return Scaffold(
       appBar: AppBar(
@@ -26,6 +27,7 @@ class SettingsScreen extends StatelessWidget {
                 'Dark Mode',
                 'Adjust application theme',
                 Icons.dark_mode_outlined,
+                tc,
                 Switch(
                     value: appState.darkMode,
                     activeThumbColor: AppColors.green,
@@ -37,20 +39,21 @@ class SettingsScreen extends StatelessWidget {
                 'Auto-Sync',
                 'Sync data when online',
                 Icons.sync,
+                tc,
                 Switch(
                     value: appState.autoSync,
                     activeThumbColor: AppColors.green,
                     onChanged: (v) => appState.setAutoSync(v)),
               ),
-              const Divider(),
+              Divider(color: tc.border),
               _buildSettingTile(
                 'Language',
                 'Nepali / English (Coming soon)',
                 Icons.language,
-                const Text('English',
+                tc,
+                Text('English',
                     style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontWeight: FontWeight.bold)),
+                        color: tc.textMuted, fontWeight: FontWeight.bold)),
                 onTap: () {},
               ),
               const SizedBox(height: 32),
@@ -59,15 +62,16 @@ class SettingsScreen extends StatelessWidget {
                 'Clear local cache',
                 'Deletes non-pending responses',
                 Icons.delete_outline,
-                const Icon(Icons.chevron_right, color: AppColors.textMuted),
-                onTap: () => _confirmClearCache(context, appState),
+                tc,
+                Icon(Icons.chevron_right, color: tc.textMuted),
+                onTap: () => _confirmClearCache(context, appState, tc),
               ),
               Container(
                 margin: const EdgeInsets.only(top: 8, left: 52),
                 child: Text(
                   'Storage used: ${((appState.storage.storageUsedBytes()) / 1024).toStringAsFixed(2)} KB',
-                  style: const TextStyle(
-                      color: AppColors.textMuted,
+                  style: TextStyle(
+                      color: tc.textMuted,
                       fontSize: 12,
                       fontWeight: FontWeight.w600),
                 ),
@@ -78,16 +82,17 @@ class SettingsScreen extends StatelessWidget {
                   'App Version',
                   'Build #2026.03.02',
                   Icons.info_outline,
-                  const Text('1.0.0',
+                  tc,
+                  Text('1.0.0',
                       style: TextStyle(
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.bold))),
-              const Divider(),
+                          color: tc.textMuted, fontWeight: FontWeight.bold))),
+              Divider(color: tc.border),
               _buildSettingTile(
                   'Privacy Policy',
                   'Read our data terms',
                   Icons.policy_outlined,
-                  const Icon(Icons.chevron_right, size: 20),
+                  tc,
+                  Icon(Icons.chevron_right, size: 20, color: tc.textMuted),
                   onTap: () {}),
             ],
           ),
@@ -108,8 +113,8 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingTile(
-      String title, String sub, IconData icon, Widget trailing,
+  Widget _buildSettingTile(String title, String sub, IconData icon,
+      AppThemeColors tc, Widget trailing,
       {VoidCallback? onTap}) {
     return ListTile(
       onTap: onTap,
@@ -117,17 +122,20 @@ class SettingsScreen extends StatelessWidget {
       leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-              color: AppColors.bg, borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, color: AppColors.textPrimary)),
+              color: tc.surfaceVariant, borderRadius: BorderRadius.circular(8)),
+          child: Icon(icon, color: tc.textPrimary)),
       title: Text(title,
-          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
-      subtitle: Text(sub,
-          style: const TextStyle(color: AppColors.textSub, fontSize: 13)),
+          style: TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 15,
+              color: tc.textPrimary)),
+      subtitle: Text(sub, style: TextStyle(color: tc.textSub, fontSize: 13)),
       trailing: trailing,
     );
   }
 
-  void _confirmClearCache(BuildContext context, AppState appState) {
+  void _confirmClearCache(
+      BuildContext context, AppState appState, AppThemeColors tc) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

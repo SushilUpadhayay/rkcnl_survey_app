@@ -24,19 +24,19 @@ class DashboardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildWelcomeBanner(appState),
-                if (!appState.isOnline) _buildOfflineBanner(),
+                if (!appState.isOnline) _buildOfflineBanner(context),
                 const SizedBox(height: 24),
-                _buildSectionHeader(Icons.bar_chart, 'Survey Statistics'),
+                _buildSectionHeader(context, Icons.bar_chart, 'Survey Statistics'),
                 const SizedBox(height: 12),
-                _buildStatsGrid(appState),
+                _buildStatsGrid(context, appState),
                 const SizedBox(height: 32),
-                _buildSectionHeader(Icons.bolt, 'Quick Actions'),
+                _buildSectionHeader(context, Icons.bolt, 'Quick Actions'),
                 const SizedBox(height: 12),
                 _buildQuickActions(context),
                 const SizedBox(height: 32),
-                _buildSectionHeader(Icons.history, 'Recent Activity'),
+                _buildSectionHeader(context, Icons.history, 'Recent Activity'),
                 const SizedBox(height: 12),
-                _buildRecentActivity(appState),
+                _buildRecentActivity(context, appState),
                 const SizedBox(height: 80),
               ],
             ),
@@ -126,7 +126,6 @@ class DashboardScreen extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // TEXT CONTENT
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -171,7 +170,6 @@ class DashboardScreen extends StatelessWidget {
               ),
             ],
           ),
-
           const Positioned(
             right: 0,
             top: 0,
@@ -190,7 +188,8 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOfflineBanner() {
+  Widget _buildOfflineBanner(BuildContext context) {
+    final tc = context.appColors;
     return Container(
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
@@ -198,14 +197,14 @@ class DashboardScreen extends StatelessWidget {
           color: AppColors.orange.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: AppColors.orange.withValues(alpha: 0.3))),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.wifi_off, color: AppColors.orange, size: 18),
-          SizedBox(width: 12),
+          const Icon(Icons.wifi_off, color: AppColors.orange, size: 18),
+          const SizedBox(width: 12),
           Expanded(
             child: Text('Offline Mode – Data saved locally',
                 style: TextStyle(
-                    color: AppColors.orange,
+                    color: tc.isDark ? AppColors.orange : AppColors.orange,
                     fontWeight: FontWeight.w600,
                     fontSize: 13)),
           ),
@@ -214,21 +213,22 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(IconData icon, String title) {
+  Widget _buildSectionHeader(BuildContext context, IconData icon, String title) {
+    final tc = context.appColors;
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.textPrimary),
+        Icon(icon, size: 18, color: tc.textPrimary),
         const SizedBox(width: 8),
         Text(title,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary)),
+                color: tc.textPrimary)),
       ],
     );
   }
 
-  Widget _buildStatsGrid(AppState appState) {
+  Widget _buildStatsGrid(BuildContext context, AppState appState) {
     return GridView.count(
       crossAxisCount: 3,
       shrinkWrap: true,
@@ -238,13 +238,15 @@ class DashboardScreen extends StatelessWidget {
       childAspectRatio: 0.85,
       children: [
         _buildStatCard(
+            context,
             'Assigned',
             '${appState.surveys.where((s) => s.status != SurveyStatus.synced).length}',
             'Active',
             AppColors.green),
         _buildStatCard(
-            'Finished', '${appState.todayCompleted}', '+2%', AppColors.blue),
+            context, 'Finished', '${appState.todayCompleted}', '+2%', AppColors.blue),
         _buildStatCard(
+            context,
             'Pending',
             '${appState.pendingCount}',
             appState.pendingCount > 0 ? 'Upload' : 'Clear',
@@ -253,7 +255,8 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String label, String value, String badge, Color color) {
+  Widget _buildStatCard(BuildContext context, String label, String value, String badge, Color color) {
+    final tc = context.appColors;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -261,16 +264,16 @@ class DashboardScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(label,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textSub,
+                    color: tc.textSub,
                     fontWeight: FontWeight.w600)),
             const SizedBox(height: 4),
             Text(value,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary)),
+                    color: tc.textPrimary)),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -304,22 +307,23 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildActionTile(BuildContext context, IconData icon, String title,
       String sub, Color color, String route) {
+    final tc = context.appColors;
     return InkWell(
       onTap: () => context.push(route),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: tc.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: tc.border),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
+                  color: color.withValues(alpha: tc.isDark ? 0.2 : 0.1),
                   borderRadius: BorderRadius.circular(8)),
               child: Icon(icon, color: color, size: 24),
             ),
@@ -329,25 +333,26 @@ class DashboardScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 15,
-                          color: AppColors.textPrimary)),
+                          color: tc.textPrimary)),
                   const SizedBox(height: 2),
                   Text(sub,
-                      style: const TextStyle(
-                          color: AppColors.textSub, fontSize: 13)),
+                      style: TextStyle(
+                          color: tc.textSub, fontSize: 13)),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.textMuted),
+            Icon(Icons.chevron_right, color: tc.textMuted),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRecentActivity(AppState appState) {
+  Widget _buildRecentActivity(BuildContext context, AppState appState) {
+    final tc = context.appColors;
     final List<Map<String, dynamic>> allActivity = [];
     for (final s in appState.surveys) {
       final resps = appState.getRespondents(s.id);
@@ -364,21 +369,22 @@ class DashboardScreen extends StatelessWidget {
     final display = allActivity.take(5).toList();
 
     if (display.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 32),
+          padding: const EdgeInsets.symmetric(vertical: 32),
           child: Text('No recent activity yet.',
-              style: TextStyle(color: AppColors.textMuted)),
+              style: TextStyle(color: tc.textMuted)),
         ),
       );
     }
 
     return Column(
-      children: display.map((a) => _buildActivityItem(a)).toList(),
+      children: display.map((a) => _buildActivityItem(context, a)).toList(),
     );
   }
 
-  Widget _buildActivityItem(Map<String, dynamic> item) {
+  Widget _buildActivityItem(BuildContext context, Map<String, dynamic> item) {
+    final tc = context.appColors;
     final status = item['status'] as RespondentStatus;
     final color = status == RespondentStatus.completed
         ? AppColors.green
@@ -401,16 +407,16 @@ class DashboardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(item['name'],
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 14)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 14, color: tc.textPrimary)),
                 Text(item['survey'],
-                    style: const TextStyle(
-                        color: AppColors.textSub, fontSize: 12)),
+                    style: TextStyle(
+                        color: tc.textSub, fontSize: 12)),
               ],
             ),
           ),
           Text(timeStr,
-              style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+              style: TextStyle(color: tc.textMuted, fontSize: 12)),
         ],
       ),
     );
