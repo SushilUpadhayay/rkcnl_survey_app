@@ -28,7 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _errorMessage = null);
 
-    // Simulate login
     await context.read<AppState>().login(user);
     if (mounted) context.go('/dashboard');
   }
@@ -117,29 +116,30 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLoginForm() {
+    final tc = context.appColors;
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Welcome Back',
             style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary),
+                color: tc.textPrimary),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Log in to start your field survey',
-            style: TextStyle(fontSize: 16, color: AppColors.textSub),
+            style: TextStyle(fontSize: 16, color: tc.textSub),
           ),
           if (_errorMessage != null) ...[
             const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.redLight,
+                color: tc.redLight,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: AppColors.red.withValues(alpha: 0.3)),
               ),
@@ -156,8 +156,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ],
           const SizedBox(height: 32),
-          const Text('Phone number or Username',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+          Text('Phone number or Username',
+              style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  color: tc.textPrimary)),
           const SizedBox(height: 8),
           TextField(
             controller: _userController,
@@ -170,10 +173,13 @@ class _LoginScreenState extends State<LoginScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Password',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+              Text('Password',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: tc.textPrimary)),
               TextButton(
-                onPressed: () {}, // Forgot password placeholder
+                onPressed: () {},
                 child: const Text('Forgot password?',
                     style: TextStyle(
                         color: AppColors.green,
@@ -209,18 +215,18 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          const Row(
+          Row(
             children: [
-              Expanded(child: Divider()),
+              const Expanded(child: Divider()),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text('OR',
                     style: TextStyle(
-                        color: AppColors.textMuted,
+                        color: tc.textMuted,
                         fontSize: 12,
                         fontWeight: FontWeight.w700)),
               ),
-              Expanded(child: Divider()),
+              const Expanded(child: Divider()),
             ],
           ),
           const SizedBox(height: 24),
@@ -233,8 +239,8 @@ class _LoginScreenState extends State<LoginScreen> {
           Center(
             child: Wrap(
               children: [
-                const Text("Don't have an account? ",
-                    style: TextStyle(color: AppColors.textSub)),
+                Text("Don't have an account? ",
+                    style: TextStyle(color: tc.textSub)),
                 GestureDetector(
                   onTap: () {},
                   child: const Text('Register',
