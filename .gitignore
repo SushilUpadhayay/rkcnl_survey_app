@@ -34,6 +34,7 @@ migrate_working_dir/
 /coverage/
 .agent/
 analysis_output.txt
+/flutter
 # Symbolication related
 app.*.symbols
 
