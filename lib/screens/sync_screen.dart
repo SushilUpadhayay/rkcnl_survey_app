@@ -36,6 +36,7 @@ class _SyncScreenState extends State<SyncScreen> {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+    final tc = context.appColors;
     final pending = appState.pendingItems;
     final history = appState.syncHistory;
 
@@ -46,11 +47,11 @@ class _SyncScreenState extends State<SyncScreen> {
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-              _buildSyncStatus(appState),
+              _buildSyncStatus(appState, tc),
               const SizedBox(height: 32),
-              _buildPendingSection(pending),
+              _buildPendingSection(pending, tc),
               const SizedBox(height: 32),
-              _buildHistorySection(history),
+              _buildHistorySection(history, tc),
               const SizedBox(height: 80),
             ],
           ),
@@ -91,14 +92,14 @@ class _SyncScreenState extends State<SyncScreen> {
     );
   }
 
-  Widget _buildSyncStatus(AppState appState) {
+  Widget _buildSyncStatus(AppState appState, AppThemeColors tc) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: tc.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: tc.border),
       ),
       child: Column(
         children: [
@@ -108,7 +109,7 @@ class _SyncScreenState extends State<SyncScreen> {
                 color: (appState.pendingCount > 0
                         ? AppColors.orange
                         : AppColors.green)
-                    .withValues(alpha: 0.1),
+                    .withValues(alpha: tc.isDark ? 0.2 : 0.1),
                 shape: BoxShape.circle),
             child: Icon(
               appState.pendingCount > 0
@@ -125,23 +126,25 @@ class _SyncScreenState extends State<SyncScreen> {
             appState.pendingCount > 0
                 ? '${appState.pendingCount} Items Pending'
                 : 'All Data Synced',
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+            style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: tc.textPrimary),
           ),
           const SizedBox(height: 8),
           Text(
             appState.lastSyncTime != null
                 ? 'Last synced: ${DateFormat('MMM d, h:mm a').format(DateTime.fromMillisecondsSinceEpoch(appState.lastSyncTime!))}'
                 : 'Never synced yet',
-            style: const TextStyle(color: AppColors.textSub, fontSize: 14),
+            style: TextStyle(color: tc.textSub, fontSize: 14),
           ),
           const SizedBox(height: 32),
           ElevatedButton(
             onPressed:
                 appState.pendingCount > 0 && !_isSyncing ? _handleSync : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: appState.pendingCount > 0
-                  ? AppColors.green
-                  : AppColors.border,
+              backgroundColor:
+                  appState.pendingCount > 0 ? AppColors.green : tc.border,
             ),
             child: _isSyncing
                 ? const SizedBox(
@@ -177,36 +180,41 @@ class _SyncScreenState extends State<SyncScreen> {
     );
   }
 
-  Widget _buildPendingSection(List<Map<String, dynamic>> items) {
+  Widget _buildPendingSection(
+      List<Map<String, dynamic>> items, AppThemeColors tc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Pending UploadQueue',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+        Text('Pending UploadQueue',
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: tc.textPrimary)),
         const SizedBox(height: 16),
         if (items.isEmpty)
-          const Text('No pending items. You\'re all caught up!',
-              style: TextStyle(color: AppColors.textMuted))
+          Text('No pending items. You\'re all caught up!',
+              style: TextStyle(color: tc.textMuted))
         else
-          ...items.map((it) => _buildPendingItem(it)),
+          ...items.map((it) => _buildPendingItem(it, tc)),
       ],
     );
   }
 
-  Widget _buildPendingItem(Map<String, dynamic> it) {
+  Widget _buildPendingItem(Map<String, dynamic> it, AppThemeColors tc) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: tc.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border)),
+          border: Border.all(color: tc.border)),
       child: Row(
         children: [
           Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                  color: AppColors.orange.withValues(alpha: 0.1),
+                  color:
+                      AppColors.orange.withValues(alpha: tc.isDark ? 0.2 : 0.1),
                   shape: BoxShape.circle),
               child:
                   const Icon(Icons.outbox, color: AppColors.orange, size: 20)),
@@ -216,38 +224,41 @@ class _SyncScreenState extends State<SyncScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(it['respondent'],
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 14)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: tc.textPrimary)),
                 Text(it['surveyTitle'],
-                    style: const TextStyle(
-                        color: AppColors.textSub, fontSize: 12)),
+                    style: TextStyle(color: tc.textSub, fontSize: 12)),
               ],
             ),
           ),
-          const Icon(Icons.pending_outlined,
-              color: AppColors.textMuted, size: 18),
+          Icon(Icons.pending_outlined, color: tc.textMuted, size: 18),
         ],
       ),
     );
   }
 
-  Widget _buildHistorySection(List<SyncHistoryItem> history) {
+  Widget _buildHistorySection(
+      List<SyncHistoryItem> history, AppThemeColors tc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Sync History',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+        Text('Sync History',
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: tc.textPrimary)),
         const SizedBox(height: 16),
         if (history.isEmpty)
-          const Text('No sync history yet.',
-              style: TextStyle(color: AppColors.textMuted))
+          Text('No sync history yet.', style: TextStyle(color: tc.textMuted))
         else
-          ...history.reversed.take(5).map((h) => _buildHistoryItem(h)),
+          ...history.reversed.take(5).map((h) => _buildHistoryItem(h, tc)),
       ],
     );
   }
 
-  Widget _buildHistoryItem(SyncHistoryItem h) {
+  Widget _buildHistoryItem(SyncHistoryItem h, AppThemeColors tc) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -256,13 +267,15 @@ class _SyncScreenState extends State<SyncScreen> {
               color: AppColors.green, size: 18),
           const SizedBox(width: 12),
           Text('Synced ${h.count} record${h.count != 1 ? 's' : ''}',
-              style:
-                  const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+              style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: tc.textPrimary)),
           const Spacer(),
           Text(
               DateFormat('MMM d, h:mm a')
                   .format(DateTime.fromMillisecondsSinceEpoch(h.timestamp)),
-              style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+              style: TextStyle(color: tc.textMuted, fontSize: 12)),
         ],
       ),
     );
