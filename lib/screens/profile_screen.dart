@@ -205,7 +205,7 @@ class ProfileScreen extends StatelessWidget {
               decoration: BoxDecoration(
                   color: tc.redLight, borderRadius: BorderRadius.circular(8)),
               child: const Icon(Icons.logout, color: AppColors.red)),
-          title: Text('Logout',
+          title: const Text('Logout',
               style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 15,
