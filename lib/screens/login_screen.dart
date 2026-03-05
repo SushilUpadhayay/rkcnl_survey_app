@@ -34,105 +34,118 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tc = context.appColors;
     return Scaffold(
+      backgroundColor: tc.bg,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildHero(),
-              _buildLoginForm(),
-            ],
-          ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+                    child: Column(
+                      children: [
+                        _buildHeader(tc),
+                        const Spacer(),
+                        _buildLoginForm(tc),
+                        const Spacer(),
+                        _buildFooter(tc),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildHero() {
-    return Stack(
+  Widget _buildHeader(AppThemeColors tc) {
+    return Column(
       children: [
         Container(
-          height: MediaQuery.of(context).size.height * 0.4,
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            color: AppColors.green,
-            image: DecorationImage(
-              image: AssetImage(
-                  'assets/images/photo-1523348837708-15d4a09cfac2.jpg'),
-              fit: BoxFit.cover,
-              opacity: 0.4,
-            ),
-          ),
-        ),
-        Positioned(
-          top: 64,
-          left: 24,
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: tc.surface,
+            shape: BoxShape.circle,
+            border: Border.all(color: tc.border),
+            boxShadow: [
+              if (!tc.isDark)
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
-                child: Image.asset(
-                  'assets/images/Krishi_Logo-Tr.png',
-                  width: 24,
-                  height: 24,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'Rastriye Krishi',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
             ],
           ),
+          child: Image.asset(
+            'assets/images/Krishi_Logo-Tr.png',
+            width: 48,
+            height: 48,
+          ),
         ),
-        Positioned(
-          bottom: 24,
-          left: 24,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white12,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white24),
-            ),
-            child: Image.asset(
-              'assets/images/Krishi_Logo-Tr.png',
-              width: 40,
-              height: 40,
-              color: Colors.white,
-            ),
+        const SizedBox(height: 16),
+        Text(
+          'Rastriye Krishi',
+          style: TextStyle(
+            color: tc.textPrimary,
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+          ),
+        ),
+        Text(
+          'Survey Application',
+          style: TextStyle(
+            color: tc.textSub,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildLoginForm() {
-    final tc = context.appColors;
-    return Padding(
+  Widget _buildLoginForm(AppThemeColors tc) {
+    return Container(
       padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: tc.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: tc.border),
+        boxShadow: [
+          if (!tc.isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+        ],
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             'Welcome Back',
+            textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
-                color: tc.textPrimary),
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: tc.textPrimary,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
-            'Log in to start your field survey',
-            style: TextStyle(fontSize: 16, color: tc.textSub),
+            'Login to continue your work',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, color: tc.textSub),
           ),
           if (_errorMessage != null) ...[
             const SizedBox(height: 20),
@@ -140,118 +153,177 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: tc.redLight,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.red.withValues(alpha: 0.3)),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.red.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error_outline,
-                      color: AppColors.red, size: 20),
-                  const SizedBox(width: 8),
-                  Text(_errorMessage!,
+                  const Icon(Icons.error_outline, color: AppColors.red, size: 18),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _errorMessage!,
                       style: const TextStyle(
-                          color: AppColors.red, fontWeight: FontWeight.w600)),
+                        color: AppColors.red,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ],
-          const SizedBox(height: 32),
-          Text('Phone number or Username',
-              style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                  color: tc.textPrimary)),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _userController,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.person_outline),
-              hintText: 'Enter your credentials',
-            ),
-          ),
           const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Password',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                      color: tc.textPrimary)),
-              TextButton(
-                onPressed: () {},
-                child: const Text('Forgot password?',
-                    style: TextStyle(
-                        color: AppColors.green,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13)),
-              ),
-            ],
+          _buildTextField(
+            label: 'Username',
+            controller: _userController,
+            hint: 'Enter your username',
+            icon: Icons.person_outline,
+            tc: tc,
           ),
-          TextField(
+          const SizedBox(height: 16),
+          _buildTextField(
+            label: 'Password',
             controller: _passController,
-            obscureText: _obscureText,
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.lock_outline),
-              suffixIcon: IconButton(
-                icon: Icon(
-                    _obscureText ? Icons.visibility : Icons.visibility_off,
-                    size: 20),
-                onPressed: () => setState(() => _obscureText = !_obscureText),
+            hint: '••••••••',
+            icon: Icons.lock_outline,
+            isPassword: true,
+            tc: tc,
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () {},
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                foregroundColor: AppColors.green,
               ),
-              hintText: '••••••••',
+              child: const Text(
+                'Forgot Password?',
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+              ),
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
           ElevatedButton(
             onPressed: _handleLogin,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.green,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              elevation: 0,
+            ),
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('Login'),
                 SizedBox(width: 8),
-                Icon(Icons.arrow_forward, size: 20),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              const Expanded(child: Divider()),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text('OR',
-                    style: TextStyle(
-                        color: tc.textMuted,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700)),
-              ),
-              const Expanded(child: Divider()),
-            ],
-          ),
-          const SizedBox(height: 24),
-          OutlinedButton.icon(
-            onPressed: () => context.push('/otp'),
-            icon: const Icon(Icons.vibration, size: 20),
-            label: const Text('Login with OTP'),
-          ),
-          const SizedBox(height: 32),
-          Center(
-            child: Wrap(
-              children: [
-                Text("Don't have an account? ",
-                    style: TextStyle(color: tc.textSub)),
-                GestureDetector(
-                  onTap: () {},
-                  child: const Text('Register',
-                      style: TextStyle(
-                          color: AppColors.green, fontWeight: FontWeight.w800)),
-                ),
+                Icon(Icons.arrow_forward_rounded, size: 18),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    required AppThemeColors tc,
+    bool isPassword = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
+            color: tc.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          obscureText: isPassword && _obscureText,
+          style: TextStyle(color: tc.textPrimary, fontSize: 15),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, size: 20, color: tc.textSub),
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                      size: 20,
+                      color: tc.textSub,
+                    ),
+                    onPressed: () => setState(() => _obscureText = !_obscureText),
+                  )
+                : null,
+            hintText: hint,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            filled: true,
+            fillColor: tc.isDark ? tc.surfaceVariant : Colors.grey[50],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: tc.border),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: tc.border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(color: AppColors.green, width: 1.5),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooter(AppThemeColors tc) {
+    return Column(
+      children: [
+        OutlinedButton.icon(
+          onPressed: () => context.push('/otp'),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 54),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            side: BorderSide(color: tc.border),
+            foregroundColor: tc.textPrimary,
+          ),
+          icon: const Icon(Icons.phonelink_ring_rounded, size: 18, color: AppColors.green),
+          label: const Text('Login with OTP'),
+        ),
+        const SizedBox(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Don't have an account? ",
+              style: TextStyle(color: tc.textSub, fontSize: 14),
+            ),
+            GestureDetector(
+              onTap: () {},
+              child: const Text(
+                'Register',
+                style: TextStyle(
+                  color: AppColors.green,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
