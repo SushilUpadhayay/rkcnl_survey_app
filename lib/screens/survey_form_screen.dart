@@ -75,32 +75,38 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 16),
-            const Icon(Icons.check_circle, color: AppColors.green, size: 72),
-            const SizedBox(height: 24),
-            Text('Response Saved!',
-                style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    color: tc.textPrimary)),
-            const SizedBox(height: 12),
-            Text('Submission for ${_respondent.name} was successful.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: tc.textSub)),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                context.go('/respondents/${widget.surveyId}');
-              },
-              child: const Text('Back to Respondents'),
-            ),
-          ],
+      builder: (context) => PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (didPop) return;
+          context.go('/dashboard');
+        },
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 16),
+              const Icon(Icons.check_circle, color: AppColors.green, size: 72),
+              const SizedBox(height: 24),
+              Text('Response Saved!',
+                  style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: tc.textPrimary)),
+              const SizedBox(height: 12),
+              Text('Submission for ${_respondent.name} was successful.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: tc.textSub)),
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: () {
+                  context.go('/dashboard');
+                },
+                child: const Text('Back to Home'),
+              ),
+            ],
+          ),
         ),
       ),
     );
