@@ -79,7 +79,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
         canPop: false,
         onPopInvoked: (didPop) {
           if (didPop) return;
-          context.go('/dashboard');
+          context.go('/respondents/${widget.surveyId}');
         },
         child: AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -101,9 +101,9 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
-                  context.go('/dashboard');
+                  context.go('/respondents/${widget.surveyId}');
                 },
-                child: const Text('Back to Home'),
+                child: const Text('Back to Respondents'),
               ),
             ],
           ),
@@ -387,7 +387,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                 context.read<AppState>().saveRespondentDraft(
                     widget.surveyId, _respondent, _answers);
                 Navigator.pop(context);
-                context.pop();
+                context.go('/respondents/${widget.surveyId}');
               },
               child: const Text('Save & Exit')),
         ],

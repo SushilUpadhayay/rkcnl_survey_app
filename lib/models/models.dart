@@ -60,6 +60,7 @@ class Survey {
   final List<Question> questions;
   final String iconName;
   final int colorValue;
+  final int targetResponses;
 
   Survey({
     required this.id,
@@ -72,6 +73,7 @@ class Survey {
     required this.questions,
     required this.iconName,
     required this.colorValue,
+    this.targetResponses = 5,
   });
 
   Map<String, dynamic> toJson() => {
@@ -85,6 +87,7 @@ class Survey {
         'questions': questions.map((q) => q.toJson()).toList(),
         'iconName': iconName,
         'colorValue': colorValue,
+        'targetResponses': targetResponses,
       };
 }
 
