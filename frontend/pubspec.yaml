@@ -12,7 +12,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # State management
-  provider: ^6.1.2
+  provider: ^6.1.5+1
 
   # Navigation
   go_router: ^14.6.3
@@ -28,6 +28,8 @@ dependencies:
   # Utilities
   intl: ^0.20.2
   uuid: ^4.5.1
+  http: ^1.6.0
+  flutter_secure_storage: ^10.0.0
 
 dev_dependencies:
   flutter_test:
