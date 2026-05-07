@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="theme-color" content="#008000"/>
+<title>Rastriye Krishi | RKCNL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- ════════════════════════════════
+     SCREEN: SPLASH
+════════════════════════════════ -->
+<div id="screen-splash" class="screen screen-splash active">
+  <div class="splash-bg"></div>
+  <div class="splash-content">
+    <div class="splash-logo">
+      <span class="material-symbols-outlined">agriculture</span>
+    </div>
+    <h1 class="splash-title">Rastriye Krishi</h1>
+    <p class="splash-subtitle">RKCNL Field Survey System</p>
+    <div class="splash-loader">
+      <div class="loader-bar"><div class="loader-fill" id="splashLoader"></div></div>
+    </div>
+  </div>
+  <p class="splash-footer">RKCNL iTech Limited &copy; 2025</p>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: LOGIN
+════════════════════════════════ -->
+<div id="screen-login" class="screen screen-login">
+  <div class="login-hero">
+    <div class="login-logo-row">
+      <div class="login-logo"><span class="material-symbols-outlined">agriculture</span></div>
+      <span class="login-brand">Rastriye Krishi</span>
+    </div>
+    <div class="login-hero-img">
+      <div class="login-hero-overlay">
+        <span class="material-symbols-outlined hero-icon">grass</span>
+      </div>
+    </div>
+  </div>
+  <div class="login-card">
+    <h2 class="login-heading">Welcome Back</h2>
+    <p class="login-sub">Log in to start your field survey</p>
+    <div id="loginError" class="alert-error hidden">Invalid credentials. Please try again.</div>
+    <div class="form-group">
+      <label class="form-label">Phone number or Username</label>
+      <div class="input-wrap"><span class="material-symbols-outlined input-icon">person</span>
+        <input id="loginUser" type="text" class="form-input" placeholder="Enter your credentials"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="label-row">
+        <label class="form-label">Password</label>
+        <button class="link-btn" onclick="showScreen('screen-forgot')">Forgot password?</button>
+      </div>
+      <div class="input-wrap"><span class="material-symbols-outlined input-icon">lock</span>
+        <input id="loginPass" type="password" class="form-input" placeholder="••••••••"/>
+        <button class="eye-btn" onclick="togglePass('loginPass',this)"><span class="material-symbols-outlined">visibility</span></button>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="doLogin()">
+      Login <span class="material-symbols-outlined btn-icon">arrow_forward</span>
+    </button>
+    <div class="divider"><span>OR</span></div>
+    <button class="btn-outline" onclick="showScreen('screen-otp')">
+      <span class="material-symbols-outlined">vibration</span> Login with OTP
+    </button>
+    <p class="register-row">Don't have an account? <button class="link-btn green" onclick="showToast('Please contact your admin to create an account.')">Register</button></p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: OTP
+════════════════════════════════ -->
+<div id="screen-otp" class="screen screen-otp">
+  <header class="sub-header">
+    <button class="back-btn" onclick="showScreen('screen-login')"><span class="material-symbols-outlined">arrow_back</span></button>
+    <h1 class="sub-title">Login with OTP</h1>
+    <div class="w36"></div>
+  </header>
+  <div class="otp-body">
+    <div class="otp-icon"><span class="material-symbols-outlined">sms</span></div>
+    <h3>Enter your phone number</h3>
+    <p>We'll send a one-time password to verify your identity.</p>
+    <div class="form-group">
+      <label class="form-label">Phone Number</label>
+      <div class="input-wrap"><span class="material-symbols-outlined input-icon">phone</span>
+        <input id="otpPhone" type="tel" class="form-input" placeholder="+977 98XXXXXXXX"/>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="sendOTP()">Send OTP</button>
+    <div id="otp-verify-section" class="hidden mt16">
+      <div class="form-group">
+        <label class="form-label">Enter OTP</label>
+        <div class="otp-boxes">
+          <input class="otp-box" maxlength="1" type="text" oninput="otpMove(this,0)"/>
+          <input class="otp-box" maxlength="1" type="text" oninput="otpMove(this,1)"/>
+          <input class="otp-box" maxlength="1" type="text" oninput="otpMove(this,2)"/>
+          <input class="otp-box" maxlength="1" type="text" oninput="otpMove(this,3)"/>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="verifyOTP()">Verify & Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: FORGOT PASSWORD
+════════════════════════════════ -->
+<div id="screen-forgot" class="screen">
+  <header class="sub-header">
+    <button class="back-btn" onclick="showScreen('screen-login')"><span class="material-symbols-outlined">arrow_back</span></button>
+    <h1 class="sub-title">Reset Password</h1>
+    <div class="w36"></div>
+  </header>
+  <div class="otp-body">
+    <div class="otp-icon"><span class="material-symbols-outlined">lock_reset</span></div>
+    <h3>Forgot your password?</h3>
+    <p>Enter your phone number and we'll send a reset link.</p>
+    <div class="form-group">
+      <label class="form-label">Phone Number</label>
+      <div class="input-wrap"><span class="material-symbols-outlined input-icon">phone</span>
+        <input type="tel" class="form-input" placeholder="+977 98XXXXXXXX"/>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="showToast('Reset link sent! Check your messages.');showScreen('screen-login')">Send Reset Link</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: DASHBOARD (HOME)
+════════════════════════════════ -->
+<div id="screen-dashboard" class="screen screen-main">
+  <header class="main-header">
+    <div class="header-logo"><span class="material-symbols-outlined">agriculture</span></div>
+    <span class="header-brand">Rastriye Krishi</span>
+    <div class="header-right">
+      <button class="icon-btn" onclick="showScreen('screen-notifications')"><span class="material-symbols-outlined" id="alertBell">notifications</span></button>
+      <button class="avatar-btn" onclick="showScreen('screen-profile')" id="headerAvatar">JD</button>
+    </div>
+  </header>
+  <main class="main-content">
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+      <div class="welcome-text">
+        <p class="welcome-label">Welcome back,</p>
+        <h2 class="welcome-name" id="welcomeName">Surveyor</h2>
+        <p class="welcome-region" id="welcomeRegion">Assigned Region: Ward 4</p>
+      </div>
+      <span class="material-symbols-outlined welcome-icon">eco</span>
+    </div>
+    <!-- Offline Banner -->
+    <div id="offlineBanner" class="offline-banner hidden">
+      <span class="material-symbols-outlined">wifi_off</span>
+      <span>Offline Mode – Data saved locally</span>
+    </div>
+    <!-- Stats -->
+    <div class="section-header"><span class="material-symbols-outlined section-icon">bar_chart</span> Survey Statistics</div>
+    <div class="stats-grid">
+      <div class="stat-card"><p class="stat-label">Assigned Surveys</p><p class="stat-value" id="statAssigned">5</p><span class="stat-badge green" id="statAssignedBadge">Active</span></div>
+      <div class="stat-card"><p class="stat-label">Completed Today</p><p class="stat-value" id="statCompleted">0</p><span class="stat-badge blue">+2%</span></div>
+      <div class="stat-card"><p class="stat-label">Pending Sync</p><p class="stat-value" id="statPendingSync">0</p><span class="stat-badge orange" id="pendingSyncBadge">-</span></div>
+    </div>
+    <!-- Quick Actions -->
+    <div class="section-header mt16">Quick Actions</div>
+    <div class="quick-actions">
+      <button class="action-card" onclick="switchTab('surveys')">
+        <div class="action-icon green"><span class="material-symbols-outlined">assignment_add</span></div>
+        <div><p class="action-title">View Surveys</p><p class="action-sub">View and fill assigned surveys</p></div>
+        <span class="material-symbols-outlined action-arrow">chevron_right</span>
+      </button>
+      <button class="action-card" onclick="switchTab('sync')">
+        <div class="action-icon blue"><span class="material-symbols-outlined">cloud_sync</span></div>
+        <div><p class="action-title">Sync Data</p><p class="action-sub">Upload saved offline responses</p></div>
+        <span class="material-symbols-outlined action-arrow">chevron_right</span>
+      </button>
+      <button class="action-card" onclick="switchTab('analytics')">
+        <div class="action-icon purple"><span class="material-symbols-outlined">insights</span></div>
+        <div><p class="action-title">Analytics</p><p class="action-sub">View your submission summary</p></div>
+        <span class="material-symbols-outlined action-arrow">chevron_right</span>
+      </button>
+    </div>
+    <!-- Recent Activity -->
+    <div class="section-header mt16">Recent Activity</div>
+    <div id="recentActivity" class="recent-list">
+      <p class="empty-state">No recent activity yet.</p>
+    </div>
+  </main>
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="home" onclick="switchTab('home')"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+    <button class="nav-item" data-tab="surveys" onclick="switchTab('surveys')"><span class="material-symbols-outlined">assignment</span><span>Surveys</span></button>
+    <button class="nav-item" data-tab="sync" onclick="switchTab('sync')"><span class="material-symbols-outlined" id="syncNavIcon">sync</span><span>Sync</span></button>
+    <button class="nav-item" data-tab="analytics" onclick="switchTab('analytics')"><span class="material-symbols-outlined">insights</span><span>Analytics</span></button>
+  </nav>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: ACTIVE SURVEYS
+════════════════════════════════ -->
+<div id="screen-surveys" class="screen screen-main">
+  <header class="main-header">
+    <span class="header-title-only">Field Surveys</span>
+    <div class="header-right">
+      <button class="avatar-btn" onclick="showScreen('screen-profile')" id="headerAvatar2">JD</button>
+    </div>
+  </header>
+  <div class="search-bar-wrap">
+    <div class="search-bar">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input type="text" id="surveySearch" class="search-input" placeholder="Search surveys by name or ID..." oninput="filterSurveys()"/>
+      <button class="clear-search" id="clearSearch" onclick="clearSurveySearch()"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <div class="filter-pills" id="filterPills">
+      <button class="pill active" onclick="setFilter(this,'all')">All Surveys</button>
+      <button class="pill" onclick="setFilter(this,'in_progress')">In Progress</button>
+      <button class="pill" onclick="setFilter(this,'pending')">Pending</button>
+      <button class="pill" onclick="setFilter(this,'synced')">Synced</button>
+    </div>
+  </div>
+  <main class="surveys-list" id="surveysContainer">
+    <!-- Populated by JS -->
+  </main>
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item" data-tab="home" onclick="switchTab('home')"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+    <button class="nav-item active" data-tab="surveys" onclick="switchTab('surveys')"><span class="material-symbols-outlined">assignment</span><span>Surveys</span></button>
+    <button class="nav-item" data-tab="sync" onclick="switchTab('sync')"><span class="material-symbols-outlined" id="syncNavIcon2">sync</span><span>Sync</span></button>
+    <button class="nav-item" data-tab="analytics" onclick="switchTab('analytics')"><span class="material-symbols-outlined">insights</span><span>Analytics</span></button>
+  </nav>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: RESPONDENTS LIST
+════════════════════════════════ -->
+<div id="screen-respondents" class="screen">
+  <header class="sub-header">
+    <button class="back-btn" onclick="showScreen('screen-surveys')"><span class="material-symbols-outlined">arrow_back</span></button>
+    <h1 class="sub-title" id="respondentsTitle">Survey Respondents</h1>
+    <button class="icon-btn-sm" onclick="showAddRespondent()"><span class="material-symbols-outlined">person_add</span></button>
+  </header>
+  <div class="respondents-info" id="respondentsSurveyInfo"><!-- populated by JS --></div>
+  <div class="respondents-list" id="respondentsList"><!-- populated by JS --></div>
+  <button class="fab" onclick="showAddRespondent()"><span class="material-symbols-outlined">add</span></button>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: SURVEY FORM
+════════════════════════════════ -->
+<div id="screen-form" class="screen">
+  <header class="sub-header">
+    <button class="back-btn" id="formBackBtn" onclick="formBack()"><span class="material-symbols-outlined">arrow_back</span></button>
+    <h1 class="sub-title">Survey Data Collection</h1>
+    <button class="icon-btn-sm" onclick="saveDraft()"><span class="material-symbols-outlined">save</span></button>
+  </header>
+  <div class="form-progress">
+    <div class="progress-label">
+      <span id="stepLabel">Step 1 of 1</span>
+      <span class="progress-pct" id="progressPct">0% Complete</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+  <div class="form-body" id="formBody"><!-- Populated by JS --></div>
+  <div class="form-footer">
+    <button class="btn-secondary" id="formPrevBtn" onclick="formPrev()">Back</button>
+    <button class="btn-primary flex1" id="formNextBtn" onclick="formNext()">Next Step <span class="material-symbols-outlined btn-icon">arrow_forward</span></button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: SYNC
+════════════════════════════════ -->
+<div id="screen-sync" class="screen screen-main">
+  <header class="main-header">
+    <span class="header-title-only">Data Sync</span>
+    <button class="icon-btn" onclick="doSync()"><span class="material-symbols-outlined">refresh</span></button>
+  </header>
+  <main class="main-content">
+    <!-- Sync Status Card -->
+    <div class="sync-status-card" id="syncStatusCard">
+      <div class="sync-status-icon" id="syncStatusIcon"><span class="material-symbols-outlined">cloud_done</span></div>
+      <p class="sync-status-title" id="syncStatusTitle">All Data Synced</p>
+      <p class="sync-status-sub" id="syncStatusSub">Last sync: Never</p>
+      <button class="btn-primary mt16" id="syncNowBtn" onclick="doSync()">Sync Now</button>
+    </div>
+    <!-- Pending Items -->
+    <div class="section-header mt16">Pending Uploads</div>
+    <div id="pendingList" class="pending-list"><p class="empty-state">No pending data to sync.</p></div>
+    <!-- Sync History -->
+    <div class="section-header mt16">Sync History</div>
+    <div id="syncHistoryList" class="sync-history"><p class="empty-state">No sync history yet.</p></div>
+    <div class="auto-sync-note"><span class="material-symbols-outlined">info</span> Auto-sync enabled – data uploads automatically when online.</div>
+  </main>
+  <nav class="bottom-nav">
+    <button class="nav-item" data-tab="home" onclick="switchTab('home')"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+    <button class="nav-item" data-tab="surveys" onclick="switchTab('surveys')"><span class="material-symbols-outlined">assignment</span><span>Surveys</span></button>
+    <button class="nav-item active" data-tab="sync" onclick="switchTab('sync')"><span class="material-symbols-outlined">sync</span><span>Sync</span></button>
+    <button class="nav-item" data-tab="analytics" onclick="switchTab('analytics')"><span class="material-symbols-outlined">insights</span><span>Analytics</span></button>
+  </nav>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: ANALYTICS
+════════════════════════════════ -->
+<div id="screen-analytics" class="screen screen-main">
+  <header class="main-header">
+    <span class="header-title-only">Analytics</span>
+    <button class="icon-btn" onclick="renderAnalytics()"><span class="material-symbols-outlined">refresh</span></button>
+  </header>
+  <main class="main-content" id="analyticsContent"><!-- Populated by JS --></main>
+  <nav class="bottom-nav">
+    <button class="nav-item" data-tab="home" onclick="switchTab('home')"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+    <button class="nav-item" data-tab="surveys" onclick="switchTab('surveys')"><span class="material-symbols-outlined">assignment</span><span>Surveys</span></button>
+    <button class="nav-item" data-tab="sync" onclick="switchTab('sync')"><span class="material-symbols-outlined">sync</span><span>Sync</span></button>
+    <button class="nav-item active" data-tab="analytics" onclick="switchTab('analytics')"><span class="material-symbols-outlined">insights</span><span>Analytics</span></button>
+  </nav>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: NOTIFICATIONS / ALERTS
+════════════════════════════════ -->
+<div id="screen-notifications" class="screen">
+  <header class="sub-header">
+    <button class="back-btn" onclick="goBack()"><span class="material-symbols-outlined">arrow_back</span></button>
+    <h1 class="sub-title">Alerts &amp; Notifications</h1>
+    <button class="link-btn small" onclick="markAllRead()">Mark all read</button>
+  </header>
+  <div id="notifList" class="notif-list"><!-- Populated by JS --></div>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: PROFILE
+════════════════════════════════ -->
+<div id="screen-profile" class="screen">
+  <header class="sub-header">
+    <button class="back-btn" onclick="goBack()"><span class="material-symbols-outlined">arrow_back</span></button>
+    <h1 class="sub-title">My Profile</h1>
+    <button class="icon-btn-sm" onclick="showScreen('screen-settings')"><span class="material-symbols-outlined">settings</span></button>
+  </header>
+  <div class="profile-hero">
+    <div class="profile-avatar" id="profileAvatar">JD</div>
+    <h2 class="profile-name" id="profileName">John Doe</h2>
+    <p class="profile-role">Field Surveyor</p>
+    <p class="profile-region" id="profileRegionDisplay">Region: Ward 4, Northern Sector</p>
+  </div>
+  <div class="profile-section">
+    <div class="profile-item"><span class="material-symbols-outlined">badge</span><div><p class="pi-label">Employee ID</p><p class="pi-value" id="profileEmpId">EMP-0042</p></div></div>
+    <div class="profile-item"><span class="material-symbols-outlined">phone</span><div><p class="pi-label">Phone</p><p class="pi-value" id="profilePhone">+977 9800000000</p></div></div>
+    <div class="profile-item"><span class="material-symbols-outlined">email</span><div><p class="pi-label">Email</p><p class="pi-value" id="profileEmail">surveyor@rkcnl.gov.np</p></div></div>
+    <div class="profile-item"><span class="material-symbols-outlined">location_on</span><div><p class="pi-label">Assigned Region</p><p class="pi-value" id="profileRegion">Ward 4, Northern Sector</p></div></div>
+    <div class="profile-item"><span class="material-symbols-outlined">calendar_today</span><div><p class="pi-label">Joined</p><p class="pi-value">Jan 2025</p></div></div>
+  </div>
+  <div class="profile-section mt8">
+    <button class="profile-menu-item" onclick="showScreen('screen-settings')"><span class="material-symbols-outlined">settings</span>Settings<span class="material-symbols-outlined ml-auto">chevron_right</span></button>
+    <button class="profile-menu-item danger" onclick="doLogout()"><span class="material-symbols-outlined">logout</span>Logout<span class="material-symbols-outlined ml-auto">chevron_right</span></button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     SCREEN: SETTINGS
+════════════════════════════════ -->
+<div id="screen-settings" class="screen">
+  <header class="sub-header">
+    <button class="back-btn" onclick="goBack()"><span class="material-symbols-outlined">arrow_back</span></button>
+    <h1 class="sub-title">Settings</h1>
+    <div class="w36"></div>
+  </header>
+  <div class="settings-list">
+    <div class="settings-section-label">Preferences</div>
+    <div class="settings-item">
+      <div><p class="si-title">Dark Mode</p><p class="si-sub">Switch to dark theme</p></div>
+      <label class="toggle"><input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode(this)"/><span class="toggle-slider"></span></label>
+    </div>
+    <div class="settings-item">
+      <div><p class="si-title">Language</p><p class="si-sub">App display language</p></div>
+      <select class="settings-select"><option>English</option><option>नेपाली</option></select>
+    </div>
+    <div class="settings-section-label mt16">Data &amp; Sync</div>
+    <div class="settings-item">
+      <div><p class="si-title">Auto Sync</p><p class="si-sub">Sync when internet is available</p></div>
+      <label class="toggle"><input type="checkbox" id="autoSyncToggle" checked/><span class="toggle-slider"></span></label>
+    </div>
+    <div class="settings-item">
+      <div><p class="si-title">Save Photos Locally</p><p class="si-sub">Keep photos on device</p></div>
+      <label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label>
+    </div>
+    <div class="settings-item">
+      <div><p class="si-title">Storage Used</p><p class="si-sub" id="storageUsed">Calculating...</p></div>
+      <button class="link-btn green" onclick="clearCache()">Clear</button>
+    </div>
+    <div class="settings-section-label mt16">Notifications</div>
+    <div class="settings-item">
+      <div><p class="si-title">Push Notifications</p><p class="si-sub">Survey assignments &amp; reminders</p></div>
+      <label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label>
+    </div>
+    <div class="settings-section-label mt16">About</div>
+    <div class="settings-item"><div><p class="si-title">App Version</p><p class="si-sub">v1.0.0</p></div></div>
+    <div class="settings-item"><div><p class="si-title">Developer</p><p class="si-sub">RKCNL iTech Limited, Bhaktapur, Nepal</p></div></div>
+    <button class="btn-danger mt16" onclick="doLogout()">Logout</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     TOAST NOTIFICATION
+════════════════════════════════ -->
+<div id="toast" class="toast"></div>
+
+<!-- ════════════════════════════════
+     MODAL: Add Respondent / Confirm
+════════════════════════════════ -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()"></div>
+<div id="modal" class="modal hidden">
+  <div id="modal-content"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
