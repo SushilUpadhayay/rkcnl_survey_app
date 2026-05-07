@@ -19,14 +19,7 @@ class RespondentsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/surveys');
-              }
-            }),
+            icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         title: Text(survey.title,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
         actions: [

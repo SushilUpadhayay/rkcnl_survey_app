@@ -27,19 +27,18 @@ void main() async {
   ));
   final storage = await StorageService.create();
   final appState = AppState(storage);
-  final router = _buildRouter(appState);
   runApp(
-    ChangeNotifierProvider.value(value: appState, child: RKNCLSurveyApp(router: router)),
+    ChangeNotifierProvider.value(value: appState, child: const RKNCLSurveyApp()),
   );
 }
 
 class RKNCLSurveyApp extends StatelessWidget {
-  final GoRouter router;
-  const RKNCLSurveyApp({super.key, required this.router});
+  const RKNCLSurveyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+    final router = _buildRouter(appState);
     return MaterialApp.router(
       title: 'RKNCL Survey App',
       debugShowCheckedModeBanner: false,
@@ -52,7 +51,6 @@ class RKNCLSurveyApp extends StatelessWidget {
 }
 
 GoRouter _buildRouter(AppState appState) => GoRouter(
-  refreshListenable: appState,
   initialLocation: '/splash',
   redirect: (context, state) {
     if (state.matchedLocation == '/splash') return null;

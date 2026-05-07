@@ -205,17 +205,14 @@ class AppState extends ChangeNotifier {
     await storage.setLastSyncTime(now);
     await storage
         .addSyncHistory(SyncHistoryItem(count: pending.length, timestamp: now));
-    // Mark surveys as synced if target reached and all respondents done
+    // Mark surveys as synced if all respondents done
     for (final p in pending) {
       final sid = p['surveyId'] as String;
       final respondents = storage.getRespondents(sid);
       final idx = surveys.indexWhere((s) => s.id == sid);
-      if (idx >= 0) {
-        final completedCount = respondents.where((r) => r.status == RespondentStatus.completed).length;
-        if (completedCount >= surveys[idx].targetResponses &&
-            respondents.every((r) => r.status == RespondentStatus.completed)) {
-          surveys[idx].status = SurveyStatus.synced;
-        }
+      if (idx >= 0 &&
+          respondents.every((r) => r.status == RespondentStatus.completed)) {
+        surveys[idx].status = SurveyStatus.synced;
       }
     }
     notifyListeners();
