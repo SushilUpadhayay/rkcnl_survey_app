@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Field Surveys - Active List</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#008000",
+                        "background-light": "#f5f8f5",
+                        "background-dark": "#0f230f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header Section -->
+<header class="flex items-center bg-white dark:bg-slate-900 p-4 border-b border-primary/10 justify-between sticky top-0 z-10">
+<div class="text-primary flex size-12 shrink-0 items-center justify-center">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</div>
+<h1 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center">Field Surveys</h1>
+<div class="flex w-12 items-center justify-end">
+<button class="flex items-center justify-center rounded-full h-10 w-10 bg-primary/10 text-primary">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Search and Filter Section -->
+<div class="px-4 py-4 space-y-3">
+<label class="flex flex-col w-full">
+<div class="flex w-full items-stretch rounded-xl h-12 shadow-sm border border-primary/10 bg-white dark:bg-slate-800">
+<div class="text-primary/60 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full border-none bg-transparent focus:ring-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 px-3 text-base" placeholder="Search surveys by name or ID..." value=""/>
+</div>
+</label>
+<!-- Horizontal Filters -->
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary text-white px-5 shadow-md shadow-primary/20">
+<span class="text-sm font-semibold">All Surveys</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-slate-800 border border-primary/10 text-slate-700 dark:text-slate-300 px-5">
+<span class="text-sm font-medium">High Priority</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-slate-800 border border-primary/10 text-slate-700 dark:text-slate-300 px-5">
+<span class="text-sm font-medium">Region 4</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-slate-800 border border-primary/10 text-slate-700 dark:text-slate-300 px-5">
+<span class="text-sm font-medium">In Progress</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Survey Cards List -->
+<main class="flex-1 px-4 space-y-4 pb-24">
+<!-- Card 1: In Progress -->
+<div class="flex flex-col bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-primary/5 overflow-hidden">
+<div class="h-32 w-full bg-cover bg-center" data-alt="Aerial view of green agricultural fields in rows" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBg-JeziNPy8xBwAidvT-X-dMsRYFSIaQFDzrmuqgnfSfKcPzKNBdFFbRWiH1QlWHK2tRZfIYUj7hsSbX-2pLF45QE995-3U2pGWPNC1n99pmggaYeZSxLqOHNarpA6Em_oLB-K6pIjwGrBpSX4ipV3VlirycKCjiE7cYWWywZp15aFNOhgh3vTldEnWEM_XkdIy006CoctrdBgJIooJ22o29vclmjgBLJav46-T7ZvxXvyJtu0px04A6qDWOXWCsritQZp8GXnNYI');"></div>
+<div class="p-4 space-y-3">
+<div class="flex justify-between items-start">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight">Crop Health Assessment - Ward 4</h3>
+<span class="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">In Progress</span>
+</div>
+<div class="grid grid-cols-2 gap-y-2">
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-base">location_on</span>
+<span>Northern Sector</span>
+</div>
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-base">calendar_today</span>
+<span>Due Oct 25</span>
+</div>
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-base">priority_high</span>
+<span>High Priority</span>
+</div>
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-base">person</span>
+<span>A. Miller</span>
+</div>
+</div>
+<button class="w-full bg-primary text-white py-2.5 rounded-lg font-bold text-sm hover:bg-primary/90 transition-colors">
+                        Resume Survey
+                    </button>
+</div>
+</div>
+<!-- Card 2: Pending -->
+<div class="flex flex-col bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-primary/5 overflow-hidden">
+<div class="h-32 w-full bg-cover bg-center" data-alt="Close up of dry soil in a field" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCNPT7tORXZfCSt2ZCuoxADlGKTBINl3jk8raq_hUdFKNALHfo3KrnYITLL2bUvCWz5WUNXZr_MdHS30NI1BPIM1KQQQB4bCD7ADqgdUuB3Ga9iAqbDDYMS1F_DP4D5EEql7yNcQUU79WLrpdcuh_1NgmEVtpD70Ro82ijOsPoNiOi2MNtkUEAzRqyrYQTYnLJr5_Hawsx4_6A2zPrETjWmmhS5HAIm1W-O1fcTl-BW1DCR-DwhKlUzma8PQnQENRcbAfKYljLWzHw');"></div>
+<div class="p-4 space-y-3">
+<div class="flex justify-between items-start">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight">Soil Moisture Map - East</h3>
+<span class="bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">Pending</span>
+</div>
+<div class="grid grid-cols-2 gap-y-2">
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-base">location_on</span>
+<span>Eastern Plains</span>
+</div>
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-base">calendar_today</span>
+<span>Due Oct 28</span>
+</div>
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-base">priority_high</span>
+<span>Medium</span>
+</div>
+</div>
+<button class="w-full bg-primary/10 text-primary py-2.5 rounded-lg font-bold text-sm hover:bg-primary/20 transition-colors">
+                        Start Survey
+                    </button>
+</div>
+</div>
+<!-- Card 3: Synced/Completed -->
+<div class="flex flex-col bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-primary/5 overflow-hidden opacity-80">
+<div class="h-32 w-full bg-cover bg-center grayscale" data-alt="Wide landscape of a farm at sunset" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBktL9HWQIbmUL53Pog7tu1JNqqy-cCkOpRQTScdibYQNm_OScNUBjd7DCyKVleOqlPZta6OAlwcPE1cxFE3QC2xdyZQ4tm_QIkYqxiJ8aMNqbiqDV_uCo0KpA4yFYMqxOEQ8L9RI5WfOMRTmhORLIBHxPctuO2io8rfsSluFP6KrhbhAgS6rXxbhvLaOvwj6fSkguuRc-41n8lSnl9sh8W8W63BTYGEHDv8Ar9PNTtu_hWu10535B_9F3LufEisKw5GdjieKZGXYY');"></div>
+<div class="p-4 space-y-3">
+<div class="flex justify-between items-start">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight">Irrigation Audit - Zone B</h3>
+<span class="bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">Synced</span>
+</div>
+<div class="grid grid-cols-2 gap-y-2">
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-base">location_on</span>
+<span>Central Hub</span>
+</div>
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-base">check_circle</span>
+<span>Done Oct 20</span>
+</div>
+</div>
+<button class="w-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 py-2.5 rounded-lg font-bold text-sm cursor-not-allowed">
+                        View Summary
+                    </button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 border-t border-primary/10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-4 pb-6 pt-3 z-20">
+<div class="flex items-center justify-around max-w-lg mx-auto">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-[1]">assignment</span>
+<span class="text-[10px] font-bold">Surveys</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="text-[10px] font-medium">Map</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">sync</span>
+<span class="text-[10px] font-medium">Sync</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Floating Action Button for New Survey -->
+<button class="fixed bottom-24 right-6 size-14 rounded-full bg-primary text-white shadow-lg shadow-primary/40 flex items-center justify-center z-30">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>
