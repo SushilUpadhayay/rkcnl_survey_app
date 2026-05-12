@@ -9,12 +9,12 @@
 
 | Module | Status | Completion % | Missing Components |
 | :--- | :--- | :---: | :--- |
-| **Backend API** | In Progress | 70% | Apply Prisma migrations to real DB, Reporting endpoints. |
-| **Mobile App (Frontend)** | Partial | 30% | 6/10 Question Types, Offline Sync logic, Custom questions, Notes. |
-| **Web Admin Portal** | Not Started | 0% | Dashboard, Survey Builder, Reporting, User Management, Category Management. |
-| **Database Layer** | In Progress | 25% | Schema defined (Prisma/PostgreSQL), awaiting migration on real DB. |
-| **Authentication** | Complete | 100% | JWT, bcrypt password hashing, role-based access, frontend integration. |
-| **Security Cleanup** | Complete | 100% | Removed secrets from history, root .gitignore, .env untracked. |
+| **Backend API** | In Progress | 75% | Apply Prisma migrations to real DB, Reporting endpoints. |
+| **Mobile App (Frontend)** | In Progress | 40% | Dynamic UI for all 10 Question Types, Offline Sync logic. |
+| **Web Admin Portal** | Not Started | 0% | Dashboard, Survey Builder, Reporting. |
+| **Database Layer** | In Progress | 30% | Schema defined, repository cleaned, ready for migration. |
+| **Authentication** | Complete | 100% | JWT, role-based access, Flutter AuthService integrated. |
+| **Security & Git** | Complete | 100% | Purged junk from tracking, root .gitignore configured, merged branches. |
 
 ---
 
@@ -29,7 +29,9 @@
 - [x] Multiple screens created in Flutter app.
 - [x] **Authentication**: JWT login/register/me endpoints + Flutter AuthService.
 - [x] **Security Audit**: Removed exposed credentials and `node_modules` from Git history.
-- [x] **Git Hygiene**: Root `.gitignore` created, `.env` untracked.
+- [x] **Git Hygiene**: Root `.gitignore` created, repository tracking cleaned (removed `node_modules`, `.env`, build artifacts).
+- [x] **Merge Resolution**: Successfully merged `backend` into `main` with unrelated histories.
+- [x] **Frontend Alignment**: Updated `AppState` and `models.dart` to support 10 question types and backend-ready auth.
 - [x] **Backend Controllers**: Full CRUD implemented for Surveys, Responses, Categories.
   - [x] `surveyController.js` — role-aware CRUD + soft delete.
   - [x] `responseController.js` — bulk offline sync + paginated fetch.
@@ -67,8 +69,6 @@
 
 ## 🛠️ Next Steps
 1. Run `prisma migrate dev` against a live PostgreSQL instance.
-2. Align Flutter `QuestionType` enum with all 10 backend question types.
-3. Implement dynamic survey form rendering in Flutter for all question types.
-4. Wire the Flutter offline sync to `POST /api/responses/sync`.
-5. Start the Web Admin Portal development.
-6. Implement reporting / data export endpoints.
+2. Implement dynamic survey form rendering in Flutter for all 10 question types.
+3. Wire the Flutter offline sync to `POST /api/responses/sync`.
+4. Start the Web Admin Portal development.
