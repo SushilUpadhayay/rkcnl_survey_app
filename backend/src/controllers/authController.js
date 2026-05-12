@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { prisma } = require('../config/db');
@@ -85,79 +84,13 @@ exports.getMe = async (req, res) => {
 
 // Generate JWT
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '30d'
-    });
-=======
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-
-// @desc    Auth user & get token
-// @route   POST /api/auth/login
-// @access  Public
-const loginUser = async (req, res) => {
-    const { govId, password } = req.body;
-
-    try {
-        const user = await User.findOne({ govId });
-
-        if (user && (await user.matchPassword(password))) {
-            res.json({
-                _id: user._id,
-                name: user.name,
-                govId: user.govId,
-                role: user.role,
-                token: generateToken(user._id)
-            });
-        } else {
-            res.status(401).json({ message: 'Invalid Government ID or Security Token' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: 'Internal Server Error' });
-    }
-};
-
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Private/Admin
-const registerUser = async (req, res) => {
-    const { name, govId, password, role } = req.body;
-
-    try {
-        const userExists = await User.findOne({ govId });
-
-        if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
-
-        const user = await User.create({
-            name,
-            govId,
-            password,
-            role
-        });
-
-        if (user) {
-            res.status(201).json({
-                _id: user._id,
-                name: user.name,
-                govId: user.govId,
-                role: user.role,
-                token: generateToken(user._id)
-            });
-        } else {
-            res.status(400).json({ message: 'Invalid user data' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: 'Internal Server Error' });
-    }
->>>>>>> Stashed changes
-};
-
-const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET || 'rkcnl_secret_key', {
         expiresIn: '30d'
     });
 };
 
-module.exports = { loginUser, registerUser };
+module.exports = { 
+    loginUser: exports.login, 
+    registerUser: exports.register,
+    getMe: exports.getMe
+};
