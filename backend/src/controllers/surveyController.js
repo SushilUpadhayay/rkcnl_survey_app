@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 /**
  * src/controllers/surveyController.js
  *
@@ -65,10 +66,47 @@ exports.getSurveyById = async (req, res) => {
         res.json(survey);
     } catch (error) {
         console.error('[getSurveyById]', error);
+=======
+const Survey = require('../models/Survey');
+
+// @desc    Create new survey
+// @route   POST /api/surveys
+// @access  Private
+const createSurvey = async (req, res) => {
+    try {
+        const { district, cropType, landArea, healthStatus, notes, coordinates, syncId } = req.body;
+
+        const survey = await Survey.create({
+            userId: req.user._id,
+            district,
+            cropType,
+            landArea,
+            healthStatus,
+            notes,
+            location: coordinates ? { coordinates } : undefined,
+            syncId
+        });
+
+        res.status(201).json(survey);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// @desc    Get all surveys
+// @route   GET /api/surveys
+// @access  Private/Admin
+const getSurveys = async (req, res) => {
+    try {
+        const surveys = await Survey.find({}).populate('userId', 'name govId');
+        res.json(surveys);
+    } catch (error) {
+>>>>>>> Stashed changes
         res.status(500).json({ message: error.message });
     }
 };
 
+<<<<<<< Updated upstream
 // ── @route   POST /api/surveys
 // ── @access  Private – Admin only
 exports.createSurvey = async (req, res) => {
@@ -172,3 +210,6 @@ exports.deleteSurvey = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+=======
+module.exports = { createSurvey, getSurveys };
+>>>>>>> Stashed changes

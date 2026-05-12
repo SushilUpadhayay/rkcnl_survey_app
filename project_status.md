@@ -42,7 +42,6 @@
 - [ ] **Frontend Model Alignment**: Update `QuestionType` in `frontend/lib/models/models.dart` to support all 10 types.
 - [ ] **Survey Engine**: Implement dynamic question rendering for all 10 types in Flutter.
 - [ ] **Offline Sync**: Wire Flutter `SyncScreen` to the `/api/responses/sync` endpoint.
-- [ ] **Web Admin Portal**: Build entire web portal for admin functions.
 - [ ] **Reporting**: Generate reports and export data from responses.
 
 ## 🐛 Bugs & Issues
