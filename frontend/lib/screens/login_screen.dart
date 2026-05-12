@@ -18,19 +18,24 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _errorMessage;
 
   void _handleLogin() async {
-    final user = _userController.text.trim();
+    final email = _userController.text.trim();
     final pass = _passController.text;
 
-    if (user.isEmpty || pass.isEmpty) {
+    if (email.isEmpty || pass.isEmpty) {
       setState(() => _errorMessage = 'Please enter your credentials.');
       return;
     }
 
     setState(() => _errorMessage = null);
 
-    // Simulate login
-    await context.read<AppState>().login(user);
-    if (mounted) context.go('/dashboard');
+    final appState = context.read<AppState>();
+    final success = await appState.login(email, pass);
+
+    if (success) {
+      if (mounted) context.go('/dashboard');
+    } else {
+      setState(() => _errorMessage = appState.errorMessage);
+    }
   }
 
   @override
@@ -198,15 +203,24 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           const SizedBox(height: 32),
           ElevatedButton(
-            onPressed: _handleLogin,
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Login'),
-                SizedBox(width: 8),
-                Icon(Icons.arrow_forward, size: 20),
-              ],
-            ),
+            onPressed: context.watch<AppState>().isAuthenticating ? null : _handleLogin,
+            child: context.watch<AppState>().isAuthenticating
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Login'),
+                      SizedBox(width: 8),
+                      Icon(Icons.arrow_forward, size: 20),
+                    ],
+                  ),
           ),
           const SizedBox(height: 24),
           const Row(
