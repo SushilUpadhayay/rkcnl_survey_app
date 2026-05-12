@@ -1,7 +1,7 @@
 # Project Status: RKCNL Survey App
 
 **Last Updated**: 2026-05-12
-**Overall Progress**: 35%
+**Overall Progress**: 40%
 
 ---
 
@@ -14,6 +14,7 @@
 | **Web Admin Portal** | Not Started | 0% | Dashboard, Survey Builder, Reporting, User Management, Category Management. |
 | **Database Layer** | In Progress | 25% | Migration to PostgreSQL (Prisma) complete, awaiting schema application to real DB. |
 | **Authentication** | Complete | 100% | JWT implementation, Password hashing, Role-based access, Frontend integration. |
+| **Security Cleanup** | Complete | 100% | Removed exposed secrets from history, added .gitignore, untracked .env. |
 
 ---
 
@@ -25,6 +26,8 @@
 - [x] Integration of `sqflite`, `go_router`, and `provider` in frontend.
 - [x] Requirements parsing and initial analysis.
 - [x] Basic survey form UI structure in Flutter.
+- [x] **Security Audit**: Removed exposed secrets (MongoDB Atlas strings) and `node_modules` from Git history.
+- [x] **Git Hygiene**: Created root `.gitignore` and ensured `.env` files are not tracked.
 - [x] Multiple screens created in Flutter app.
 
 ## 📝 Pending Work (High Priority)
