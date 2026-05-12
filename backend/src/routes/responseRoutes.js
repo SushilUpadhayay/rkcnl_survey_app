@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const responseController = require('../controllers/responseController');
+const { protect } = require('../middleware/authMiddleware');
 
-// Define response routes mapping to controller placeholders
-// TODO: Add auth middleware later
+// All response routes require authentication
+router.use(protect);
+
 router.post('/sync', responseController.syncResponses);
 router.get('/survey/:surveyId', responseController.getResponsesBySurvey);
 

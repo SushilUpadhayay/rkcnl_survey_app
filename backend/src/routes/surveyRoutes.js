@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const surveyController = require('../controllers/surveyController');
+const { protect } = require('../middleware/authMiddleware');
 
-// Define survey routes mapping to controller placeholders
-// TODO: Add auth/role middleware later
+// All survey routes require authentication
+router.use(protect);
+
 router.get('/', surveyController.getSurveys);
 router.get('/:id', surveyController.getSurveyById);
 router.post('/', surveyController.createSurvey);
