@@ -1,17 +1,16 @@
-const mongoose = require('mongoose');
+const { PrismaClient } = require('@prisma/client');
 
-// Placeholder for MongoDB connection setup using Mongoose
-// Currently this is just structural preparation for future integration
+const prisma = new PrismaClient();
+
 const connectDB = async () => {
     try {
-        // TODO: Replace with actual MongoDB connection string from environment variables
-        // const conn = await mongoose.connect(process.env.MONGO_URI);
-        // console.log(`MongoDB Connected: ${conn.connection.host}`);
-        console.log('MongoDB Integration Placeholder: connectDB called');
+        await prisma.$connect();
+        console.log('PostgreSQL Connected via Prisma');
     } catch (error) {
-        console.error(`Error connecting to MongoDB: ${error.message}`);
-        process.exit(1);
+        console.error(`Error connecting to PostgreSQL: ${error.message}`);
+        // In production, you might not want to exit immediately, but for setup it's fine
+        // process.exit(1);
     }
 };
 
-module.exports = connectDB;
+module.exports = { connectDB, prisma };

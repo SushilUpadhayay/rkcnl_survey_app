@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import '../models/models.dart';
 import '../services/storage_service.dart';
+import '../services/auth_service.dart';
 
 /// Central app state provider - manages auth, surveys, connectivity, and sync
 class AppState extends ChangeNotifier {
   final StorageService storage;
+  final AuthService _authService = AuthService();
 
   // ── Auth ──
   bool isLoggedIn = false;
   String userName = 'Field Surveyor';
   String userInitials = 'FS';
   String userRegion = 'Ward 4, Northern Sector';
+  String? errorMessage;
+  bool isAuthenticating = false;
 
   // ── Connectivity ──
   bool isOnline = true;
@@ -90,23 +94,38 @@ class AppState extends ChangeNotifier {
   }
 
   // ── AUTH ──
-  Future<void> login(String name) async {
-    final initials = name.length >= 2
-        ? name.substring(0, 2).toUpperCase()
-        : name.toUpperCase();
-    userName = name;
-    userInitials = initials;
-    isLoggedIn = true;
-    await storage.saveAuth({
-      'loggedIn': true,
-      'name': name,
-      'initials': initials,
-      'region': userRegion
-    });
+  Future<bool> login(String email, String password) async {
+    isAuthenticating = true;
+    errorMessage = null;
     notifyListeners();
+
+    final result = await _authService.login(email, password);
+    
+    isAuthenticating = false;
+    if (result['success']) {
+      final user = result['user'];
+      isLoggedIn = true;
+      userName = user['username'] ?? 'User';
+      userInitials = userName.length >= 2 ? userName.substring(0, 2).toUpperCase() : userName.toUpperCase();
+      // Region can be added to user model later
+      
+      await storage.saveAuth({
+        'loggedIn': true,
+        'name': userName,
+        'initials': userInitials,
+        'region': userRegion
+      });
+      notifyListeners();
+      return true;
+    } else {
+      errorMessage = result['message'];
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<void> logout() async {
+    await _authService.logout();
     isLoggedIn = false;
     await storage.clearAuth();
     notifyListeners();

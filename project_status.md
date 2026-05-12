@@ -1,7 +1,7 @@
 # Project Status: RKCNL Survey App
 
 **Last Updated**: 2026-05-12
-**Overall Progress**: 18%
+**Overall Progress**: 35%
 
 ---
 
@@ -12,8 +12,8 @@
 | **Backend API** | Partial | 25% | Full CRUD operations, MS-SQL integration, Security, Response handling. |
 | **Mobile App (Frontend)** | Partial | 30% | 6/10 Question Types, Offline Sync logic, Auth UI, Custom questions, Notes. |
 | **Web Admin Portal** | Not Started | 0% | Dashboard, Survey Builder, Reporting, User Management, Category Management. |
-| **Database Layer** | Incorrect | 5% | Migration from MongoDB to MS-SQL, Schema setup. |
-| **Authentication** | Skeleton | 10% | JWT implementation, Password hashing, Role-based access. |
+| **Database Layer** | In Progress | 25% | Migration to PostgreSQL (Prisma) complete, awaiting schema application to real DB. |
+| **Authentication** | Complete | 100% | JWT implementation, Password hashing, Role-based access, Frontend integration. |
 
 ---
 
@@ -28,9 +28,9 @@
 - [x] Multiple screens created in Flutter app.
 
 ## 📝 Pending Work (High Priority)
-- [ ] **Database Migration**: Switch backend from MongoDB (Mongoose) to MS-SQL.
+- [ ] **Database Migration**: Switch backend from MongoDB (Mongoose) to PostgreSQL.
 - [ ] **Frontend Model Alignment**: Update `QuestionType` in `frontend/lib/models/models.dart` to support all 10 types.
-- [ ] **Authentication**: Implement functional login/signup in backend and frontend.
+- [x] **Authentication**: Implement functional login/signup in backend and frontend.
 - [ ] **Survey Engine**: Implement dynamic question rendering for all 10 types in Flutter.
 - [ ] **API Implementation**: Implement CRUD operations for Surveys, Responses, Categories.
 - [ ] **Web Admin Portal**: Build entire web portal for admin functions.
