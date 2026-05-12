@@ -1,5 +1,16 @@
 /// Question types supported by the survey system
-enum QuestionType { radio, checkbox, text, rating }
+enum QuestionType {
+  MultiChoiceSingleSelect,
+  MultiChoiceMultiSelect,
+  ChoiceWithAddition,
+  ChoiceWithFreeWriting,
+  OpenEnd,
+  Ranking,
+  PickingUp,
+  PickupAndRank,
+  RatingScale,
+  Matrix,
+}
 
 /// A single question within a survey (created by admin)
 class Question {
@@ -8,6 +19,8 @@ class Question {
   final String text;
   final String? description;
   final List<String>? options;
+  final List<String>? matrixRows;
+  final List<String>? matrixColumns;
   final int? maxRating;
   final String? placeholder;
 
@@ -17,6 +30,8 @@ class Question {
     required this.text,
     this.description,
     this.options,
+    this.matrixRows,
+    this.matrixColumns,
     this.maxRating,
     this.placeholder,
   });
@@ -27,22 +42,28 @@ class Question {
         'text': text,
         'description': description,
         'options': options,
+        'matrixRows': matrixRows,
+        'matrixColumns': matrixColumns,
         'maxRating': maxRating,
         'placeholder': placeholder,
       };
 
   factory Question.fromJson(Map<String, dynamic> j) => Question(
         id: (j['id'] as dynamic).toString(),
-        type: QuestionType.values.byName((j['type']?.toString() ?? 'text')),
+        type: QuestionType.values.byName((j['type']?.toString() ?? 'OpenEnd')),
         text: (j['text'] as dynamic).toString(),
-        description:
-            j['description']?.toString(),
+        description: j['description']?.toString(),
         options: j['options'] != null
             ? (j['options'] as List).map((e) => e.toString()).toList()
             : null,
+        matrixRows: j['matrixRows'] != null
+            ? (j['matrixRows'] as List).map((e) => e.toString()).toList()
+            : null,
+        matrixColumns: j['matrixColumns'] != null
+            ? (j['matrixColumns'] as List).map((e) => e.toString()).toList()
+            : null,
         maxRating: (j['maxRating'] as int?) ?? 5,
-        placeholder:
-            j['placeholder']?.toString(),
+        placeholder: j['placeholder']?.toString(),
       );
 }
 
