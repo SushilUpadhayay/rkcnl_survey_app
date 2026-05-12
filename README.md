@@ -1,16 +1,25 @@
-# rkcnl_app
+# RKCNL Survey App Monorepo
 
-A new Flutter project.
+This repository contains the RKCNL Survey application, split into two parts:
 
-## Getting Started
+## 1. Frontend (`frontend/`)
+A Flutter application that provides an offline-first survey collection experience for field surveyors.
 
-This project is a starting point for a Flutter application.
+## 2. Backend (`backend/`)
+A Node.js and Express API that acts as the central synchronization and management server. It interfaces with PostgreSQL to store surveys and responses.
 
-A few resources to get you started if this is your first Flutter project:
+### Getting Started
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+#### Frontend
+```bash
+cd frontend
+flutter pub get
+flutter run
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+#### Backend
+```bash
+cd backend
+npm install
+node index.js
+```
