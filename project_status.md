@@ -10,7 +10,8 @@
 | Module | Status | Completion % | Missing Components |
 | :--- | :--- | :---: | :--- |
 | **Backend API** | In Progress | 75% | Apply Prisma migrations to real DB, Reporting endpoints. |
-| **Mobile App (Frontend)** | In Progress | 40% | Dynamic UI for all 10 Question Types, Offline Sync logic. |
+| **Mobile App (Frontend)** | In Progress | 65% | Offline Sync logic, Detailed Analytics UI. |
+| **Survey Engine** | Complete | 100% | 10/10 Question Types, Isolated State, Centralized Validation. |
 | **Web Admin Portal** | Not Started | 0% | Dashboard, Survey Builder, Reporting. |
 | **Database Layer** | In Progress | 30% | Schema defined, repository cleaned, ready for migration. |
 | **Authentication** | Complete | 100% | JWT, role-based access, Flutter AuthService integrated. |
@@ -32,6 +33,12 @@
 - [x] **Git Hygiene**: Root `.gitignore` created, repository tracking cleaned (removed `node_modules`, `.env`, build artifacts).
 - [x] **Merge Resolution**: Successfully merged `backend` into `main` with unrelated histories.
 - [x] **Frontend Alignment**: Updated `AppState` and `models.dart` to support 10 question types and backend-ready auth.
+- [x] **Survey Engine (Enhanced)**: 
+  - [x] Implemented `QuestionController` & `SurveyController` for isolated state management.
+  - [x] Centralized `AnswerParser` for data normalization.
+  - [x] Abstracted `ValidationRule` system (Required, Min/Max, Completeness).
+  - [x] Created 10/10 specialized widgets (Matrix, Ranking, Searchable Dropdowns, etc.).
+  - [x] Refactored `SurveyFormScreen` for scalable dynamic rendering.
 - [x] **Backend Controllers**: Full CRUD implemented for Surveys, Responses, Categories.
   - [x] `surveyController.js` — role-aware CRUD + soft delete.
   - [x] `responseController.js` — bulk offline sync + paginated fetch.
@@ -41,8 +48,6 @@
 
 ## 📝 Pending Work (High Priority)
 - [ ] **Database Migration**: Run `prisma migrate deploy` against real PostgreSQL instance.
-- [ ] **Frontend Model Alignment**: Update `QuestionType` in `frontend/lib/models/models.dart` to support all 10 types.
-- [ ] **Survey Engine**: Implement dynamic question rendering for all 10 types in Flutter.
 - [ ] **Offline Sync**: Wire Flutter `SyncScreen` to the `/api/responses/sync` endpoint.
 - [ ] **Web Admin Portal**: Build entire web portal for admin functions.
 - [ ] **Reporting**: Generate reports and export data from responses.
