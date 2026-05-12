@@ -1,0 +1,95 @@
+Requirements Specification For RKCNL-SURVEY
+Introduction
+1.1 Purpose
+The purpose of the RKCNL - Survey application is to facilitate public surveys conducted 
+by internal staff, primarily from the Sales and Marketing departments. The system 
+comprises two components:
+•A web-based admin portal for centralized survey management and reporting.
+•A mobile application for staff to conduct surveys in the field.
+1.2 Intended Audience
+•Admin Users: Internal staff responsible for creating, managing, and analyzing 
+surveys.
+•Field Staff: Sales and Marketing personnel conducting surveys using mobile 
+devices.
+1.3 Scope
+RKCNL - Survey will enable:
+•Admins to create and manage surveys, questions, and view collected responses.
+•Field staff to download surveys, collect responses, add notes, and submit data.
+2. Overall Description
+2.1 Product Perspective
+The application will consist of:
+•Web Admin Portal: Centralized control panel for survey creation, user 
+management, reporting and question management.
+•Mobile App: Android app for field staff to conduct surveys and sync data with the 
+server.
+2.2 User Classes and Characteristics
+2.3 Operating Environment
+•Web Portal: Modern browsers (Chrome, Edge, Firefox)
+•Mobile App: Android 10+ 
+2.4 Design and Implementation Constraints
+•Secure authentication and role-based access
+•Offline data collection capability in mobile app
+•RESTful API for communication between mobile and server
+3. Functional Requirements
+3.1 Web Admin Portal
+•Admin can log in securely.
+•Admin can create/edit and soft delete surveys.
+•Created Surveys can be categories into different types. Create and Edit Category 
+class
+•Admin can add/edit/delete questions with their options and patterns.
+oQuestion can be of different nature.
+▪Multi-Choice Multi-Select Questions: Respondents choose multiple 
+answers from a list.
+▪Multi-Choice Single-Select Questions: Respondents choose one 
+answer from a list.
+▪Choice Questions with Addition Option: Respondents choose one 
+answer from a list or if not find, can add own answer.
+▪Choice Questions with Free Writing Option: Respondents choose 
+one or multiple answers from a list and also can write some notes/ 
+reason to selection.
+▪Open End: Users type their own answer. (Free writing)
+▪Ranking base: Respondents rank items in order of preference or 
+importance.
+▪Picking Up: Pick up answer from hundred for option available. It is 
+kind of choice question but here answer is searched in dropdown list 
+as it contains hundreds of options.
+▪Pickup and Rank: It is like picking up questions, but answers are 
+picked as well as raked.
+▪Rating Scale: Respondents rate something on a scale (e.g., 1 to 5 
+stars).
+▪Matrix/Grid Question: Measures attitudes or opinions across a range. 
+For e.g.
+Service: Poor/Fair/ Good/ Excellent.
+Feeling: Strongly Disagree/ Disagree /Neutral /Agree /Strongly 
+Agree
+•Admin can view submitted responses.
+•Admin can generate reports and export data.
+•Admin can manage user roles and permissions.
+3.2 Mobile App
+•Field staff can log in securely.
+•Field staff can fetch available surveys from the server.
+•Field staff can view and answer survey questions.
+•Field staff can add personal notes per survey.
+•Field staff can add custom questions during survey.
+•Field staff can submit completed surveys to the server.
+•App stores data locally when offline and syncs when online.
+5. External Interface Requirements
+5.1 User Interfaces
+•Web portal with dashboard, survey builder, and reporting tools.
+•Mobile app with intuitive UI for survey navigation and data entry.
+5.2 Hardware Interfaces
+•Mobile devices with camera and GPS (optional for future features).
+5.3 Software Interfaces
+•Backend API (RESTful) for data exchange between mobile and web.
+•Database (MS-SQL) for storing survey data.
+6. Future Enhancements
+•GPS tagging of survey responses
+•Image/audio capture during surveys
+•Multilingual support
+•Push notifications for survey update
+7. Appendices
+Images of Sample questions are attached below:
+
+
+
+
