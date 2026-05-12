@@ -48,7 +48,6 @@
 ## 📝 Pending Work (High Priority)
 - [ ] **Database Migration**: Run `prisma migrate deploy` against real PostgreSQL instance.
 - [ ] **Offline Sync**: Wire Flutter `SyncScreen` to the `/api/responses/sync` endpoint.
-- [ ] **Web Admin Portal**: Build entire web portal for admin functions.
 - [ ] **Reporting**: Generate reports and export data from responses.
 
 ## 🐛 Bugs & Issues
