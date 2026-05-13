@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../services/app_state.dart';
+import '../widgets/questions/question_factory.dart';
 import '../models/models.dart';
 import '../theme/app_theme.dart';
 
@@ -219,72 +219,15 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
   }
 
   Widget _buildInput(Question q) {
-    switch (q.type) {
-      case QuestionType.radio:
-        return Column(
-          children: q.options!.map((opt) {
-            final selected = _answers[q.id] == opt;
-            return ListTile(
-              title: Text(opt,
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
-              leading: Icon(
-                selected
-                    ? Icons.radio_button_checked
-                    : Icons.radio_button_unchecked,
-                color: selected ? AppColors.green : AppColors.border,
-              ),
-              onTap: () => setState(() => _answers[q.id] = opt),
-              contentPadding: EdgeInsets.zero,
-            );
-          }).toList(),
-        );
-      case QuestionType.checkbox:
-        final List<String> current = List<String>.from(_answers[q.id] ?? []);
-        return Column(
-          children: q.options!
-              .map((opt) => CheckboxListTile(
-                    title: Text(opt,
-                        style: const TextStyle(fontWeight: FontWeight.w600)),
-                    value: current.contains(opt),
-                    onChanged: (v) {
-                      setState(() {
-                        if (v == true) {
-                          current.add(opt);
-                        } else {
-                          current.remove(opt);
-                        }
-                        _answers[q.id] = current;
-                      });
-                    },
-                    contentPadding: EdgeInsets.zero,
-                    activeColor: AppColors.green,
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ))
-              .toList(),
-        );
-      case QuestionType.text:
-        return TextField(
-          maxLines: 4,
-          onChanged: (v) => _answers[q.id] = v,
-          controller: TextEditingController(text: _answers[q.id] ?? ''),
-          decoration: InputDecoration(
-              hintText: q.placeholder ?? 'Type your answer here...'),
-        );
-      case QuestionType.rating:
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List.generate(q.maxRating ?? 5, (i) {
-            final val = i + 1;
-            final isActive = (_answers[q.id] ?? 0) >= val;
-            return GestureDetector(
-              onTap: () => setState(() => _answers[q.id] = val),
-              child: Icon(isActive ? Icons.star : Icons.star_border,
-                  color: isActive ? AppColors.orange : AppColors.border,
-                  size: 36),
-            );
-          }),
-        );
-    }
+    return QuestionFactory.build(
+      question: q,
+      value: _answers[q.id],
+      onChanged: (val) {
+        setState(() {
+          _answers[q.id] = val;
+        });
+      },
+    );
   }
 
   Widget _buildReviewScreen() {
@@ -322,6 +265,14 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
 
   String _formatAnswer(Question q, dynamic ans) {
     if (ans == null) return 'No answer provided';
+    if (q.type == QuestionType.Matrix) {
+      if (ans is! Map) return 'Invalid data';
+      return ans.entries.map((e) => '${e.key}: ${e.value}').join(', ');
+    }
+    if (q.type == QuestionType.ChoiceWithFreeWriting) {
+      if (ans is! Map) return 'Invalid data';
+      return 'Choice: ${ans['choice']}, Notes: ${ans['notes']}';
+    }
     if (ans is List) return ans.isEmpty ? 'No answer provided' : ans.join(', ');
     return ans.toString();
   }

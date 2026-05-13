@@ -55,8 +55,19 @@ class AnalyticsScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildChartSection(appState),
               const SizedBox(height: 32),
-              const Text('Survey Breakdown',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Survey Breakdown',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                  if (appState.userRole == 'Admin')
+                    TextButton.icon(
+                      onPressed: () => appState.fetchGlobalStats(),
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: const Text('Refresh', style: TextStyle(fontSize: 12)),
+                    ),
+                ],
+              ),
               const SizedBox(height: 16),
               ...appState.surveys.map((s) => _buildSurveyProgress(s, appState)),
               const SizedBox(height: 80),
@@ -239,11 +250,36 @@ class AnalyticsScreen extends StatelessWidget {
                 backgroundColor: AppColors.border),
           ),
           const SizedBox(height: 6),
-          Text('$completed completed of ${respondents.length} total',
-              style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColors.textSub,
-                  fontWeight: FontWeight.w600)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('$completed completed of ${respondents.length} total',
+                  style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textSub,
+                      fontWeight: FontWeight.w600)),
+              if (appState.userRole == 'Admin')
+                GestureDetector(
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Exporting ${s.title} CSV...')),
+                    );
+                    appState.exportSurveyData(s.id);
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.download, size: 14, color: AppColors.blue),
+                      const SizedBox(width: 4),
+                      const Text('Export CSV',
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.blue,
+                              fontWeight: FontWeight.w700)),
+                    ],
+                  ),
+                ),
+            ],
+          ),
         ],
       ),
     );

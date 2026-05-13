@@ -130,6 +130,10 @@ class Question {
   /// Row labels for Matrix questions (e.g. ["Service", "Feeling"]).
   final List<String>? matrixRows;
 
+  /// Additional properties for specific question types (e.g. matrix rows, rating icons).
+  /// This ensures the system is "greater or less than 10" types and easily extendable.
+  final Map<String, dynamic> extras;
+
   const Question({
     required this.id,
     required this.type,
@@ -141,6 +145,7 @@ class Question {
     this.isRequired = false,
     this.matrixColumns,
     this.matrixRows,
+    this.extras = const {},
   });
 
   Map<String, dynamic> toJson() => {
@@ -154,6 +159,7 @@ class Question {
         'isRequired': isRequired,
         if (matrixColumns != null) 'matrixColumns': matrixColumns,
         if (matrixRows != null) 'matrixRows': matrixRows,
+        'extras': extras,
       };
 
   factory Question.fromJson(Map<String, dynamic> j) => Question(
@@ -176,6 +182,7 @@ class Question {
             ? List<String>.from(
                 (j['matrixRows'] as List).map((e) => e.toString()))
             : null,
+        extras: Map<String, dynamic>.from(j['extras'] ?? {}),
       );
 }
 
