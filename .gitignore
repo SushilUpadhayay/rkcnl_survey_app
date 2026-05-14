@@ -69,3 +69,5 @@ coverage/
 .agent/
 analysis_output.txt
 migrate_working_dir/
+workflow.md 
+project_status.md

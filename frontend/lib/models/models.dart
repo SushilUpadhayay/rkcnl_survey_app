@@ -226,6 +226,27 @@ class Survey {
         'iconName': iconName,
         'colorValue': colorValue,
       };
+
+  factory Survey.fromJson(Map<String, dynamic> j) {
+    // Map status from backend (Active/Draft/Closed) to frontend enum
+    SurveyStatus s = SurveyStatus.pending;
+    if (j['status'] == 'Active') s = SurveyStatus.inProgress;
+
+    return Survey(
+      id: j['id']?.toString() ?? '',
+      title: j['title']?.toString() ?? 'Untitled Survey',
+      region: j['region']?.toString() ?? 'Global', // Default if missing
+      dueDate: j['dueDate']?.toString() ?? 'No deadline',
+      priority: j['priority']?.toString() ?? 'medium',
+      status: s,
+      description: j['description']?.toString() ?? '',
+      questions: j['questions'] != null
+          ? List<Question>.from((j['questions'] as List).map((q) => Question.fromJson(q as Map<String, dynamic>)))
+          : [],
+      iconName: j['iconName']?.toString() ?? 'assignment',
+      colorValue: j['colorValue'] is int ? j['colorValue'] : 0xFF1A6B1A,
+    );
+  }
 }
 
 enum RespondentStatus { pending, draft, completed }

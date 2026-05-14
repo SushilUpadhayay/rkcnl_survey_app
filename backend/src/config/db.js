@@ -1,16 +1,17 @@
 const { PrismaClient } = require('@prisma/client');
 
+// Single shared Prisma instance for the entire application
 const prisma = new PrismaClient();
 
+// Verify database connection on startup
 const connectDB = async () => {
     try {
         await prisma.$connect();
-        console.log('PostgreSQL Connected via Prisma');
+        console.log('PostgreSQL connected successfully via Prisma');
     } catch (error) {
-        console.error(`Error connecting to PostgreSQL: ${error.message}`);
-        // In production, you might not want to exit immediately, but for setup it's fine
-        // process.exit(1);
+        console.error(`Database connection error: ${error.message}`);
+        process.exit(1); // Exit if DB is unreachable
     }
 };
 
-module.exports = { connectDB, prisma };
+module.exports = { prisma, connectDB };

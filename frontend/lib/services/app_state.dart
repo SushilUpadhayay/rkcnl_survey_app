@@ -84,19 +84,41 @@ class AppState extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // Real implementation would look like:
-      // final res = await http.get(Uri.parse('$baseUrl/api/surveys'), headers: authHeader);
-      // if (res.statusCode == 200) {
-      //   final List data = json.decode(res.body)['surveys'];
-      //   surveys = data.map((s) => Survey.fromJson(s)).toList();
-      // }
+      final token = await _authService.getToken();
+      if (token == null) {
+        // Fallback to demo if not logged in yet (e.g. splash)
+        surveys = _buildAdminSurveys();
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
 
-      // For now, we refresh the local data to simulate a success
-      surveys = _buildAdminSurveys();
+      final baseUrl = AuthService.baseUrl.replaceAll('/api/auth', '');
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/surveys/assigned'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        final List data = body['data'] ?? [];
+        
+        if (data.isNotEmpty) {
+          surveys = data.map((s) => Survey.fromJson(s as Map<String, dynamic>)).toList();
+        } else {
+          // If no surveys assigned, use demo as placeholder for now or leave empty
+          surveys = _buildAdminSurveys();
+        }
+      } else {
+        debugPrint('Failed to fetch surveys: ${response.statusCode}');
+        surveys = _buildAdminSurveys(); // Fallback
+      }
     } catch (e) {
+      debugPrint('Error fetching surveys: $e');
+      surveys = _buildAdminSurveys(); // Fallback
       error = e.toString();
     } finally {
       isLoading = false;
@@ -324,7 +346,8 @@ class AppState extends ChangeNotifier {
       if (payload.isEmpty) return true;
 
       // Real network request
-      final url = Uri.parse('http://10.0.2.2:3000/api/responses/sync');
+      final baseUrl = AuthService.baseUrl.replaceAll('/api/auth', '');
+      final url = Uri.parse('$baseUrl/api/responses/sync');
       final response = await http.post(
         url,
         headers: {

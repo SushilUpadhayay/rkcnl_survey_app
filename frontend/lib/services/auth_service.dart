@@ -37,7 +37,7 @@ class AuthService {
         Uri.parse('$baseUrl/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'username': username,
+          'full_name': username,
           'email': email,
           'password': password,
           'role': 'FieldStaff',
@@ -78,7 +78,7 @@ class AuthService {
 
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/me'),
+        Uri.parse('$baseUrl/profile'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
