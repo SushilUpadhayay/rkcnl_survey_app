@@ -7,13 +7,13 @@ const { prisma } = require('../config/db');
 // @access  Public
 const register = async (req, res) => {
     try {
-        const { full_name, email, password } = req.body;
+        const { full_name, gender, date_of_birth, location, email, phone, password } = req.body;
 
         // Validate required fields
-        if (!full_name || !email || !password) {
+        if (!full_name || !gender || !date_of_birth || !location || !email || !phone || !password) {
             return res.status(400).json({
                 success: false,
-                message: 'Please provide full_name, email, and password'
+                message: 'Please provide all required fields: full_name, gender, date_of_birth, location, email, phone, and password'
             });
         }
 
@@ -37,6 +37,10 @@ const register = async (req, res) => {
             data: {
                 username: full_name, // Map full_name to username field
                 email,
+                gender,
+                dateOfBirth: date_of_birth,
+                location,
+                phone,
                 passwordHash: hashedPassword,
                 role: 'FieldStaff' // Default role
             },
@@ -44,6 +48,10 @@ const register = async (req, res) => {
                 id: true,
                 username: true,
                 email: true,
+                gender: true,
+                dateOfBirth: true,
+                location: true,
+                phone: true,
                 role: true,
                 createdAt: true
             }

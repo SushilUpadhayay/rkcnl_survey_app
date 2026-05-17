@@ -24,6 +24,10 @@ model User {
   username     String   @unique
   email        String   @unique
   passwordHash String?
+  gender       String?
+  dateOfBirth  String?
+  phone        String?
+  location     String?
   role         Role     @default(FieldStaff)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())

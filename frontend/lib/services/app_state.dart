@@ -217,6 +217,34 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> register({
+    required String fullName,
+    required String gender,
+    required String dateOfBirth,
+    required String location,
+    required String email,
+    required String phone,
+    required String password,
+  }) async {
+    isAuthenticating = true;
+    errorMessage = null;
+    notifyListeners();
+
+    final result = await _authService.register(
+      fullName: fullName,
+      gender: gender,
+      dateOfBirth: dateOfBirth,
+      location: location,
+      email: email,
+      phone: phone,
+      password: password,
+    );
+
+    isAuthenticating = false;
+    notifyListeners();
+    return result;
+  }
+
   Future<void> logout() async {
     await _authService.logout();
     isLoggedIn = false;

@@ -7,6 +7,7 @@ import 'services/storage_service.dart';
 import 'services/app_state.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/surveys_screen.dart';
 import 'screens/respondents_screen.dart';
@@ -53,7 +54,7 @@ GoRouter _buildRouter(AppState appState) => GoRouter(
   initialLocation: '/splash',
   redirect: (context, state) {
     if (state.matchedLocation == '/splash') return null;
-    if (!appState.isLoggedIn && state.matchedLocation != '/login') {
+    if (!appState.isLoggedIn && state.matchedLocation != '/login' && state.matchedLocation != '/register') {
       return '/login';
     }
     if (appState.userRole != 'Admin' && state.matchedLocation == '/analytics') {
@@ -64,6 +65,7 @@ GoRouter _buildRouter(AppState appState) => GoRouter(
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
     GoRoute(path: '/dashboard', builder: (_, __) => const DashboardScreen()),
     GoRoute(path: '/surveys', builder: (_, __) => const SurveysScreen()),
     GoRoute(
