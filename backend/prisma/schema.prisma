@@ -31,6 +31,7 @@ model User {
 
   surveys      Survey[]   @relation("CreatedSurveys")
   responses    Response[] @relation("UserResponses")
+  assignments  SurveyAssignment[]
 }
 
 model Category {
@@ -60,9 +61,22 @@ model Survey {
   createdBy   User         @relation("CreatedSurveys", fields: [createdById], references: [id])
   
   responses   Response[]
+  assignments SurveyAssignment[]
   
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+}
+
+model SurveyAssignment {
+  id        String   @id @default(uuid())
+  surveyId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  survey    Survey   @relation(fields: [surveyId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([surveyId, userId])
 }
 
 model Response {
@@ -73,6 +87,11 @@ model Response {
   answers         Json     @default("[]")
   customQuestions Json     @default("[]")
   personalNotes   String?
+  
+  // Media and Location
+  latitude        Float?
+  longitude       Float?
+  photos          Json     @default("[]")
   
   surveyId        String
   survey          Survey   @relation(fields: [surveyId], references: [id])

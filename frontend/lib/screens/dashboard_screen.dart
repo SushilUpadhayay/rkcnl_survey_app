@@ -295,9 +295,11 @@ class DashboardScreen extends StatelessWidget {
         const SizedBox(height: 12),
         _buildActionTile(context, Icons.cloud_sync, 'Sync Data',
             'Upload saved offline responses', AppColors.blue, '/sync'),
-        const SizedBox(height: 12),
-        _buildActionTile(context, Icons.insights, 'Analytics',
-            'View your submission summary', AppColors.purple, '/analytics'),
+        if (context.read<AppState>().userRole == 'Admin') ...[
+          const SizedBox(height: 12),
+          _buildActionTile(context, Icons.insights, 'Analytics',
+              'View your submission summary', AppColors.purple, '/analytics'),
+        ],
       ],
     );
   }
@@ -434,23 +436,24 @@ class DashboardScreen extends StatelessWidget {
         if (i == 2) context.go('/sync');
         if (i == 3) context.go('/analytics');
       },
-      items: const [
-        BottomNavigationBarItem(
+      items: [
+        const BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Home'),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),
             activeIcon: Icon(Icons.assignment),
             label: 'Surveys'),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
             icon: Icon(Icons.sync),
             activeIcon: Icon(Icons.sync),
             label: 'Sync'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.insights),
-            activeIcon: Icon(Icons.insights),
-            label: 'Analytics'),
+        if (Provider.of<AppState>(context, listen: false).userRole == 'Admin')
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.insights),
+              activeIcon: Icon(Icons.insights),
+              label: 'Analytics'),
       ],
     );
   }

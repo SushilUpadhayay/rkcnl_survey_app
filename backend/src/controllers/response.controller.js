@@ -17,7 +17,7 @@ const syncResponses = async (req, res) => {
         const results = [];
 
         for (const item of responses) {
-            const { surveyId, deviceTimestamp, answers, customQuestions, personalNotes } = item;
+            const { surveyId, deviceTimestamp, answers, customQuestions, personalNotes, latitude, longitude, photos } = item;
 
             if (!surveyId || !deviceTimestamp) {
                 results.push({ surveyId, success: false, message: 'Missing surveyId or deviceTimestamp' });
@@ -42,7 +42,10 @@ const syncResponses = async (req, res) => {
                         deviceTimestamp: new Date(deviceTimestamp),
                         answers: answers ?? [],
                         customQuestions: customQuestions ?? [],
-                        personalNotes: personalNotes ?? ''
+                        personalNotes: personalNotes ?? '',
+                        latitude: latitude !== undefined ? parseFloat(latitude) : null,
+                        longitude: longitude !== undefined ? parseFloat(longitude) : null,
+                        photos: photos ?? []
                     }
                 });
                 results.push({ surveyId, responseId: response.id, success: true });

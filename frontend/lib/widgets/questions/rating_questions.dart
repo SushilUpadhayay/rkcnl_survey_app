@@ -55,7 +55,7 @@ class RatingQuestion extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.between,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Poor', style: TextStyle(fontSize: 12)),
                     Text('Excellent', style: TextStyle(fontSize: 12, color: Colors.grey[600])),

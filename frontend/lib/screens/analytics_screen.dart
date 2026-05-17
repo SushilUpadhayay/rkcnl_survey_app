@@ -69,7 +69,7 @@ class AnalyticsScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              ...appState.surveys.map((s) => _buildSurveyProgress(s, appState)),
+              ...appState.surveys.map((s) => _buildSurveyProgress(context, s, appState)),
               const SizedBox(height: 80),
             ],
           ),
@@ -213,7 +213,7 @@ class AnalyticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSurveyProgress(Survey s, AppState appState) {
+  Widget _buildSurveyProgress(BuildContext context, Survey s, AppState appState) {
     final respondents = appState.getRespondents(s.id);
     final completed =
         respondents.where((r) => r.status == RespondentStatus.completed).length;
@@ -294,23 +294,24 @@ class AnalyticsScreen extends StatelessWidget {
         if (i == 2) context.go('/sync');
         if (i == 3) context.go('/analytics');
       },
-      items: const [
-        BottomNavigationBarItem(
+      items: [
+        const BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Home'),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),
             activeIcon: Icon(Icons.assignment),
             label: 'Surveys'),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
             icon: Icon(Icons.sync),
             activeIcon: Icon(Icons.sync),
             label: 'Sync'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.insights),
-            activeIcon: Icon(Icons.insights),
-            label: 'Analytics'),
+        if (Provider.of<AppState>(context, listen: false).userRole == 'Admin')
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.insights),
+              activeIcon: Icon(Icons.insights),
+              label: 'Analytics'),
       ],
     );
   }

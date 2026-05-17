@@ -4,6 +4,10 @@ import 'package:provider/provider.dart';
 import '../widgets/questions/question_factory.dart';
 import '../models/models.dart';
 import '../theme/app_theme.dart';
+import '../services/app_state.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class SurveyFormScreen extends StatefulWidget {
   final String surveyId;
@@ -21,6 +25,10 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
   late Survey _survey;
   late Respondent _respondent;
   bool _initialized = false;
+  List<String> _photos = [];
+  double? _latitude;
+  double? _longitude;
+  bool _isLocating = false;
 
   @override
   void initState() {
@@ -35,6 +43,9 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
         .getRespondents(widget.surveyId)
         .firstWhere((r) => r.id == widget.respondentId);
     _answers.addAll(_respondent.answers);
+    _photos = List<String>.from(_respondent.photos);
+    _latitude = _respondent.latitude;
+    _longitude = _respondent.longitude;
     _initialized = true;
   }
 
@@ -43,7 +54,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
       setState(() => _currentStep++);
       context
           .read<AppState>()
-          .saveRespondentDraft(widget.surveyId, _respondent, _answers);
+          .saveRespondentDraft(widget.surveyId, _respondent, _answers, photos: _photos, latitude: _latitude, longitude: _longitude);
     }
   }
 
@@ -62,7 +73,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
 
     await context
         .read<AppState>()
-        .submitRespondent(widget.surveyId, _respondent, _answers);
+        .submitRespondent(widget.surveyId, _respondent, _answers, photos: _photos, latitude: _latitude, longitude: _longitude);
 
     if (mounted) {
       Navigator.pop(context); // Close loader
@@ -132,7 +143,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
               icon: const Icon(Icons.save_outlined),
               onPressed: () {
                 context.read<AppState>().saveRespondentDraft(
-                    widget.surveyId, _respondent, _answers);
+                    widget.surveyId, _respondent, _answers, photos: _photos, latitude: _latitude, longitude: _longitude);
                 ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Draft saved successfully')));
               }),
@@ -259,8 +270,154 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                 ],
               ),
             )),
+        const SizedBox(height: 16),
+        _buildLocationSection(),
+        const SizedBox(height: 32),
+        _buildPhotoSection(),
       ],
     );
+  }
+
+  Widget _buildLocationSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Location', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.border),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.location_on, color: _latitude != null ? AppColors.green : AppColors.textSub),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(_latitude != null ? 'Location Captured' : 'Location Required', 
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                    if (_latitude != null) 
+                      Text('Lat: ${_latitude!.toStringAsFixed(4)}, Lng: ${_longitude!.toStringAsFixed(4)}', 
+                        style: const TextStyle(fontSize: 12, color: AppColors.textSub)),
+                  ],
+                ),
+              ),
+              if (_isLocating)
+                const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+              else
+                TextButton(
+                  onPressed: _captureLocation, 
+                  child: Text(_latitude != null ? 'Update' : 'Capture')
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _captureLocation() async {
+    setState(() => _isLocating = true);
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        throw Exception('Location services are disabled.');
+      }
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception('Location permissions are denied');
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception('Location permissions are permanently denied');
+      }
+
+      Position pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _latitude = pos.latitude;
+        _longitude = pos.longitude;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Location captured')));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Location error: $e')));
+    } finally {
+      setState(() => _isLocating = false);
+    }
+  }
+
+  Widget _buildPhotoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Attachments (Photos)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            TextButton.icon(
+              onPressed: _photos.length < 3 ? _addPhoto : null,
+              icon: const Icon(Icons.camera_alt, size: 16),
+              label: const Text('Add Photo'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (_photos.isEmpty)
+          const Text('No photos attached.', style: TextStyle(color: AppColors.textSub, fontStyle: FontStyle.italic))
+        else
+          SizedBox(
+            height: 120,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _photos.length,
+              itemBuilder: (context, index) {
+                return Stack(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(right: 12),
+                      width: 120,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        image: DecorationImage(
+                          image: FileImage(File(_photos[index])),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 4,
+                      right: 16,
+                      child: GestureDetector(
+                        onTap: () => setState(() => _photos.removeAt(index)),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                          child: const Icon(Icons.close, size: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _addPhoto() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera, imageQuality: 70);
+    if (pickedFile != null) {
+      setState(() {
+        _photos.add(pickedFile.path);
+      });
+    }
   }
 
   String _formatAnswer(Question q, dynamic ans) {
@@ -318,7 +475,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
           TextButton(
               onPressed: () {
                 context.read<AppState>().saveRespondentDraft(
-                    widget.surveyId, _respondent, _answers);
+                    widget.surveyId, _respondent, _answers, photos: _photos, latitude: _latitude, longitude: _longitude);
                 Navigator.pop(context); // Close dialog
                 context.pop(); // Go back
               },

@@ -265,6 +265,10 @@ class Respondent {
   int? completedAt;
   bool synced;
 
+  final double? latitude;
+  final double? longitude;
+  final List<String> photos;
+
   Respondent({
     required this.id,
     required this.surveyId,
@@ -277,7 +281,11 @@ class Respondent {
     required this.startedAt,
     this.completedAt,
     this.synced = false,
-  }) : answers = answers ?? {};
+    this.latitude,
+    this.longitude,
+    List<String>? photos,
+  }) : answers = answers ?? {},
+       photos = photos ?? [];
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -291,6 +299,9 @@ class Respondent {
         'startedAt': startedAt,
         'completedAt': completedAt,
         'synced': synced,
+        'latitude': latitude,
+        'longitude': longitude,
+        'photos': photos,
       };
 
   factory Respondent.fromJson(Map<String, dynamic> j) => Respondent(
@@ -306,13 +317,19 @@ class Respondent {
         startedAt: (j['startedAt'] as int?) ?? 0,
         completedAt: j['completedAt'] as int?,
         synced: (j['synced'] as bool?) ?? false,
+        latitude: j['latitude'] as double?,
+        longitude: j['longitude'] as double?,
+        photos: j['photos'] != null ? List<String>.from((j['photos'] as List).map((e) => e.toString())) : [],
       );
 
   Respondent copyWith(
       {RespondentStatus? status,
       Map<String, dynamic>? answers,
       int? completedAt,
-      bool? synced}) {
+      bool? synced,
+      double? latitude,
+      double? longitude,
+      List<String>? photos}) {
     return Respondent(
       id: id,
       surveyId: surveyId,
@@ -325,6 +342,9 @@ class Respondent {
       startedAt: startedAt,
       completedAt: completedAt ?? this.completedAt,
       synced: synced ?? this.synced,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      photos: photos ?? this.photos,
     );
   }
 }

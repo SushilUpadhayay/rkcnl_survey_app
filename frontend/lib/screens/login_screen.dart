@@ -238,12 +238,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          OutlinedButton.icon(
-            onPressed: () => context.push('/otp'),
-            icon: const Icon(Icons.vibration, size: 20),
-            label: const Text('Login with OTP'),
-          ),
-          const SizedBox(height: 32),
           Center(
             child: Wrap(
               children: [

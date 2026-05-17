@@ -277,23 +277,24 @@ class _SyncScreenState extends State<SyncScreen> {
         if (i == 2) context.go('/sync');
         if (i == 3) context.go('/analytics');
       },
-      items: const [
-        BottomNavigationBarItem(
+      items: [
+        const BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Home'),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),
             activeIcon: Icon(Icons.assignment),
             label: 'Surveys'),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
             icon: Icon(Icons.sync),
             activeIcon: Icon(Icons.sync),
             label: 'Sync'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.insights),
-            activeIcon: Icon(Icons.insights),
-            label: 'Analytics'),
+        if (Provider.of<AppState>(context, listen: false).userRole == 'Admin')
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.insights),
+              activeIcon: Icon(Icons.insights),
+              label: 'Analytics'),
       ],
     );
   }

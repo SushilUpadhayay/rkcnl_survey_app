@@ -13,6 +13,11 @@ router.get('/assigned', protect, surveyController.getAssignedSurveys);
 // @access  Private (Admin)
 router.post('/', protect, authorize('Admin'), surveyController.createSurvey);
 
+// @route   POST /api/surveys/assign
+// @desc    Assign a survey to a user (Admin only)
+// @access  Private (Admin)
+router.post('/assign', protect, authorize('Admin'), surveyController.assignSurvey);
+
 // @route   GET /api/surveys
 // @desc    Get all active surveys
 // @access  Public

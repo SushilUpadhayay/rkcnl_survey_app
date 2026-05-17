@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/models.dart';
 import '../services/storage_service.dart';
@@ -71,8 +72,7 @@ class AppState extends ChangeNotifier {
   AppState(this.storage) {
     _loadSettings();
     _listenConnectivity();
-    // Build admin surveys for demo/offline fallback
-    surveys = _buildAdminSurveys();
+    // Attempt to fetch real surveys
     fetchSurveys();
   }
 
@@ -86,8 +86,7 @@ class AppState extends ChangeNotifier {
     try {
       final token = await _authService.getToken();
       if (token == null) {
-        // Fallback to demo if not logged in yet (e.g. splash)
-        surveys = _buildAdminSurveys();
+        surveys = [];
         isLoading = false;
         notifyListeners();
         return;
@@ -109,16 +108,17 @@ class AppState extends ChangeNotifier {
         if (data.isNotEmpty) {
           surveys = data.map((s) => Survey.fromJson(s as Map<String, dynamic>)).toList();
         } else {
-          // If no surveys assigned, use demo as placeholder for now or leave empty
-          surveys = _buildAdminSurveys();
+          // If no surveys assigned, show an empty list
+          surveys = [];
         }
       } else {
         debugPrint('Failed to fetch surveys: ${response.statusCode}');
-        surveys = _buildAdminSurveys(); // Fallback
+        // Optional: Keep existing surveys if fetch fails, or clear them
+        surveys = [];
       }
     } catch (e) {
       debugPrint('Error fetching surveys: $e');
-      surveys = _buildAdminSurveys(); // Fallback
+      surveys = [];
       error = e.toString();
     } finally {
       isLoading = false;
@@ -262,20 +262,25 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> saveRespondentDraft(
-      String surveyId, Respondent r, Map<String, dynamic> answers) async {
+      String surveyId, Respondent r, Map<String, dynamic> answers,
+      {double? latitude, double? longitude, List<String>? photos}) async {
     final updated =
-        r.copyWith(status: RespondentStatus.draft, answers: answers);
+        r.copyWith(status: RespondentStatus.draft, answers: answers, latitude: latitude, longitude: longitude, photos: photos);
     await storage.saveRespondent(surveyId, updated);
     _markSurveyInProgress(surveyId);
     notifyListeners();
   }
 
   Future<void> submitRespondent(
-      String surveyId, Respondent r, Map<String, dynamic> answers) async {
+      String surveyId, Respondent r, Map<String, dynamic> answers,
+      {double? latitude, double? longitude, List<String>? photos}) async {
     final updated = r.copyWith(
       status: RespondentStatus.completed,
       answers: answers,
       completedAt: DateTime.now().millisecondsSinceEpoch,
+      latitude: latitude,
+      longitude: longitude,
+      photos: photos,
     );
     await storage.saveRespondent(surveyId, updated);
     final survey = surveys.firstWhere((s) => s.id == surveyId);
@@ -334,12 +339,29 @@ class AppState extends ChangeNotifier {
           'answer': e.value,
         }).toList();
 
+        // Convert photos to base64
+        List<String> base64Photos = [];
+        for (String photoPath in r.photos) {
+          try {
+            final file = File(photoPath);
+            if (await file.exists()) {
+              final bytes = await file.readAsBytes();
+              base64Photos.add(base64Encode(bytes));
+            }
+          } catch (e) {
+            debugPrint('Failed to read photo: $e');
+          }
+        }
+
         payload.add({
           'surveyId': sid,
           'deviceTimestamp': DateTime.fromMillisecondsSinceEpoch(r.completedAt ?? DateTime.now().millisecondsSinceEpoch).toIso8601String(),
           'answers': answersList,
           'customQuestions': [],
           'personalNotes': '',
+          'latitude': r.latitude,
+          'longitude': r.longitude,
+          'photos': base64Photos,
         });
       }
 
@@ -437,333 +459,4 @@ class AppState extends ChangeNotifier {
   }
 }
 
-// ── ADMIN-CREATED SURVEYS (simulated) ──
-List<Survey> _buildAdminSurveys() => [
-      Survey(
-        id: 'SRV-001',
-        title: 'Crop Health Assessment – Ward 4',
-        region: 'Northern Sector',
-        dueDate: 'Mar 10, 2026',
-        priority: 'high',
-        status: SurveyStatus.inProgress,
-        description:
-            'Evaluate crop health conditions across assigned plots in Ward 4.',
-        iconName: 'eco',
-        colorValue: 0xFF1A6B1A,
-        questions: [
-          const Question(
-              id: 'q1',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'What is the current crop stage?',
-              description: 'Select the most accurate phase.',
-              options: ['Sowing', 'Vegetative', 'Flowering', 'Harvesting']),
-          const Question(
-              id: 'q2',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Overall crop health?',
-              description: 'Rate the general health of the crops.',
-              options: ['Excellent', 'Good', 'Fair', 'Poor', 'Critical']),
-          const Question(
-              id: 'q3',
-              type: QuestionType.MultiChoiceMultiSelect,
-              text: 'Issues observed (select all):',
-              description: 'Mark all problems currently visible.',
-              options: [
-                'Pest infestation',
-                'Disease signs',
-                'Nutrient deficiency',
-                'Water stress',
-                'Weed overgrowth',
-                'None'
-              ]),
-          const Question(
-              id: 'q4',
-              type: QuestionType.OpenEnd,
-              text: 'Field Observations',
-              description: 'Note pests, soil moisture, weather impacts.',
-              placeholder: 'Describe what you observed...'),
-          const Question(
-              id: 'q5',
-              type: QuestionType.RatingScale,
-              text: 'Estimated yield potential (1–10)?',
-              description: '1 = very low, 10 = excellent yield.',
-              maxRating: 10),
-          const Question(
-              id: 'q6',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Irrigation status?',
-              description: 'Current irrigation situation.',
-              options: [
-                'Adequate',
-                'Insufficient',
-                'Over-irrigated',
-                'Rain-fed only'
-              ]),
-          const Question(
-              id: 'q7',
-              type: QuestionType.OpenEnd,
-              text: 'Recommended action?',
-              description: 'Suggest next steps or interventions.',
-              placeholder: 'e.g. Apply fertilizer, drain field...'),
-        ],
-      ),
-      Survey(
-        id: 'SRV-002',
-        title: 'Soil Moisture Survey – East Plains',
-        region: 'Eastern Plains',
-        dueDate: 'Mar 15, 2026',
-        priority: 'medium',
-        status: SurveyStatus.pending,
-        description:
-            'Measure and document soil moisture levels across Eastern Plains.',
-        iconName: 'water_drop',
-        colorValue: 0xFF0D47A1,
-        questions: [
-          const Question(
-              id: 'q1',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Soil moisture level?',
-              description: 'Visual and tactile estimation.',
-              options: ['Very Dry', 'Dry', 'Moist', 'Wet', 'Waterlogged']),
-          const Question(
-              id: 'q2',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Soil texture?',
-              description: 'Primary texture of the soil.',
-              options: ['Sandy', 'Loamy', 'Clay', 'Silt', 'Rocky']),
-          const Question(
-              id: 'q3',
-              type: QuestionType.MultiChoiceMultiSelect,
-              text: 'Observed soil issues:',
-              description: 'Select all issues currently visible.',
-              options: [
-                'Erosion',
-                'Compaction',
-                'Salinization',
-                'Drainage problem',
-                'None'
-              ]),
-          const Question(
-              id: 'q4',
-              type: QuestionType.RatingScale,
-              text: 'Soil quality rating (1–10)?',
-              description: 'Overall assessment of soil quality.',
-              maxRating: 10),
-          const Question(
-              id: 'q5',
-              type: QuestionType.OpenEnd,
-              text: 'Additional notes:',
-              description: 'Any other observations.',
-              placeholder: 'Enter details here...'),
-        ],
-      ),
-      Survey(
-        id: 'SRV-003',
-        title: 'Irrigation Audit – Zone B',
-        region: 'Central Hub',
-        dueDate: 'Feb 28, 2026',
-        priority: 'low',
-        status: SurveyStatus.synced,
-        description:
-            'Verify irrigation infrastructure and water distribution in Zone B.',
-        iconName: 'water',
-        colorValue: 0xFF2E7D32,
-        questions: [
-          const Question(
-              id: 'q1',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Irrigation system type?',
-              description: 'Primary irrigation method.',
-              options: ['Drip', 'Sprinkler', 'Flood', 'Canal', 'None']),
-          const Question(
-              id: 'q2',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'System condition?',
-              description: 'Overall condition of the infrastructure.',
-              options: ['Excellent', 'Good', 'Needs repair', 'Broken']),
-          const Question(
-              id: 'q3',
-              type: QuestionType.MultiChoiceMultiSelect,
-              text: 'Issues with irrigation:',
-              description: 'Select all issues observed.',
-              options: [
-                'Leaking pipes',
-                'Clogged nozzles',
-                'Uneven distribution',
-                'Low pressure',
-                'None'
-              ]),
-          const Question(
-              id: 'q4',
-              type: QuestionType.OpenEnd,
-              text: 'Maintenance notes:',
-              description: 'Describe needed repairs.',
-              placeholder: 'Describe issues in detail...'),
-        ],
-      ),
-      Survey(
-        id: 'SRV-004',
-        title: 'Livestock & Fodder Assessment – Ward 6',
-        region: 'Western Zone',
-        dueDate: 'Mar 20, 2026',
-        priority: 'high',
-        status: SurveyStatus.pending,
-        description:
-            'Survey livestock count, fodder availability and animal health in Ward 6.',
-        iconName: 'pets',
-        colorValue: 0xFF4E342E,
-        questions: [
-          const Question(
-              id: 'q1',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Primary livestock species?',
-              description: 'Main animals being kept.',
-              options: ['Cattle', 'Goats', 'Poultry', 'Pigs', 'Mixed']),
-          const Question(
-              id: 'q2',
-              type: QuestionType.RatingScale,
-              text: 'Animal health rating (1–10)?',
-              description: 'General condition and vitality.',
-              maxRating: 10),
-          const Question(
-              id: 'q3',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Fodder availability?',
-              description: 'Current availability of animal feed.',
-              options: ['Abundant', 'Adequate', 'Scarce', 'Critical shortage']),
-          const Question(
-              id: 'q4',
-              type: QuestionType.MultiChoiceMultiSelect,
-              text: 'Issues observed:',
-              description: 'Select all concerns noted.',
-              options: [
-                'Disease signs',
-                'Malnutrition',
-                'Water shortage',
-                'Overcrowding',
-                'None'
-              ]),
-          const Question(
-              id: 'q5',
-              type: QuestionType.OpenEnd,
-              text: 'Additional notes:',
-              description: 'Other observations.',
-              placeholder: 'Enter notes here...'),
-        ],
-      ),
-      Survey(
-        id: 'SRV-005',
-        title: 'Post-harvest Loss Assessment',
-        region: 'All Sectors',
-        dueDate: 'Mar 25, 2026',
-        priority: 'medium',
-        status: SurveyStatus.pending,
-        description:
-            'Estimate and document post-harvest losses for major crops.',
-        iconName: 'warehouse',
-        colorValue: 0xFF6A1B9A,
-        questions: [
-          const Question(
-              id: 'q1',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Primary crop assessed?',
-              description: 'Main crop being evaluated.',
-              options: [
-                'Rice',
-                'Wheat',
-                'Maize',
-                'Vegetables',
-                'Fruits',
-                'Other'
-              ]),
-          const Question(
-              id: 'q2',
-              type: QuestionType.RatingScale,
-              text: 'Estimated harvest loss level (1–10)?',
-              description: '1 = very low, 10 = severe loss.',
-              maxRating: 10),
-          const Question(
-              id: 'q3',
-              type: QuestionType.MultiChoiceMultiSelect,
-              text: 'Causes of post-harvest loss:',
-              description: 'Select all relevant causes.',
-              options: [
-                'Pest damage',
-                'Moisture/mold',
-                'Poor storage',
-                'Transport damage',
-                'Market delay',
-                'None'
-              ]),
-          const Question(
-              id: 'q4',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Storage facility used?',
-              description: 'Where is the produce stored?',
-              options: [
-                'Home storage',
-                'Community warehouse',
-                'Cooperative store',
-                'Cold storage',
-                'None – sold immediately'
-              ]),
-          const Question(
-              id: 'q5',
-              type: QuestionType.OpenEnd,
-              text: 'Recommendations:',
-              description: 'Suggest improvements.',
-              placeholder: 'e.g. Better storage containers, cold chain...'),
-        ],
-      ),
-      Survey(
-        id: 'SRV-006',
-        title: 'User Experience & Branding Audit',
-        region: 'Global',
-        dueDate: 'Apr 30, 2026',
-        priority: 'medium',
-        status: SurveyStatus.pending,
-        description: 'Comprehensive audit of branding and UX preference using all 10 question types.',
-        iconName: 'psychology',
-        colorValue: 0xFFD81B60,
-        questions: [
-          const Question(
-            id: 'q1',
-            type: QuestionType.Ranking,
-            text: 'Rank these branding elements by importance:',
-            options: ['Logo', 'Color Palette', 'Typography', 'Tone of Voice'],
-          ),
-          const Question(
-            id: 'q2',
-            type: QuestionType.Matrix,
-            text: 'Rate your satisfaction with these features:',
-            matrixRows: ['Dashboard', 'Sync Speed', 'Form Builder'],
-            matrixColumns: ['Poor', 'Fair', 'Good', 'Excellent'],
-          ),
-          const Question(
-            id: 'q3',
-            type: QuestionType.ChoiceWithAddition,
-            text: 'Which platform do you prefer?',
-            options: ['Web', 'Mobile', 'Desktop'],
-          ),
-          const Question(
-            id: 'q4',
-            type: QuestionType.ChoiceWithFreeWriting,
-            text: 'Are you satisfied with the offline mode?',
-            options: ['Yes', 'No', 'Not Sure'],
-          ),
-          const Question(
-            id: 'q5',
-            type: QuestionType.PickingUp,
-            text: 'Select your preferred secondary color:',
-            options: ['Crimson', 'Azure', 'Amber', 'Emerald', 'Violet', 'Indigo'],
-            placeholder: 'Search colors...',
-          ),
-          const Question(
-            id: 'q6',
-            type: QuestionType.PickupAndRank,
-            text: 'Select and rank your top features:',
-            options: ['Real-time Data', 'AI Insights', 'Export PDF', 'User Roles', 'API Access'],
-          ),
-        ],
-      ),
-    ];
+// Removed _buildAdminSurveys() mock data.

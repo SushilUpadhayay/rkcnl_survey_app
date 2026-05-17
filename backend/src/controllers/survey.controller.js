@@ -129,19 +129,22 @@ const getSurveyById = async (req, res) => {
 // @access  Private
 const getAssignedSurveys = async (req, res) => {
     try {
-        // In a more complex system, we would have an Assignment model.
-        // For now, we'll return active surveys. 
-        // If we want to filter by region, we could do: where: { region: req.user.region }
-        const surveys = await prisma.survey.findMany({
-            where: { 
-                isDeleted: false,
-                status: 'Active'
+        const assignments = await prisma.surveyAssignment.findMany({
+            where: {
+                userId: req.user.id
             },
-            orderBy: { createdAt: 'desc' },
             include: {
-                category: { select: { id: true, name: true } }
+                survey: {
+                    include: {
+                        category: { select: { id: true, name: true } }
+                    }
+                }
             }
         });
+
+        const surveys = assignments
+            .map(a => a.survey)
+            .filter(s => !s.isDeleted && s.status === 'Active');
 
         res.status(200).json({
             success: true,
@@ -154,6 +157,60 @@ const getAssignedSurveys = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Server error while fetching assigned surveys',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Assign a survey to a user
+// @route   POST /api/surveys/assign
+// @access  Private (Admin)
+const assignSurvey = async (req, res) => {
+    try {
+        const { surveyId, userId } = req.body;
+
+        if (!surveyId || !userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide surveyId and userId'
+            });
+        }
+
+        // Check if assignment already exists
+        const existing = await prisma.surveyAssignment.findUnique({
+            where: {
+                surveyId_userId: {
+                    surveyId,
+                    userId
+                }
+            }
+        });
+
+        if (existing) {
+            return res.status(400).json({
+                success: false,
+                message: 'Survey is already assigned to this user'
+            });
+        }
+
+        const assignment = await prisma.surveyAssignment.create({
+            data: {
+                surveyId,
+                userId
+            }
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Survey assigned successfully',
+            data: assignment
+        });
+
+    } catch (error) {
+        console.error('Assign survey error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while assigning survey',
             error: error.message
         });
     }
@@ -248,6 +305,7 @@ module.exports = {
     getAllSurveys, 
     getSurveyById, 
     getAssignedSurveys, 
+    assignSurvey,
     updateSurvey, 
     deleteSurvey 
 };
