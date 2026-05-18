@@ -295,13 +295,74 @@ class DashboardScreen extends StatelessWidget {
         const SizedBox(height: 12),
         _buildActionTile(context, Icons.cloud_sync, 'Sync Data',
             'Upload saved offline responses', AppColors.blue, '/sync'),
-        if (context.read<AppState>().userRole == 'Admin') ...[
-          const SizedBox(height: 12),
-          _buildActionTile(context, Icons.insights, 'Analytics',
-              'View your submission summary', AppColors.purple, '/analytics'),
-        ],
+        const SizedBox(height: 12),
+        _buildExportActionTile(context),
       ],
     );
+  }
+
+  Widget _buildExportActionTile(BuildContext context) {
+    return InkWell(
+      onTap: () => _handleExport(context),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              decoration: BoxDecoration(
+                  color: AppColors.purple.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8)),
+              child: const Icon(Icons.download_outlined, color: AppColors.purple, size: 24),
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Export Data',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          color: AppColors.textPrimary)),
+                  SizedBox(height: 2),
+                  Text('Download collected responses as CSV',
+                      style: TextStyle(color: AppColors.textSub, fontSize: 13)),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: AppColors.textMuted),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleExport(BuildContext context) async {
+    final appState = context.read<AppState>();
+    final count = appState.totalResponses;
+    if (count == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No respondent data to export yet.')),
+      );
+      return;
+    }
+    final success = await appState.exportSyncedData();
+    if (context.mounted) {
+      if (!success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Export failed. Please try again.'),
+              backgroundColor: AppColors.red),
+        );
+      }
+    }
   }
 
   Widget _buildActionTile(BuildContext context, IconData icon, String title,
@@ -434,26 +495,20 @@ class DashboardScreen extends StatelessWidget {
         if (i == 0) context.go('/dashboard');
         if (i == 1) context.go('/surveys');
         if (i == 2) context.go('/sync');
-        if (i == 3) context.go('/analytics');
       },
-      items: [
-        const BottomNavigationBarItem(
+      items: const [
+        BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Home'),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),
             activeIcon: Icon(Icons.assignment),
             label: 'Surveys'),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
             icon: Icon(Icons.sync),
             activeIcon: Icon(Icons.sync),
             label: 'Sync'),
-        if (Provider.of<AppState>(context, listen: false).userRole == 'Admin')
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.insights),
-              activeIcon: Icon(Icons.insights),
-              label: 'Analytics'),
       ],
     );
   }

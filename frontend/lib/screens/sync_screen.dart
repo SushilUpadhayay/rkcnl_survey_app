@@ -15,6 +15,7 @@ class SyncScreen extends StatefulWidget {
 
 class _SyncScreenState extends State<SyncScreen> {
   bool _isSyncing = false;
+  bool _isExporting = false;
 
   void _handleSync() async {
     setState(() => _isSyncing = true);
@@ -51,6 +52,8 @@ class _SyncScreenState extends State<SyncScreen> {
               _buildPendingSection(pending),
               const SizedBox(height: 32),
               _buildHistorySection(history),
+              const SizedBox(height: 32),
+              _buildExportSection(appState),
               const SizedBox(height: 80),
             ],
           ),
@@ -247,6 +250,72 @@ class _SyncScreenState extends State<SyncScreen> {
     );
   }
 
+  Widget _buildExportSection(AppState appState) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.download_outlined, size: 18, color: AppColors.textPrimary),
+              SizedBox(width: 8),
+              Text('Export Data',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '${appState.totalResponses} respondent record${appState.totalResponses != 1 ? 's' : ''} available for export.',
+            style: const TextStyle(color: AppColors.textSub, fontSize: 13),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: appState.totalResponses > 0 && !_isExporting
+                  ? () => _handleExport(appState)
+                  : null,
+              icon: _isExporting
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Icon(Icons.ios_share_outlined, size: 18),
+              label: Text(_isExporting ? 'Preparing...' : 'Share CSV'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.green,
+                side: const BorderSide(color: AppColors.green),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleExport(AppState appState) async {
+    setState(() => _isExporting = true);
+    final success = await appState.exportSyncedData();
+    if (mounted) {
+      setState(() => _isExporting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success
+              ? 'CSV ready — choose an app to share.'
+              : 'Export failed. Please try again.'),
+          backgroundColor: success ? AppColors.green : AppColors.red,
+        ),
+      );
+    }
+  }
+
   Widget _buildHistoryItem(SyncHistoryItem h) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -275,26 +344,20 @@ class _SyncScreenState extends State<SyncScreen> {
         if (i == 0) context.go('/dashboard');
         if (i == 1) context.go('/surveys');
         if (i == 2) context.go('/sync');
-        if (i == 3) context.go('/analytics');
       },
-      items: [
-        const BottomNavigationBarItem(
+      items: const [
+        BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Home'),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),
             activeIcon: Icon(Icons.assignment),
             label: 'Surveys'),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
             icon: Icon(Icons.sync),
             activeIcon: Icon(Icons.sync),
             label: 'Sync'),
-        if (Provider.of<AppState>(context, listen: false).userRole == 'Admin')
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.insights),
-              activeIcon: Icon(Icons.insights),
-              label: 'Analytics'),
       ],
     );
   }

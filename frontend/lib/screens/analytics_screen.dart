@@ -5,8 +5,15 @@ import '../services/app_state.dart';
 import '../models/models.dart';
 import '../theme/app_theme.dart';
 
-class AnalyticsScreen extends StatelessWidget {
+class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
+
+  @override
+  State<AnalyticsScreen> createState() => _AnalyticsScreenState();
+}
+
+class _AnalyticsScreenState extends State<AnalyticsScreen> {
+  bool _isExporting = false;
 
   PreferredSizeWidget _buildAppBar(BuildContext context, AppState appState) {
     return AppBar(
@@ -55,27 +62,18 @@ class AnalyticsScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildChartSection(appState),
               const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Survey Breakdown',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-                  if (appState.userRole == 'Admin')
-                    TextButton.icon(
-                      onPressed: () => appState.fetchGlobalStats(),
-                      icon: const Icon(Icons.refresh, size: 18),
-                      label: const Text('Refresh', style: TextStyle(fontSize: 12)),
-                    ),
-                ],
-              ),
+              const Text('Survey Breakdown',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
               const SizedBox(height: 16),
-              ...appState.surveys.map((s) => _buildSurveyProgress(context, s, appState)),
+              ...appState.surveys.map((s) => _buildSurveyProgress(s, appState)),
+              const SizedBox(height: 24),
+              _buildExportButton(appState),
               const SizedBox(height: 80),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(context, 3),
+      bottomNavigationBar: _buildBottomNav(context),
     );
   }
 
@@ -213,7 +211,7 @@ class AnalyticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSurveyProgress(BuildContext context, Survey s, AppState appState) {
+  Widget _buildSurveyProgress(Survey s, AppState appState) {
     final respondents = appState.getRespondents(s.id);
     final completed =
         respondents.where((r) => r.status == RespondentStatus.completed).length;
@@ -250,68 +248,76 @@ class AnalyticsScreen extends StatelessWidget {
                 backgroundColor: AppColors.border),
           ),
           const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('$completed completed of ${respondents.length} total',
-                  style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textSub,
-                      fontWeight: FontWeight.w600)),
-              if (appState.userRole == 'Admin')
-                GestureDetector(
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Exporting ${s.title} CSV...')),
-                    );
-                    appState.exportSurveyData(s.id);
-                  },
-                  child: Row(
-                    children: [
-                      const Icon(Icons.download, size: 14, color: AppColors.blue),
-                      const SizedBox(width: 4),
-                      const Text('Export CSV',
-                          style: TextStyle(
-                              fontSize: 11,
-                              color: AppColors.blue,
-                              fontWeight: FontWeight.w700)),
-                    ],
-                  ),
-                ),
-            ],
-          ),
+          Text('$completed completed of ${respondents.length} total',
+              style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textSub,
+                  fontWeight: FontWeight.w600)),
         ],
       ),
     );
   }
 
-  Widget _buildBottomNav(BuildContext context, int currentIndex) {
+  Widget _buildExportButton(AppState appState) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: appState.totalResponses > 0 && !_isExporting
+            ? () => _handleExport(appState)
+            : null,
+        icon: _isExporting
+            ? const SizedBox(
+                height: 16,
+                width: 16,
+                child: CircularProgressIndicator(strokeWidth: 2))
+            : const Icon(Icons.ios_share_outlined, size: 18),
+        label: Text(_isExporting ? 'Preparing CSV...' : 'Export All Data as CSV'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.green,
+          side: const BorderSide(color: AppColors.green),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+      ),
+    );
+  }
+
+  void _handleExport(AppState appState) async {
+    setState(() => _isExporting = true);
+    final success = await appState.exportSyncedData();
+    if (mounted) {
+      setState(() => _isExporting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success
+              ? 'CSV ready — choose an app to share.'
+              : 'Export failed. Please try again.'),
+          backgroundColor: success ? AppColors.green : AppColors.red,
+        ),
+      );
+    }
+  }
+
+  Widget _buildBottomNav(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: currentIndex,
+      currentIndex: 2,
       onTap: (i) {
         if (i == 0) context.go('/dashboard');
         if (i == 1) context.go('/surveys');
         if (i == 2) context.go('/sync');
-        if (i == 3) context.go('/analytics');
       },
-      items: [
-        const BottomNavigationBarItem(
+      items: const [
+        BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Home'),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),
             activeIcon: Icon(Icons.assignment),
             label: 'Surveys'),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
             icon: Icon(Icons.sync),
             activeIcon: Icon(Icons.sync),
             label: 'Sync'),
-        if (Provider.of<AppState>(context, listen: false).userRole == 'Admin')
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.insights),
-              activeIcon: Icon(Icons.insights),
-              label: 'Analytics'),
       ],
     );
   }

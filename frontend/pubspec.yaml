@@ -32,6 +32,11 @@ dependencies:
   geolocator: ^14.0.2
   image_picker: ^1.2.2
 
+  # Data export
+  csv: ^6.0.0
+  share_plus: ^10.0.0
+  path_provider: ^2.1.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

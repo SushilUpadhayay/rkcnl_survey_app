@@ -3,6 +3,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:csv/csv.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import '../models/models.dart';
 import '../services/storage_service.dart';
 import '../services/auth_service.dart';
@@ -126,39 +129,6 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  // ── Reporting & Export ──
-  Map<String, dynamic> globalStats = {};
-  
-  Future<void> fetchGlobalStats() async {
-    if (userRole != 'Admin') return;
-    
-    try {
-      final token = await _authService.getToken();
-      // In real scenario, usebaseUrl + '/reports/global/stats'
-      // final res = await http.get(...);
-      // For demo, we'll populate with some realistic data
-      globalStats = {
-        'totalResponses': totalResponses,
-        'syncedCount': syncedCount,
-        'pendingCount': pendingCount,
-      };
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Error fetching stats: $e');
-    }
-  }
-
-  Future<void> exportSurveyData(String surveyId) async {
-    try {
-      final token = await _authService.getToken();
-      // Logic to trigger download from backend
-      debugPrint('Exporting survey $surveyId...');
-      await Future.delayed(const Duration(seconds: 2));
-      debugPrint('CSV Export successful for $surveyId');
-    } catch (e) {
-      debugPrint('Export failed: $e');
-    }
-  }
 
   void _loadSettings() {
     darkMode = storage.getDarkMode();
@@ -411,6 +381,75 @@ class AppState extends ChangeNotifier {
   void _triggerAutoSync() {
     if (isOnline && autoSync && pendingCount > 0) {
       syncAll();
+    }
+  }
+
+  // ── DATA EXPORT ──
+  /// Generates a CSV of all locally stored respondents and shares it
+  /// via the system share dialog. Fully client-side — no network required.
+  Future<bool> exportSyncedData() async {
+    try {
+      // Build CSV rows
+      final List<List<dynamic>> rows = [
+        // Header
+        [
+          'Survey',
+          'Respondent Name',
+          'Phone',
+          'Gender',
+          'Age',
+          'Status',
+          'GPS Latitude',
+          'GPS Longitude',
+          'Completed At',
+          'Answers',
+        ]
+      ];
+
+      for (final survey in surveys) {
+        final respondents = storage.getRespondents(survey.id);
+        for (final r in respondents) {
+          final completedAt = r.completedAt != null
+              ? DateTime.fromMillisecondsSinceEpoch(r.completedAt!)
+                  .toIso8601String()
+              : '';
+          final answersStr = r.answers.entries
+              .map((e) => '${e.key}: ${e.value}')
+              .join(' | ');
+
+          rows.add([
+            survey.title,
+            r.name,
+            r.phone ?? '',
+            r.gender ?? '',
+            r.age ?? '',
+            r.status.name,
+            r.latitude?.toString() ?? '',
+            r.longitude?.toString() ?? '',
+            completedAt,
+            answersStr,
+          ]);
+        }
+      }
+
+      if (rows.length <= 1) return false; // Only header, no data
+
+      final csvString = const ListToCsvConverter().convert(rows);
+      final directory = await getTemporaryDirectory();
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final file = File('${directory.path}/rkcnl_export_$timestamp.csv');
+      await file.writeAsString(csvString);
+
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'text/csv')],
+        subject: 'RKCNL Survey Export',
+        text: 'Survey respondent data exported from RKCNL Field App.',
+      );
+
+      return true;
+    } catch (e) {
+      debugPrint('Export error: $e');
+      return false;
     }
   }
 
