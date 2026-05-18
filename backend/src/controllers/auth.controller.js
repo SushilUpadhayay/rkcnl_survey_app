@@ -2,14 +2,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { prisma } = require('../config/db');
 
-// @desc    Register a new user
+// @desc    Register a new FieldStaff user
 // @route   POST /api/auth/register
 // @access  Public
 const register = async (req, res) => {
     try {
         const { full_name, gender, date_of_birth, location, email, phone, password } = req.body;
 
-        // Validate required fields
         if (!full_name || !gender || !date_of_birth || !location || !email || !phone || !password) {
             return res.status(400).json({
                 success: false,
@@ -17,32 +16,27 @@ const register = async (req, res) => {
             });
         }
 
-        // Check if user with this email already exists
-        const existingUser = await prisma.user.findUnique({
-            where: { email }
-        });
+        const existingUser = await prisma.user.findUnique({ where: { email } });
 
         if (existingUser) {
             return res.status(409).json({
                 success: false,
-                message: 'User with this email already exists'
+                message: 'An account with this email already exists'
             });
         }
 
-        // Hash password using bcryptjs
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create user in database via Prisma
         const newUser = await prisma.user.create({
             data: {
-                username: full_name, // Map full_name to username field
+                username: full_name,
                 email,
                 gender,
                 dateOfBirth: date_of_birth,
                 location,
                 phone,
-                passwordHash: hashedPassword,
-                role: 'FieldStaff' // Default role
+                passwordHash: hashedPassword
+                // role defaults to "FieldStaff" via schema
             },
             select: {
                 id: true,
@@ -59,7 +53,7 @@ const register = async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: 'User registered successfully',
+            message: 'Account registered successfully',
             data: newUser
         });
 
@@ -73,14 +67,13 @@ const register = async (req, res) => {
     }
 };
 
-// @desc    Authenticate user and return JWT
+// @desc    Authenticate FieldStaff user and return JWT
 // @route   POST /api/auth/login
 // @access  Public
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validate required fields
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -88,10 +81,7 @@ const login = async (req, res) => {
             });
         }
 
-        // Find user by email
-        const user = await prisma.user.findUnique({
-            where: { email }
-        });
+        const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) {
             return res.status(401).json({
@@ -100,7 +90,6 @@ const login = async (req, res) => {
             });
         }
 
-        // Compare entered password with stored hash
         const isMatch = await bcrypt.compare(password, user.passwordHash);
 
         if (!isMatch) {
@@ -110,9 +99,9 @@ const login = async (req, res) => {
             });
         }
 
-        // Generate JWT with user payload
+        // JWT contains only id and email — role is a fixed FieldStaff string on the User record
         const token = jwt.sign(
-            { id: user.id, email: user.email, role: user.role },
+            { id: user.id, email: user.email },
             process.env.JWT_SECRET,
             { expiresIn: '30d' }
         );
@@ -124,8 +113,7 @@ const login = async (req, res) => {
             data: {
                 id: user.id,
                 username: user.username,
-                email: user.email,
-                role: user.role
+                email: user.email
             }
         });
 
@@ -139,19 +127,21 @@ const login = async (req, res) => {
     }
 };
 
-// @desc    Get authenticated user profile from JWT
+// @desc    Get authenticated user profile
 // @route   GET /api/auth/profile
 // @access  Private
 const getProfile = async (req, res) => {
     try {
-        // req.user is attached by auth.middleware.js
         const user = await prisma.user.findUnique({
             where: { id: req.user.id },
             select: {
                 id: true,
                 username: true,
                 email: true,
-                role: true,
+                gender: true,
+                dateOfBirth: true,
+                phone: true,
+                location: true,
                 isActive: true,
                 createdAt: true
             }
