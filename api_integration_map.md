@@ -106,24 +106,24 @@ Token present?
 **Request Body:**
 ```json
 {
-  "full_name": "Sushil Upadhayay",
-  "gender": "Male",
+  "full_name": "Rubi Adhikari",
+  "gender": "Female",
   "date_of_birth": "1998-05-12",
   "location": "Ward 4, Northern Region",
-  "email": "sushil@example.com",
+  "email": "rubi.adhikari@example.com",
   "phone": "+977-9876543210",
   "password": "Password123"
 }
 ```
-**Response (201):**
+**RRubi Adhikari
 ```json
 {
   "success": true,
   "message": "Account registered successfully",
   "data": {
     "id": "7fa85b61-da2f-48e2-b01c-1bb3705be8b2",
-    "username": "Sushil Upadhayay",
-    "email": "sushil@example.com",
+    "username": "Rubi Adhikari",
+    "email": "rubi.adhikari@example.com",
     "role": "FieldStaff",
     "createdAt": "2026-05-18T01:30:00.000Z"
   }
@@ -135,7 +135,7 @@ Token present?
 ### 6.2 POST `/api/auth/login`
 **Request Body:**
 ```json
-{ "email": "sushil@example.com", "password": "Password123" }
+{ "email": "rubi.adhikari@example.com", "password": "Password123" }
 ```
 **Response (200):**
 ```json
@@ -145,8 +145,8 @@ Token present?
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "data": {
     "id": "7fa85b61-da2f-48e2-b01c-1bb3705be8b2",
-    "username": "Sushil Upadhayay",
-    "email": "sushil@example.com"
+    "username": "Rubi Adhikari",
+    "email": "rubi.adhikari@example.com"
   }
 }
 ```
@@ -162,9 +162,9 @@ Token present?
   "message": "Profile retrieved successfully",
   "data": {
     "id": "7fa85b61-da2f-48e2-b01c-1bb3705be8b2",
-    "username": "Sushil Upadhayay",
-    "email": "sushil@example.com",
-    "gender": "Male",
+    "username": "Rubi Adhikari",
+    "email": "rubi.adhikari@example.com",
+    "gender": "Female",
     "phone": "+977-9876543210",
     "location": "Ward 4, Northern Region",
     "isActive": true,
