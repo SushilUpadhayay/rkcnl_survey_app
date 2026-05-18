@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { getStats } = require('../controllers/report.controller');
-const { protect, authorize } = require('../middleware/auth.middleware');
+const { protect } = require('../middleware/auth.middleware');
 
 // @route   GET /api/reports/stats
-// @desc    Get dashboard statistics (Admin only)
-// @access  Private (Admin)
-router.get('/stats', protect, authorize('Admin'), getStats);
+// @desc    Get dashboard statistics
+// @access  Private
+router.get('/stats', protect, getStats);
 
 module.exports = router;

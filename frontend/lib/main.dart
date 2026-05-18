@@ -13,7 +13,6 @@ import 'screens/surveys_screen.dart';
 import 'screens/respondents_screen.dart';
 import 'screens/survey_form_screen.dart';
 import 'screens/sync_screen.dart';
-import 'screens/analytics_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/settings_screen.dart';
@@ -57,9 +56,6 @@ GoRouter _buildRouter(AppState appState) => GoRouter(
     if (!appState.isLoggedIn && state.matchedLocation != '/login' && state.matchedLocation != '/register') {
       return '/login';
     }
-    if (appState.userRole != 'Admin' && state.matchedLocation == '/analytics') {
-      return '/dashboard';
-    }
     return null;
   },
   routes: [
@@ -80,7 +76,6 @@ GoRouter _buildRouter(AppState appState) => GoRouter(
       ),
     ),
     GoRoute(path: '/sync', builder: (_, __) => const SyncScreen()),
-    GoRoute(path: '/analytics', builder: (_, __) => const AnalyticsScreen()),
     GoRoute(path: '/notifications', builder: (_, __) => const NotificationsScreen()),
     GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
     GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),

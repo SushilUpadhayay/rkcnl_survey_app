@@ -127,38 +127,6 @@ class AppState extends ChangeNotifier {
   }
 
   // ── Reporting & Export ──
-  Map<String, dynamic> globalStats = {};
-  
-  Future<void> fetchGlobalStats() async {
-    if (userRole != 'Admin') return;
-    
-    try {
-      final token = await _authService.getToken();
-      // In real scenario, usebaseUrl + '/reports/global/stats'
-      // final res = await http.get(...);
-      // For demo, we'll populate with some realistic data
-      globalStats = {
-        'totalResponses': totalResponses,
-        'syncedCount': syncedCount,
-        'pendingCount': pendingCount,
-      };
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Error fetching stats: $e');
-    }
-  }
-
-  Future<void> exportSurveyData(String surveyId) async {
-    try {
-      final token = await _authService.getToken();
-      // Logic to trigger download from backend
-      debugPrint('Exporting survey $surveyId...');
-      await Future.delayed(const Duration(seconds: 2));
-      debugPrint('CSV Export successful for $surveyId');
-    } catch (e) {
-      debugPrint('Export failed: $e');
-    }
-  }
 
   void _loadSettings() {
     darkMode = storage.getDarkMode();

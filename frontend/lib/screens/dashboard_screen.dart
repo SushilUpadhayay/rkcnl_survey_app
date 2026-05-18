@@ -295,11 +295,6 @@ class DashboardScreen extends StatelessWidget {
         const SizedBox(height: 12),
         _buildActionTile(context, Icons.cloud_sync, 'Sync Data',
             'Upload saved offline responses', AppColors.blue, '/sync'),
-        if (context.read<AppState>().userRole == 'Admin') ...[
-          const SizedBox(height: 12),
-          _buildActionTile(context, Icons.insights, 'Analytics',
-              'View your submission summary', AppColors.purple, '/analytics'),
-        ],
       ],
     );
   }
@@ -434,7 +429,6 @@ class DashboardScreen extends StatelessWidget {
         if (i == 0) context.go('/dashboard');
         if (i == 1) context.go('/surveys');
         if (i == 2) context.go('/sync');
-        if (i == 3) context.go('/analytics');
       },
       items: [
         const BottomNavigationBarItem(
@@ -449,11 +443,6 @@ class DashboardScreen extends StatelessWidget {
             icon: Icon(Icons.sync),
             activeIcon: Icon(Icons.sync),
             label: 'Sync'),
-        if (Provider.of<AppState>(context, listen: false).userRole == 'Admin')
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.insights),
-              activeIcon: Icon(Icons.insights),
-              label: 'Analytics'),
       ],
     );
   }

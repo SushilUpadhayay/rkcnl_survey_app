@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const surveyController = require('../controllers/survey.controller');
-const { protect, authorize } = require('../middleware/auth.middleware');
+const { protect } = require('../middleware/auth.middleware');
 
 // @route   GET /api/surveys/assigned
 // @desc    Get surveys assigned to the current user
@@ -9,14 +9,14 @@ const { protect, authorize } = require('../middleware/auth.middleware');
 router.get('/assigned', protect, surveyController.getAssignedSurveys);
 
 // @route   POST /api/surveys
-// @desc    Create a new survey (Admin only)
-// @access  Private (Admin)
-router.post('/', protect, authorize('Admin'), surveyController.createSurvey);
+// @desc    Create a new survey
+// @access  Private
+router.post('/', protect, surveyController.createSurvey);
 
 // @route   POST /api/surveys/assign
-// @desc    Assign a survey to a user (Admin only)
-// @access  Private (Admin)
-router.post('/assign', protect, authorize('Admin'), surveyController.assignSurvey);
+// @desc    Assign a survey to a user
+// @access  Private
+router.post('/assign', protect, surveyController.assignSurvey);
 
 // @route   GET /api/surveys
 // @desc    Get all active surveys
@@ -29,13 +29,13 @@ router.get('/', surveyController.getAllSurveys);
 router.get('/:id', surveyController.getSurveyById);
 
 // @route   PUT /api/surveys/:id
-// @desc    Update a survey (Admin only)
-// @access  Private (Admin)
-router.put('/:id', protect, authorize('Admin'), surveyController.updateSurvey);
+// @desc    Update a survey
+// @access  Private
+router.put('/:id', protect, surveyController.updateSurvey);
 
 // @route   DELETE /api/surveys/:id
-// @desc    Delete a survey (Admin only)
-// @access  Private (Admin)
-router.delete('/:id', protect, authorize('Admin'), surveyController.deleteSurvey);
+// @desc    Delete a survey
+// @access  Private
+router.delete('/:id', protect, surveyController.deleteSurvey);
 
 module.exports = router;

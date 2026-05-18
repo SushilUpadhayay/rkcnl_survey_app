@@ -275,7 +275,6 @@ class _SyncScreenState extends State<SyncScreen> {
         if (i == 0) context.go('/dashboard');
         if (i == 1) context.go('/surveys');
         if (i == 2) context.go('/sync');
-        if (i == 3) context.go('/analytics');
       },
       items: [
         const BottomNavigationBarItem(
@@ -290,11 +289,6 @@ class _SyncScreenState extends State<SyncScreen> {
             icon: Icon(Icons.sync),
             activeIcon: Icon(Icons.sync),
             label: 'Sync'),
-        if (Provider.of<AppState>(context, listen: false).userRole == 'Admin')
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.insights),
-              activeIcon: Icon(Icons.insights),
-              label: 'Analytics'),
       ],
     );
   }

@@ -75,36 +75,4 @@ const syncResponses = async (req, res) => {
     }
 };
 
-// @desc    Get all responses (admin only)
-// @route   GET /api/responses
-// @access  Private (Admin)
-const getAllResponses = async (req, res) => {
-    try {
-        const { surveyId } = req.query;
-
-        const responses = await prisma.response.findMany({
-            where: surveyId ? { surveyId } : {},
-            orderBy: { createdAt: 'desc' },
-            include: {
-                survey: { select: { id: true, title: true } },
-                submittedBy: { select: { id: true, username: true, email: true } }
-            }
-        });
-
-        res.status(200).json({
-            success: true,
-            count: responses.length,
-            data: responses
-        });
-
-    } catch (error) {
-        console.error('Get responses error:', error.message);
-        res.status(500).json({
-            success: false,
-            message: 'Server error fetching responses',
-            error: error.message
-        });
-    }
-};
-
-module.exports = { syncResponses, getAllResponses };
+module.exports = { syncResponses };
