@@ -298,8 +298,11 @@ class DashboardScreen extends StatelessWidget {
         const SizedBox(height: 12),
         _buildActionTile(context, Icons.cloud_sync, 'Sync Data',
             'Upload saved offline responses', AppColors.blue, '/sync'),
+<<<<<<< HEAD
         const SizedBox(height: 12),
         _buildExportActionTile(context),
+=======
+>>>>>>> register
       ],
     );
   }

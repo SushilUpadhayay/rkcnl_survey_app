@@ -1,131 +1,7 @@
 <<<<<<< HEAD
 const { prisma } = require('../config/db');
 
-// @desc    Create a new survey
-// @route   POST /api/surveys
-// @access  Private
-const createSurvey = async (req, res) => {
-    try {
-        const { title, description, categoryId } = req.body;
-
-        if (!title) {
-            return res.status(400).json({
-                success: false,
-                message: 'Survey title is required'
-            });
-        }
-
-        // req.user is attached by auth.middleware.js
-        const survey = await prisma.survey.create({
-            data: {
-                title,
-                description,
-                categoryId: categoryId || null,
-                createdById: req.user.id
-            },
-            include: {
-                createdBy: {
-                    select: { id: true, username: true, email: true }
-                },
-                category: {
-                    select: { id: true, name: true }
-                }
-            }
-        });
-
-        res.status(201).json({
-            success: true,
-            message: 'Survey created successfully',
-            data: survey
-        });
-
-    } catch (error) {
-        console.error('Create survey error:', error.message);
-        res.status(500).json({
-            success: false,
-            message: 'Server error while creating survey',
-            error: error.message
-        });
-    }
-};
-
-// @desc    Get all active surveys
-// @route   GET /api/surveys
-// @access  Public
-const getAllSurveys = async (req, res) => {
-    try {
-        const surveys = await prisma.survey.findMany({
-            where: { isDeleted: false },
-            orderBy: { createdAt: 'desc' },
-            include: {
-                createdBy: {
-                    select: { id: true, username: true }
-                },
-                category: {
-                    select: { id: true, name: true }
-                }
-            }
-        });
-
-        res.status(200).json({
-            success: true,
-            count: surveys.length,
-            data: surveys
-        });
-
-    } catch (error) {
-        console.error('Get all surveys error:', error.message);
-        res.status(500).json({
-            success: false,
-            message: 'Server error while fetching surveys',
-            error: error.message
-        });
-    }
-};
-
-// @desc    Get a single survey by ID
-// @route   GET /api/surveys/:id
-// @access  Public
-const getSurveyById = async (req, res) => {
-    try {
-        const survey = await prisma.survey.findFirst({
-            where: {
-                id: req.params.id,
-                isDeleted: false
-            },
-            include: {
-                createdBy: {
-                    select: { id: true, username: true, email: true }
-                },
-                category: {
-                    select: { id: true, name: true }
-                }
-            }
-        });
-
-        if (!survey) {
-            return res.status(404).json({
-                success: false,
-                message: 'Survey not found'
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            data: survey
-        });
-
-    } catch (error) {
-        console.error('Get survey by ID error:', error.message);
-        res.status(500).json({
-            success: false,
-            message: 'Server error while fetching survey',
-            error: error.message
-        });
-    }
-};
-
-// @desc    Get surveys assigned to the current user
+// @desc    Get surveys assigned to the authenticated FieldStaff user
 // @route   GET /api/surveys/assigned
 // @access  Private
 const getAssignedSurveys = async (req, res) => {
@@ -163,6 +39,7 @@ const getAssignedSurveys = async (req, res) => {
     }
 };
 
+<<<<<<< HEAD
 // @desc    Assign a survey to a user
 // @route   POST /api/surveys/assign
 // @access  Private (Admin)
@@ -343,3 +220,6 @@ module.exports = {
   getSurveys
 >>>>>>> origin/main
 };
+=======
+module.exports = { getAssignedSurveys };
+>>>>>>> register

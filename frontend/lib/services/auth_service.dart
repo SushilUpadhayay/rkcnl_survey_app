@@ -31,24 +31,34 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> register(String username, String email, String password) async {
+  Future<Map<String, dynamic>> register({
+    required String fullName,
+    required String gender,
+    required String dateOfBirth,
+    required String location,
+    required String email,
+    required String phone,
+    required String password,
+  }) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'full_name': username,
+          'full_name': fullName,
+          'gender': gender,
+          'date_of_birth': dateOfBirth,
+          'location': location,
           'email': email,
+          'phone': phone,
           'password': password,
-          'role': 'FieldStaff',
         }),
       );
 
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 201) {
-        await _saveToken(data['token']);
-        return {'success': true, 'user': data};
+        return {'success': true, 'message': data['message'] ?? 'Registration successful'};
       } else {
         return {'success': false, 'message': data['message'] ?? 'Registration failed'};
       }

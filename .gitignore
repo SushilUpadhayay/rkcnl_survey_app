@@ -70,5 +70,9 @@ coverage/
 analysis_output.txt
 migrate_working_dir/
 project_status.md
+<<<<<<< HEAD
 workflow.md
 api_integration_map.md
+=======
+api_integration_map.md
+>>>>>>> register

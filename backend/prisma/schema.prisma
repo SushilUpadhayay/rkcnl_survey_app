@@ -8,11 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  Admin
-  FieldStaff
-}
-
 enum SurveyStatus {
   Draft
   Active
@@ -24,7 +19,11 @@ model User {
   username     String   @unique
   email        String   @unique
   passwordHash String?
-  role         Role     @default(FieldStaff)
+  gender       String?
+  dateOfBirth  String?
+  phone        String?
+  location     String?
+  role         String   @default("FieldStaff")
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -50,8 +49,8 @@ model Survey {
   description String?
   status      SurveyStatus @default(Draft)
   isDeleted   Boolean      @default(false)
-  
-  // Storing questions as JSONB for flexibility, matching the current Mongoose structure
+
+  // Questions stored as JSONB for flexible, schema-free survey templates
   questions   Json         @default("[]")
   
   categoryId  String?

@@ -15,7 +15,8 @@ import '../models/models.dart';
 import '../services/storage_service.dart';
 import '../services/auth_service.dart';
 
-/// Central app state provider - manages auth, surveys, connectivity, and sync
+/// Central app state provider - manages auth, surveys, connectivity, and sync.
+/// This application is exclusively used by FieldStaff surveyors.
 class AppState extends ChangeNotifier {
   final StorageService storage;
   final AuthService _authService = AuthService();
@@ -24,7 +25,6 @@ class AppState extends ChangeNotifier {
   bool isLoggedIn = false;
   String userName = 'Field Surveyor';
   String userInitials = 'FS';
-  String userRole = 'FieldStaff'; // Default role
   String userRegion = 'Ward 4, Northern Sector';
   String? errorMessage;
   bool isAuthenticating = false;
@@ -36,7 +36,7 @@ class AppState extends ChangeNotifier {
   bool darkMode = false;
   bool autoSync = true;
 
-  // ── Surveys (admin-created, loaded at startup) ──
+  // ── Surveys (fetched from backend on login/startup) ──
   List<Survey> surveys = [];
   bool isLoading = false;
   String? error;
@@ -69,8 +69,7 @@ class AppState extends ChangeNotifier {
     AppNotification(
         id: '4',
         title: 'Account Update',
-        message:
-            'Your profile has been updated by admin. Region changed to Ward 4.',
+        message: 'Your profile has been updated. Region changed to Ward 4.',
         time: '2 days ago',
         icon: 'manage_accounts',
         colorType: 'blue',
@@ -80,12 +79,10 @@ class AppState extends ChangeNotifier {
   AppState(this.storage) {
     _loadSettings();
     _listenConnectivity();
-    // Attempt to fetch real surveys
     fetchSurveys();
   }
 
-  /// Fetches surveys from the backend API.
-  /// This makes the system fully dynamic and scalable for any number of questions.
+  /// Fetches surveys assigned to this FieldStaff user from the backend API.
   Future<void> fetchSurveys() async {
     isLoading = true;
     error = null;
@@ -112,16 +109,11 @@ class AppState extends ChangeNotifier {
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         final List data = body['data'] ?? [];
-        
-        if (data.isNotEmpty) {
-          surveys = data.map((s) => Survey.fromJson(s as Map<String, dynamic>)).toList();
-        } else {
-          // If no surveys assigned, show an empty list
-          surveys = [];
-        }
+        surveys = data.isNotEmpty
+            ? data.map((s) => Survey.fromJson(s as Map<String, dynamic>)).toList()
+            : [];
       } else {
         debugPrint('Failed to fetch surveys: ${response.statusCode}');
-        // Optional: Keep existing surveys if fetch fails, or clear them
         surveys = [];
       }
     } catch (e) {
@@ -134,7 +126,10 @@ class AppState extends ChangeNotifier {
     }
   }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> register
   void _loadSettings() {
     darkMode = storage.getDarkMode();
     autoSync = storage.getAutoSync();
@@ -143,7 +138,6 @@ class AppState extends ChangeNotifier {
       isLoggedIn = true;
       userName = auth['name'] ?? 'Surveyor';
       userInitials = auth['initials'] ?? 'SV';
-      userRole = auth['role'] ?? 'FieldStaff';
       userRegion = auth['region'] ?? 'Ward 4';
     }
   }
@@ -168,19 +162,27 @@ class AppState extends ChangeNotifier {
     notifyListeners();
 
     final result = await _authService.login(email, password);
-    
+
     isAuthenticating = false;
     if (result['success']) {
       final user = result['user'];
       isLoggedIn = true;
+<<<<<<< HEAD
       userName = user['username'] ?? 'User';
       userInitials = userName.length >= 2 ? userName.substring(0, 2).toUpperCase() : userName.toUpperCase();
       
+=======
+      userName = user['username'] ?? 'Surveyor';
+      userInitials = userName.length >= 2
+          ? userName.substring(0, 2).toUpperCase()
+          : userName.toUpperCase();
+
+>>>>>>> register
       await storage.saveAuth({
         'loggedIn': true,
         'name': userName,
         'initials': userInitials,
-        'region': userRegion
+        'region': userRegion,
       });
       notifyListeners();
       return true;
@@ -191,9 +193,38 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> register({
+    required String fullName,
+    required String gender,
+    required String dateOfBirth,
+    required String location,
+    required String email,
+    required String phone,
+    required String password,
+  }) async {
+    isAuthenticating = true;
+    errorMessage = null;
+    notifyListeners();
+
+    final result = await _authService.register(
+      fullName: fullName,
+      gender: gender,
+      dateOfBirth: dateOfBirth,
+      location: location,
+      email: email,
+      phone: phone,
+      password: password,
+    );
+
+    isAuthenticating = false;
+    notifyListeners();
+    return result;
+  }
+
   Future<void> logout() async {
     await _authService.logout();
     isLoggedIn = false;
+    surveys = [];
     await storage.clearAuth();
     notifyListeners();
   }
@@ -238,8 +269,12 @@ class AppState extends ChangeNotifier {
   Future<void> saveRespondentDraft(
       String surveyId, Respondent r, Map<String, dynamic> answers,
       {double? latitude, double? longitude, List<String>? photos}) async {
-    final updated =
-        r.copyWith(status: RespondentStatus.draft, answers: answers, latitude: latitude, longitude: longitude, photos: photos);
+    final updated = r.copyWith(
+        status: RespondentStatus.draft,
+        answers: answers,
+        latitude: latitude,
+        longitude: longitude,
+        photos: photos);
     await storage.saveRespondent(surveyId, updated);
     _markSurveyInProgress(surveyId);
     notifyListeners();
@@ -289,32 +324,31 @@ class AppState extends ChangeNotifier {
     final pending = storage.getPending();
     if (pending.isEmpty) return true;
 <<<<<<< HEAD
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> register
     try {
       final token = await _authService.getToken();
-      
-      // Build the responses array for the backend
+
       List<Map<String, dynamic>> payload = [];
       for (final p in pending) {
         final sid = p['surveyId'] as String;
         final rid = p['id'] as String;
-        
-        // Find the respondent locally
+
         final respondents = storage.getRespondents(sid);
         final idx = respondents.indexWhere((r) => r.id == rid);
-        if (idx == -1) continue; // Respondent deleted?
-        
-        final r = respondents[idx];
-        
-        // Convert Map<String, dynamic> answers into a List of objects
-        // The backend schema requires answers to be an array, or an object if JSON. 
-        // We will send it as an array of {questionId, answer}
-        final answersList = r.answers.entries.map((e) => {
-          'questionId': e.key,
-          'answer': e.value,
-        }).toList();
+        if (idx == -1) continue;
 
-        // Convert photos to base64
+        final r = respondents[idx];
+
+        final answersList = r.answers.entries.map((e) => {
+              'questionId': e.key,
+              'answer': e.value,
+            }).toList();
+
+        // Convert local photo file paths to Base64 strings for upload
         List<String> base64Photos = [];
         for (String photoPath in r.photos) {
           try {
@@ -330,7 +364,9 @@ class AppState extends ChangeNotifier {
 
         payload.add({
           'surveyId': sid,
-          'deviceTimestamp': DateTime.fromMillisecondsSinceEpoch(r.completedAt ?? DateTime.now().millisecondsSinceEpoch).toIso8601String(),
+          'deviceTimestamp': DateTime.fromMillisecondsSinceEpoch(
+                  r.completedAt ?? DateTime.now().millisecondsSinceEpoch)
+              .toIso8601String(),
           'answers': answersList,
           'customQuestions': [],
           'personalNotes': '',
@@ -419,7 +455,6 @@ class AppState extends ChangeNotifier {
 
       if (payload.isEmpty) return true;
 
-      // Real network request
       final baseUrl = AuthService.baseUrl.replaceAll('/api/auth', '');
       final url = Uri.parse('$baseUrl/api/responses/sync');
       final response = await http.post(
@@ -436,9 +471,9 @@ class AppState extends ChangeNotifier {
         await storage.addSynced(pending);
         await storage.clearPending();
         await storage.setLastSyncTime(now);
-        await storage.addSyncHistory(SyncHistoryItem(count: pending.length, timestamp: now));
-        
-        // Mark surveys as synced if all respondents done
+        await storage.addSyncHistory(
+            SyncHistoryItem(count: pending.length, timestamp: now));
+
         for (final p in pending) {
           final sid = p['surveyId'] as String;
           final respondents = storage.getRespondents(sid);
@@ -537,6 +572,7 @@ class AppState extends ChangeNotifier {
 
   // ── NOTIFICATIONS ──
   int get unreadCount => notifications.where((n) => !n.read).length;
+
   void markRead(String id) {
     final n = notifications.firstWhere((n) => n.id == id);
     n.read = true;
@@ -550,9 +586,10 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── ANALYTICS ──
+  // ── LOCAL ANALYTICS (client-side computed from SharedPreferences) ──
   int get totalResponses =>
       surveys.fold(0, (s, sv) => s + getRespondents(sv.id).length);
+
   int get completedResponses => surveys.fold(
       0,
       (s, sv) =>
@@ -560,8 +597,10 @@ class AppState extends ChangeNotifier {
           getRespondents(sv.id)
               .where((r) => r.status == RespondentStatus.completed)
               .length);
+
   int get syncedCount => storage.getSynced().length;
 
+<<<<<<< HEAD
   Map<String, int> getSurveyStatusData() {
     final Map<String, int> data = {
       'Pending': surveys.where((s) => s.status == SurveyStatus.pending).length,
@@ -599,6 +638,8 @@ class AppState extends ChangeNotifier {
     return trend;
   }
 
+=======
+>>>>>>> register
   int get todayCompleted {
     final today = DateTime.now();
     return surveys.fold(
@@ -607,9 +648,7 @@ class AppState extends ChangeNotifier {
             s +
             getRespondents(sv.id).where((r) {
               if (r.status != RespondentStatus.completed ||
-                  r.completedAt == null) {
-                return false;
-              }
+                  r.completedAt == null) return false;
               final d = DateTime.fromMillisecondsSinceEpoch(r.completedAt!);
               return d.day == today.day &&
                   d.month == today.month &&
@@ -617,6 +656,7 @@ class AppState extends ChangeNotifier {
             }).length);
   }
 }
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 // Removed _buildAdminSurveys() mock data.
@@ -790,3 +830,5 @@ List<Survey> _buildAdminSurveys() => [
       ),
     ];
 >>>>>>> origin/main
+=======
+>>>>>>> register

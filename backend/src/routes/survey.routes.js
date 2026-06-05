@@ -1,12 +1,13 @@
 <<<<<<< HEAD
 const express = require('express');
 const router = express.Router();
-const surveyController = require('../controllers/survey.controller');
-const { protect, authorize } = require('../middleware/auth.middleware');
+const { getAssignedSurveys } = require('../controllers/survey.controller');
+const { protect } = require('../middleware/auth.middleware');
 
 // @route   GET /api/surveys/assigned
-// @desc    Get surveys assigned to the current user
+// @desc    Get active surveys assigned to the authenticated FieldStaff user
 // @access  Private
+<<<<<<< HEAD
 router.get('/assigned', protect, surveyController.getAssignedSurveys);
 
 // @route   POST /api/surveys
@@ -56,5 +57,8 @@ const surveyController = require('../controllers/survey.controller');
 // @desc    Get all surveys
 router.get('/', surveyController.getSurveys);
 >>>>>>> origin/main
+=======
+router.get('/assigned', protect, getAssignedSurveys);
+>>>>>>> register
 
 module.exports = router;

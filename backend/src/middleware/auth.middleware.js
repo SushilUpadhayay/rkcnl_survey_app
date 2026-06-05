@@ -8,10 +8,8 @@ const protect = async (req, res, next) => {
 
     try {
         if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-            // Extract token from "Bearer <token>"
             token = req.headers.authorization.split(' ')[1];
 
-            // Verify token signature and expiry
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
             // Fetch fresh user from DB to ensure they still exist and are active
@@ -21,7 +19,6 @@ const protect = async (req, res, next) => {
                     id: true,
                     username: true,
                     email: true,
-                    role: true,
                     isActive: true
                 }
             });
@@ -61,18 +58,4 @@ const protect = async (req, res, next) => {
     }
 };
 
-// @desc    Restrict route to specific roles (e.g. 'Admin')
-// @usage   router.get('/admin-only', protect, authorize('Admin'), controller)
-const authorize = (...roles) => {
-    return (req, res, next) => {
-        if (!roles.includes(req.user.role)) {
-            return res.status(403).json({
-                success: false,
-                message: `Role '${req.user.role}' is not authorized to access this route`
-            });
-        }
-        next();
-    };
-};
-
-module.exports = { protect, authorize };
+module.exports = { protect };
