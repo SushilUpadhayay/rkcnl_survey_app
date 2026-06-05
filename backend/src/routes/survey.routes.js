@@ -12,6 +12,8 @@ const {
     deleteSurvey
 } = require('../controllers/survey.controller');
 const { protect, authorize } = require('../middleware/auth.middleware');
+const { validate } = require('../middleware/validate.middleware');
+const { createSurveySchema, updateSurveySchema, assignSurveySchema } = require('../schemas/survey.schema');
 
 // ─── FieldStaff Routes ────────────────────────────────────────────────────────
 
@@ -30,7 +32,7 @@ router.get('/', protect, authorize('Admin'), getAllSurveys);
 // @route   POST /api/surveys
 // @desc    Create a new survey
 // @access  Private (Admin)
-router.post('/', protect, authorize('Admin'), createSurvey);
+router.post('/', protect, authorize('Admin'), validate(createSurveySchema), createSurvey);
 
 // @route   GET /api/surveys/assignments
 // @desc    Get all survey assignments (filterable by surveyId or userId)
@@ -40,12 +42,12 @@ router.get('/assignments', protect, authorize('Admin'), getAssignments);
 // @route   POST /api/surveys/assign
 // @desc    Assign a survey to a user
 // @access  Private (Admin)
-router.post('/assign', protect, authorize('Admin'), assignSurvey);
+router.post('/assign', protect, authorize('Admin'), validate(assignSurveySchema), assignSurvey);
 
 // @route   DELETE /api/surveys/assign
 // @desc    Unassign a survey from a user
 // @access  Private (Admin)
-router.delete('/assign', protect, authorize('Admin'), unassignSurvey);
+router.delete('/assign', protect, authorize('Admin'), validate(assignSurveySchema), unassignSurvey);
 
 // @route   GET /api/surveys/:id
 // @desc    Get a single survey by ID
@@ -55,7 +57,7 @@ router.get('/:id', protect, authorize('Admin'), getSurveyById);
 // @route   PUT /api/surveys/:id
 // @desc    Update a survey
 // @access  Private (Admin)
-router.put('/:id', protect, authorize('Admin'), updateSurvey);
+router.put('/:id', protect, authorize('Admin'), validate(updateSurveySchema), updateSurvey);
 
 // @route   DELETE /api/surveys/:id
 // @desc    Soft delete a survey

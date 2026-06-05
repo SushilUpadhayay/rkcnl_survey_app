@@ -2,6 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { connectDB } = require('./src/config/db');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const { errorHandler } = require('./src/middleware/error.middleware');
 
 // Route Imports
 const authRoutes = require('./src/routes/auth.routes');
@@ -15,6 +18,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 connectDB();
+
+app.use(helmet());
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.'
+});
+app.use(limiter);
 
 app.use(cors());
 app.use(express.json());
@@ -46,14 +58,7 @@ app.use((req, res) => {
 });
 
 // Global error handler
-app.use((err, req, res, next) => {
-    console.error('Unhandled error:', err);
-    res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-        error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    });
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`✅ RKCNL Survey Backend running on port ${PORT}`);

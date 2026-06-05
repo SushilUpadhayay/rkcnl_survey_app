@@ -8,6 +8,8 @@ const {
     deleteCategory
 } = require('../controllers/category.controller');
 const { protect, authorize } = require('../middleware/auth.middleware');
+const { validate } = require('../middleware/validate.middleware');
+const { createCategorySchema, updateCategorySchema } = require('../schemas/category.schema');
 
 // @route   GET /api/categories
 // @desc    Get all categories
@@ -22,12 +24,12 @@ router.get('/:id', protect, getCategoryById);
 // @route   POST /api/categories
 // @desc    Create a new category
 // @access  Private (Admin)
-router.post('/', protect, authorize('Admin'), createCategory);
+router.post('/', protect, authorize('Admin'), validate(createCategorySchema), createCategory);
 
 // @route   PUT /api/categories/:id
 // @desc    Update a category
 // @access  Private (Admin)
-router.put('/:id', protect, authorize('Admin'), updateCategory);
+router.put('/:id', protect, authorize('Admin'), validate(updateCategorySchema), updateCategory);
 
 // @route   DELETE /api/categories/:id
 // @desc    Delete a category (blocked if surveys are linked)

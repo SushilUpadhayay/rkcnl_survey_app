@@ -7,14 +7,7 @@ const { prisma } = require('../config/db');
 // @access  Public
 const register = async (req, res) => {
     try {
-        const { full_name, gender, date_of_birth, location, email, phone, password } = req.body;
-
-        if (!full_name || !gender || !date_of_birth || !location || !email || !phone || !password) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please provide all required fields: full_name, gender, date_of_birth, location, email, phone, and password'
-            });
-        }
+        const { username, gender, dateOfBirth, location, email, phone, password } = req.body;
 
         const existingUser = await prisma.user.findUnique({ where: { email } });
 
@@ -29,10 +22,10 @@ const register = async (req, res) => {
 
         const newUser = await prisma.user.create({
             data: {
-                username: full_name,
+                username,
                 email,
                 gender,
-                dateOfBirth: date_of_birth,
+                dateOfBirth,
                 location,
                 phone,
                 passwordHash: hashedPassword
@@ -73,13 +66,6 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please provide email and password'
-            });
-        }
 
         const user = await prisma.user.findUnique({ where: { email } });
 
