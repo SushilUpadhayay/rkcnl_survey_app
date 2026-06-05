@@ -9,6 +9,7 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+    final tc = context.appColors;
     final notes = appState.notifications;
 
     return Scaffold(
@@ -23,22 +24,22 @@ class NotificationsScreen extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: notes.isEmpty 
-          ? _buildEmptyState() 
+        child: notes.isEmpty
+          ? _buildEmptyState(tc)
           : ListView.separated(
               padding: const EdgeInsets.all(20),
               itemCount: notes.length,
               separatorBuilder: (_, __) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final n = notes[index];
-                return _buildNotificationCard(context, n, appState);
+                return _buildNotificationCard(context, n, appState, tc);
               },
             ),
       ),
     );
   }
 
-  Widget _buildNotificationCard(BuildContext context, dynamic n, AppState appState) {
+  Widget _buildNotificationCard(BuildContext context, dynamic n, AppState appState, AppThemeColors tc) {
     final color = n.colorType == 'green' ? AppColors.green : n.colorType == 'orange' ? AppColors.orange : AppColors.blue;
     final icon = _getIcon(n.icon);
 
@@ -48,16 +49,16 @@ class NotificationsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: n.read ? AppColors.surface : color.withValues(alpha: 0.05),
+          color: n.read ? tc.surface : color.withValues(alpha: tc.isDark ? 0.1 : 0.05),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: n.read ? AppColors.border : color.withValues(alpha: 0.2)),
+          border: Border.all(color: n.read ? tc.border : color.withValues(alpha: 0.2)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: color.withValues(alpha: tc.isDark ? 0.2 : 0.1), shape: BoxShape.circle),
               child: Icon(icon, color: color, size: 20),
             ),
             const SizedBox(width: 16),
@@ -68,12 +69,12 @@ class NotificationsScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(n.title, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: n.read ? AppColors.textPrimary : color)),
-                      Text(n.time, style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600)),
+                      Text(n.title, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: n.read ? tc.textPrimary : color)),
+                      Text(n.time, style: TextStyle(color: tc.textMuted, fontSize: 11, fontWeight: FontWeight.w600)),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(n.message, style: TextStyle(color: AppColors.textSub, fontSize: 13, height: 1.4, fontWeight: n.read ? FontWeight.normal : FontWeight.w500)),
+                  Text(n.message, style: TextStyle(color: tc.textSub, fontSize: 13, height: 1.4, fontWeight: n.read ? FontWeight.normal : FontWeight.w500)),
                   if (!n.read) ...[
                     const SizedBox(height: 12),
                     Container(
@@ -101,16 +102,16 @@ class NotificationsScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(AppThemeColors tc) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.notifications_off_outlined, size: 64, color: AppColors.textMuted.withValues(alpha: 0.3)),
+          Icon(Icons.notifications_off_outlined, size: 64, color: tc.textMuted.withValues(alpha: 0.3)),
           const SizedBox(height: 16),
-          const Text('No notifications yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textSub)),
+          Text('No notifications yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: tc.textSub)),
           const SizedBox(height: 8),
-          const Text('You\'ll see updates from admin here.', style: TextStyle(color: AppColors.textMuted)),
+          Text('You\'ll see updates from admin here.', style: TextStyle(color: tc.textMuted)),
         ],
       ),
     );

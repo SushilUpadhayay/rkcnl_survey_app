@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require('express');
 const router = express.Router();
 const surveyController = require('../controllers/survey.controller');
@@ -37,5 +38,23 @@ router.put('/:id', protect, authorize('Admin'), surveyController.updateSurvey);
 // @desc    Delete a survey (Admin only)
 // @access  Private (Admin)
 router.delete('/:id', protect, authorize('Admin'), surveyController.deleteSurvey);
+=======
+/**
+ * src/routes/survey.routes.js
+ * 
+ * Survey routes.
+ * Responsibilities:
+ * - Define API endpoints for survey operations
+ * - Map routes to controller functions
+ */
+
+const express = require('express');
+const router = express.Router();
+const surveyController = require('../controllers/survey.controller');
+
+// @route   GET /v1/surveys
+// @desc    Get all surveys
+router.get('/', surveyController.getSurveys);
+>>>>>>> origin/main
 
 module.exports = router;

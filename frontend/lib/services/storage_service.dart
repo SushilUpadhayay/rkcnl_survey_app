@@ -119,7 +119,10 @@ class StorageService {
     int total = 0;
     for (final key in _prefs.getKeys()) {
       if (key.startsWith('rkcnl')) {
-        total += _prefs.getString(key)?.length ?? 0;
+        final val = _prefs.get(key);
+        if (val != null) {
+          total += val.toString().length;
+        }
       }
     }
     return total;

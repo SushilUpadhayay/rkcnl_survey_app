@@ -22,22 +22,23 @@ void main() async {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark,
+    statusBarIconBrightness: Brightness.light,
   ));
   final storage = await StorageService.create();
   final appState = AppState(storage);
+  final router = _buildRouter(appState);
   runApp(
-    ChangeNotifierProvider.value(value: appState, child: const RKNCLSurveyApp()),
+    ChangeNotifierProvider.value(value: appState, child: RKNCLSurveyApp(router: router)),
   );
 }
 
 class RKNCLSurveyApp extends StatelessWidget {
-  const RKNCLSurveyApp({super.key});
+  final GoRouter router;
+  const RKNCLSurveyApp({super.key, required this.router});
 
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
-    final router = _buildRouter(appState);
     return MaterialApp.router(
       title: 'RKNCL Survey App',
       debugShowCheckedModeBanner: false,
@@ -50,6 +51,7 @@ class RKNCLSurveyApp extends StatelessWidget {
 }
 
 GoRouter _buildRouter(AppState appState) => GoRouter(
+  refreshListenable: appState,
   initialLocation: '/splash',
   redirect: (context, state) {
     if (state.matchedLocation == '/splash') return null;
