@@ -15,9 +15,14 @@ const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
-    const email = 'admin@rkcnl.gov.np';
-    const password = 'Admin@1234';
-    const username = 'RKCNL Admin';
+    const email = process.env.ADMIN_EMAIL;
+    const password = process.env.ADMIN_PASSWORD;
+    const username = process.env.ADMIN_USERNAME || 'RKCNL Admin';
+
+    if (!email || !password) {
+        console.error('❌ Missing ADMIN_EMAIL or ADMIN_PASSWORD in .env file.');
+        process.exit(1);
+    }
 
     console.log('🌱 Seeding database...\n');
 

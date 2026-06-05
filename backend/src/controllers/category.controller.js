@@ -23,7 +23,11 @@ const createCategory = async (req, res) => {
         }
 
         const category = await prisma.category.create({
-            data: { name, description: description || null }
+            data: { 
+                name, 
+                description: description || null,
+                createdById: req.user.id
+            }
         });
 
         res.status(201).json({
@@ -47,16 +51,35 @@ const createCategory = async (req, res) => {
 // @access  Private
 const getAllCategories = async (req, res) => {
     try {
-        const categories = await prisma.category.findMany({
-            include: {
-                _count: { select: { surveys: true } }
-            },
-            orderBy: { name: 'asc' }
-        });
+        const { page = 1, limit = 10, search } = req.query;
+        const where = {};
+
+        if (search) {
+            where.name = { contains: search, mode: 'insensitive' };
+        }
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const take = parseInt(limit);
+
+        const [categories, total] = await Promise.all([
+            prisma.category.findMany({
+                where,
+                include: {
+                    _count: { select: { surveys: true } }
+                },
+                orderBy: { name: 'asc' },
+                skip,
+                take
+            }),
+            prisma.category.count({ where })
+        ]);
 
         res.status(200).json({
             success: true,
             count: categories.length,
+            total,
+            page: parseInt(page),
+            totalPages: Math.ceil(total / take),
             data: categories
         });
 
@@ -129,7 +152,8 @@ const updateCategory = async (req, res) => {
             where: { id: req.params.id },
             data: {
                 name: name ?? undefined,
-                description: description ?? undefined
+                description: description ?? undefined,
+                updatedById: req.user.id
             }
         });
 

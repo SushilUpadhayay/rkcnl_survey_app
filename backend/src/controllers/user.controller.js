@@ -5,39 +5,56 @@ const { prisma } = require('../config/db');
 // @access  Private (Admin)
 const getAllUsers = async (req, res) => {
     try {
-        const { role, isActive } = req.query;
-        const where = {};
+        const { role, isActive, page = 1, limit = 10, search } = req.query;
+        const where = { isDeleted: false };
 
         if (role) where.role = role;
         if (isActive !== undefined) where.isActive = isActive === 'true';
+        if (search) {
+            where.OR = [
+                { username: { contains: search, mode: 'insensitive' } },
+                { email: { contains: search, mode: 'insensitive' } }
+            ];
+        }
 
-        const users = await prisma.user.findMany({
-            where,
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                gender: true,
-                dateOfBirth: true,
-                phone: true,
-                location: true,
-                role: true,
-                isActive: true,
-                createdAt: true,
-                updatedAt: true,
-                _count: {
-                    select: {
-                        responses: true,
-                        assignments: true
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const take = parseInt(limit);
+
+        const [users, total] = await Promise.all([
+            prisma.user.findMany({
+                where,
+                select: {
+                    id: true,
+                    username: true,
+                    email: true,
+                    gender: true,
+                    dateOfBirth: true,
+                    phone: true,
+                    location: true,
+                    role: true,
+                    isActive: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    _count: {
+                        select: {
+                            responses: true,
+                            assignments: true
+                        }
                     }
-                }
-            },
-            orderBy: { createdAt: 'desc' }
-        });
+                },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take
+            }),
+            prisma.user.count({ where })
+        ]);
 
         res.status(200).json({
             success: true,
             count: users.length,
+            total,
+            page: parseInt(page),
+            totalPages: Math.ceil(total / take),
             data: users
         });
 
@@ -56,8 +73,8 @@ const getAllUsers = async (req, res) => {
 // @access  Private (Admin)
 const getUserById = async (req, res) => {
     try {
-        const user = await prisma.user.findUnique({
-            where: { id: req.params.id },
+        const user = await prisma.user.findFirst({
+            where: { id: req.params.id, isDeleted: false },
             select: {
                 id: true,
                 username: true,
@@ -125,7 +142,15 @@ const updateUser = async (req, res) => {
             // Admins can update any field
             const { username, role, isActive, phone, location, gender, dateOfBirth } = req.body;
             if (username !== undefined) updateData.username = username;
-            if (role !== undefined) updateData.role = role;
+            if (role !== undefined) {
+                if (!['Admin', 'FieldStaff'].includes(role)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Invalid role. Must be Admin or FieldStaff'
+                    });
+                }
+                updateData.role = role;
+            }
             if (isActive !== undefined) updateData.isActive = isActive;
             if (phone !== undefined) updateData.phone = phone;
             if (location !== undefined) updateData.location = location;
@@ -222,7 +247,7 @@ const toggleUserStatus = async (req, res) => {
     }
 };
 
-// @desc    Delete a user permanently (Admin only)
+// @desc    Soft delete a user (Admin only)
 // @route   DELETE /api/users/:id
 // @access  Private (Admin)
 const deleteUser = async (req, res) => {
@@ -235,8 +260,8 @@ const deleteUser = async (req, res) => {
             });
         }
 
-        const user = await prisma.user.findUnique({
-            where: { id: req.params.id }
+        const user = await prisma.user.findFirst({
+            where: { id: req.params.id, isDeleted: false }
         });
 
         if (!user) {
@@ -246,7 +271,10 @@ const deleteUser = async (req, res) => {
             });
         }
 
-        await prisma.user.delete({ where: { id: req.params.id } });
+        await prisma.user.update({
+            where: { id: req.params.id },
+            data: { isDeleted: true, isActive: false }
+        });
 
         res.status(200).json({
             success: true,

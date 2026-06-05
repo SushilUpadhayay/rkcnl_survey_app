@@ -50,27 +50,41 @@ const createSurvey = async (req, res) => {
 // @access  Private (Admin)
 const getAllSurveys = async (req, res) => {
     try {
-        const { status, categoryId } = req.query;
+        const { status, categoryId, page = 1, limit = 10, search } = req.query;
 
         const where = { isDeleted: false };
         if (status) where.status = status;
         if (categoryId) where.categoryId = categoryId;
+        if (search) {
+            where.title = { contains: search, mode: 'insensitive' };
+        }
 
-        const surveys = await prisma.survey.findMany({
-            where,
-            include: {
-                category: { select: { id: true, name: true } },
-                createdBy: { select: { id: true, username: true } },
-                _count: {
-                    select: { responses: true, assignments: true }
-                }
-            },
-            orderBy: { createdAt: 'desc' }
-        });
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const take = parseInt(limit);
+
+        const [surveys, total] = await Promise.all([
+            prisma.survey.findMany({
+                where,
+                include: {
+                    category: { select: { id: true, name: true } },
+                    createdBy: { select: { id: true, username: true } },
+                    _count: {
+                        select: { responses: true, assignments: true }
+                    }
+                },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take
+            }),
+            prisma.survey.count({ where })
+        ]);
 
         res.status(200).json({
             success: true,
             count: surveys.length,
+            total,
+            page: parseInt(page),
+            totalPages: Math.ceil(total / take),
             data: surveys
         });
 
@@ -316,11 +330,13 @@ const updateSurvey = async (req, res) => {
                 description: description ?? undefined,
                 status: status ?? undefined,
                 questions: questions ?? undefined,
-                categoryId: categoryId ?? undefined
+                categoryId: categoryId ?? undefined,
+                updatedById: req.user.id
             },
             include: {
                 category: { select: { id: true, name: true } },
-                createdBy: { select: { id: true, username: true } }
+                createdBy: { select: { id: true, username: true } },
+                updatedBy: { select: { id: true, username: true } }
             }
         });
 

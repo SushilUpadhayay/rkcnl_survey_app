@@ -14,6 +14,11 @@ enum SurveyStatus {
   Closed
 }
 
+enum Role {
+  Admin
+  FieldStaff
+}
+
 model User {
   id           String   @id @default(uuid())
   username     String   @unique
@@ -23,12 +28,16 @@ model User {
   dateOfBirth  String?
   phone        String?
   location     String?
-  role         String   @default("FieldStaff")
+  role         Role     @default(FieldStaff)
   isActive     Boolean  @default(true)
+  isDeleted    Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   surveys      Survey[]   @relation("CreatedSurveys")
+  updatedSurveys Survey[] @relation("UpdatedSurveys")
+  createdCategories Category[] @relation("CreatedCategories")
+  updatedCategories Category[] @relation("UpdatedCategories")
   responses    Response[] @relation("UserResponses")
   assignments  SurveyAssignment[]
 }
@@ -37,6 +46,10 @@ model Category {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?
+  createdById String?
+  createdBy   User?    @relation("CreatedCategories", fields: [createdById], references: [id])
+  updatedById String?
+  updatedBy   User?    @relation("UpdatedCategories", fields: [updatedById], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -58,6 +71,8 @@ model Survey {
   
   createdById String
   createdBy   User         @relation("CreatedSurveys", fields: [createdById], references: [id])
+  updatedById String?
+  updatedBy   User?        @relation("UpdatedSurveys", fields: [updatedById], references: [id])
   
   responses   Response[]
   assignments SurveyAssignment[]

@@ -9,6 +9,7 @@ const surveyRoutes = require('./src/routes/survey.routes');
 const responseRoutes = require('./src/routes/response.routes');
 const userRoutes = require('./src/routes/user.routes');
 const categoryRoutes = require('./src/routes/category.routes');
+const dashboardRoutes = require('./src/routes/dashboard.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +25,7 @@ app.use('/api/surveys', surveyRoutes);
 app.use('/api/responses', responseRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health Check
 app.get('/api/health', (req, res) => {
