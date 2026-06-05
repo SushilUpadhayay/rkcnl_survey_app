@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { prisma } = require('../config/db');
@@ -68,7 +67,7 @@ const register = async (req, res) => {
     }
 };
 
-// @desc    Authenticate FieldStaff user and return JWT
+// @desc    Authenticate user and return JWT
 // @route   POST /api/auth/login
 // @access  Public
 const login = async (req, res) => {
@@ -91,6 +90,13 @@ const login = async (req, res) => {
             });
         }
 
+        if (!user.isActive) {
+            return res.status(401).json({
+                success: false,
+                message: 'Account is inactive. Please contact an administrator.'
+            });
+        }
+
         const isMatch = await bcrypt.compare(password, user.passwordHash);
 
         if (!isMatch) {
@@ -100,7 +106,6 @@ const login = async (req, res) => {
             });
         }
 
-        // JWT contains only id and email — role is a fixed FieldStaff string on the User record
         const token = jwt.sign(
             { id: user.id, email: user.email },
             process.env.JWT_SECRET,
@@ -114,7 +119,8 @@ const login = async (req, res) => {
             data: {
                 id: user.id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                role: user.role
             }
         });
 
@@ -143,6 +149,7 @@ const getProfile = async (req, res) => {
                 dateOfBirth: true,
                 phone: true,
                 location: true,
+                role: true,
                 isActive: true,
                 createdAt: true
             }
@@ -169,58 +176,3 @@ const getProfile = async (req, res) => {
 };
 
 module.exports = { register, login, getProfile };
-=======
-/**
- * src/controllers/auth.controller.js
- * 
- * Authentication controller.
- * Responsibilities:
- * - Handle incoming HTTP requests for authentication
- * - Call the appropriate service functions
- * - Send HTTP responses back to the client
- * - Keep controllers thin; business logic belongs in services
- */
-
-const authService = require('../services/auth.service');
-
-const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    // Delegate business logic to service
-    const result = await authService.loginUser(email, password);
-    
-    res.status(200).json({
-      success: true,
-      data: result
-    });
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
-
-const register = async (req, res) => {
-  try {
-    const userData = req.body;
-    // Delegate business logic to service
-    const result = await authService.registerUser(userData);
-    
-    res.status(201).json({
-      success: true,
-      data: result
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
-
-module.exports = {
-  login,
-  register
-};
->>>>>>> origin/main

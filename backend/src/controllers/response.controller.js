@@ -24,7 +24,7 @@ const syncResponses = async (req, res) => {
                 continue;
             }
 
-            // Verify survey exists
+            // Verify survey exists and is not deleted
             const survey = await prisma.survey.findFirst({
                 where: { id: surveyId, isDeleted: false }
             });
@@ -75,4 +75,85 @@ const syncResponses = async (req, res) => {
     }
 };
 
-module.exports = { syncResponses };
+// @desc    Get all responses (Admin view — filterable by surveyId or userId)
+// @route   GET /api/responses
+// @access  Private (Admin)
+const getAllResponses = async (req, res) => {
+    try {
+        const { surveyId, userId, page = 1, limit = 20 } = req.query;
+
+        const where = {};
+        if (surveyId) where.surveyId = surveyId;
+        if (userId) where.submittedById = userId;
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        const [responses, total] = await Promise.all([
+            prisma.response.findMany({
+                where,
+                include: {
+                    survey: { select: { id: true, title: true } },
+                    submittedBy: { select: { id: true, username: true, email: true } }
+                },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: parseInt(limit)
+            }),
+            prisma.response.count({ where })
+        ]);
+
+        res.status(200).json({
+            success: true,
+            count: responses.length,
+            total,
+            page: parseInt(page),
+            totalPages: Math.ceil(total / parseInt(limit)),
+            data: responses
+        });
+
+    } catch (error) {
+        console.error('Get all responses error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching responses',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Get a single response by ID (Admin view)
+// @route   GET /api/responses/:id
+// @access  Private (Admin)
+const getResponseById = async (req, res) => {
+    try {
+        const response = await prisma.response.findUnique({
+            where: { id: req.params.id },
+            include: {
+                survey: { select: { id: true, title: true, questions: true } },
+                submittedBy: { select: { id: true, username: true, email: true } }
+            }
+        });
+
+        if (!response) {
+            return res.status(404).json({
+                success: false,
+                message: 'Response not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: response
+        });
+
+    } catch (error) {
+        console.error('Get response by ID error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching response',
+            error: error.message
+        });
+    }
+};
+
+module.exports = { syncResponses, getAllResponses, getResponseById };
