@@ -106,24 +106,41 @@ Token present?
 **Request Body:**
 ```json
 {
+<<<<<<< HEAD
   "full_name": "Rubi Adhikari",
   "gender": "Female",
   "date_of_birth": "1998-05-12",
   "location": "Ward 4, Northern Region",
   "email": "rubi.adhikari@example.com",
+=======
+  "full_name": "Sushil Upadhayay",
+  "gender": "Male",
+  "date_of_birth": "1998-05-12",
+  "location": "Ward 4, Northern Region",
+  "email": "sushil@example.com",
+>>>>>>> register
   "phone": "+977-9876543210",
   "password": "Password123"
 }
 ```
+<<<<<<< HEAD
 **RRubi Adhikari
+=======
+**Response (201):**
+>>>>>>> register
 ```json
 {
   "success": true,
   "message": "Account registered successfully",
   "data": {
     "id": "7fa85b61-da2f-48e2-b01c-1bb3705be8b2",
+<<<<<<< HEAD
     "username": "Rubi Adhikari",
     "email": "rubi.adhikari@example.com",
+=======
+    "username": "Sushil Upadhayay",
+    "email": "sushil@example.com",
+>>>>>>> register
     "role": "FieldStaff",
     "createdAt": "2026-05-18T01:30:00.000Z"
   }
@@ -135,7 +152,11 @@ Token present?
 ### 6.2 POST `/api/auth/login`
 **Request Body:**
 ```json
+<<<<<<< HEAD
 { "email": "rubi.adhikari@example.com", "password": "Password123" }
+=======
+{ "email": "sushil@example.com", "password": "Password123" }
+>>>>>>> register
 ```
 **Response (200):**
 ```json
@@ -145,8 +166,13 @@ Token present?
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "data": {
     "id": "7fa85b61-da2f-48e2-b01c-1bb3705be8b2",
+<<<<<<< HEAD
     "username": "Rubi Adhikari",
     "email": "rubi.adhikari@example.com"
+=======
+    "username": "Sushil Upadhayay",
+    "email": "sushil@example.com"
+>>>>>>> register
   }
 }
 ```
@@ -162,9 +188,15 @@ Token present?
   "message": "Profile retrieved successfully",
   "data": {
     "id": "7fa85b61-da2f-48e2-b01c-1bb3705be8b2",
+<<<<<<< HEAD
     "username": "Rubi Adhikari",
     "email": "rubi.adhikari@example.com",
     "gender": "Female",
+=======
+    "username": "Sushil Upadhayay",
+    "email": "sushil@example.com",
+    "gender": "Male",
+>>>>>>> register
     "phone": "+977-9876543210",
     "location": "Ward 4, Northern Region",
     "isActive": true,
@@ -261,6 +293,7 @@ Surveyor stats are computed entirely from local `SharedPreferences` — no backe
 
 ---
 
+<<<<<<< HEAD
 ## 8. Data Export (Client-Side CSV)
 
 Surveyors can export their locally collected respondent data as a CSV file directly from the Sync screen. This is a **fully client-side operation** — no backend endpoint is required.
@@ -286,6 +319,19 @@ Surveyors can export their locally collected respondent data as a CSV file direc
 
 ## 10. Planned Future APIs
 
+=======
+## 8. Key Integration Notes
+
+1. **Base URL:** `AuthService.baseUrl` in [auth_service.dart](file:///e:/rkcnl_survey_app/frontend/lib/services/auth_service.dart) is set to `http://10.0.2.2:3000/api/auth` for Android emulator. Update for production server.
+2. **Base64 Photos:** Photo file paths are converted to Base64 inside `AppState.syncAll()` immediately before upload.
+3. **DB Client:** A single shared `PrismaClient` instance is used across all controllers — see [db.js](file:///e:/rkcnl_survey_app/backend/src/config/db.js).
+4. **Local Storage Extensibility:** `StorageService` in [storage_service.dart](file:///e:/rkcnl_survey_app/frontend/lib/services/storage_service.dart) can be swapped for SQLite/Hive without touching UI screens.
+
+---
+
+## 9. Planned Future APIs
+
+>>>>>>> register
 ### POST `/api/notifications/token`
 - **Status:** ❌ Planned
 - **Purpose:** Register device FCM Push Notification token for real-time survey assignment alerts.
