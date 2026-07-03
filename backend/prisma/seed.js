@@ -31,6 +31,11 @@ async function main() {
 
     if (existingAdmin) {
         console.log(`ℹ️  Admin already exists: ${email}`);
+        await prisma.user.update({
+            where: { email },
+            data: { status: 'Approved', isActive: true }
+        });
+        console.log('✅ Admin user status updated to Approved.');
     } else {
         const passwordHash = await bcrypt.hash(password, 10);
 
@@ -44,7 +49,8 @@ async function main() {
                 dateOfBirth: '1990-01-01',
                 phone: '9800000000',
                 location: 'Kathmandu',
-                isActive: true
+                isActive: true,
+                status: 'Approved'
             }
         });
 

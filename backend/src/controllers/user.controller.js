@@ -5,11 +5,12 @@ const { prisma } = require('../config/db');
 // @access  Private (Admin)
 const getAllUsers = async (req, res) => {
     try {
-        const { role, isActive, page = 1, limit = 10, search } = req.query;
+        const { role, isActive, status, page = 1, limit = 10, search } = req.query;
         const where = { isDeleted: false };
 
         if (role) where.role = role;
         if (isActive !== undefined) where.isActive = isActive === 'true';
+        if (status) where.status = status;
         if (search) {
             where.OR = [
                 { username: { contains: search, mode: 'insensitive' } },
@@ -32,6 +33,7 @@ const getAllUsers = async (req, res) => {
                     phone: true,
                     location: true,
                     role: true,
+                    status: true,
                     isActive: true,
                     createdAt: true,
                     updatedAt: true,
@@ -84,6 +86,7 @@ const getUserById = async (req, res) => {
                 phone: true,
                 location: true,
                 role: true,
+                status: true,
                 isActive: true,
                 createdAt: true,
                 updatedAt: true,
@@ -140,7 +143,7 @@ const updateUser = async (req, res) => {
 
         if (isAdmin) {
             // Admins can update any field
-            const { username, role, isActive, phone, location, gender, dateOfBirth } = req.body;
+            const { username, role, isActive, status, phone, location, gender, dateOfBirth } = req.body;
             if (username !== undefined) updateData.username = username;
             if (role !== undefined) {
                 if (!['Admin', 'FieldStaff'].includes(role)) {
@@ -152,6 +155,15 @@ const updateUser = async (req, res) => {
                 updateData.role = role;
             }
             if (isActive !== undefined) updateData.isActive = isActive;
+            if (status !== undefined) {
+                if (!['Pending', 'Approved', 'Rejected'].includes(status)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Invalid status. Must be Pending, Approved, or Rejected'
+                    });
+                }
+                updateData.status = status;
+            }
             if (phone !== undefined) updateData.phone = phone;
             if (location !== undefined) updateData.location = location;
             if (gender !== undefined) updateData.gender = gender;
@@ -177,6 +189,7 @@ const updateUser = async (req, res) => {
                 username: true,
                 email: true,
                 role: true,
+                status: true,
                 isActive: true,
                 phone: true,
                 location: true,
@@ -291,4 +304,88 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { getAllUsers, getUserById, updateUser, toggleUserStatus, deleteUser };
+const approveUser = async (req, res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.params.id }
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        const updated = await prisma.user.update({
+            where: { id: req.params.id },
+            data: { status: 'Approved' },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                role: true,
+                status: true,
+                isActive: true
+            }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'User approved successfully',
+            data: updated
+        });
+
+    } catch (error) {
+        console.error('Approve user error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while approving user',
+            error: error.message
+        });
+    }
+};
+
+const rejectUser = async (req, res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.params.id }
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        const updated = await prisma.user.update({
+            where: { id: req.params.id },
+            data: { status: 'Rejected' },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                role: true,
+                status: true,
+                isActive: true
+            }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'User rejected successfully',
+            data: updated
+        });
+
+    } catch (error) {
+        console.error('Reject user error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while rejecting user',
+            error: error.message
+        });
+    }
+};
+
+module.exports = { getAllUsers, getUserById, updateUser, toggleUserStatus, deleteUser, approveUser, rejectUser };

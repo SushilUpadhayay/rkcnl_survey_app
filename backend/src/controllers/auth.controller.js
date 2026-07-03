@@ -40,13 +40,14 @@ const register = async (req, res) => {
                 location: true,
                 phone: true,
                 role: true,
+                status: true,
                 createdAt: true
             }
         });
 
         res.status(201).json({
             success: true,
-            message: 'Account registered successfully',
+            message: 'Account registered successfully. Waiting for admin approval.',
             data: newUser
         });
 
@@ -73,6 +74,27 @@ const login = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid credentials'
+            });
+        }
+
+        if (user.status === 'Pending') {
+            return res.status(401).json({
+                success: false,
+                message: 'Your account is pending administrator approval.'
+            });
+        }
+
+        if (user.status === 'Rejected') {
+            return res.status(401).json({
+                success: false,
+                message: 'Your registration request has been rejected.'
+            });
+        }
+
+        if (user.status !== 'Approved') {
+            return res.status(401).json({
+                success: false,
+                message: 'Your account is not approved to login.'
             });
         }
 
@@ -107,6 +129,7 @@ const login = async (req, res) => {
                 username: user.username,
                 email: user.email,
                 role: user.role,
+                status: user.status,
                 isActive: user.isActive
             }
         });
@@ -137,6 +160,7 @@ const getProfile = async (req, res) => {
                 phone: true,
                 location: true,
                 role: true,
+                status: true,
                 isActive: true,
                 createdAt: true
             }

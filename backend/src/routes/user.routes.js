@@ -5,12 +5,14 @@ const {
     getUserById,
     updateUser,
     toggleUserStatus,
-    deleteUser
+    deleteUser,
+    approveUser,
+    rejectUser
 } = require('../controllers/user.controller');
 const { protect, authorize } = require('../middleware/auth.middleware');
 
 // @route   GET /api/users
-// @desc    Get all users (with optional ?role= and ?isActive= filters)
+// @desc    Get all users (with optional ?role=, ?isActive=, ?status= filters)
 // @access  Private (Admin)
 router.get('/', protect, authorize('Admin'), getAllUsers);
 
@@ -28,6 +30,16 @@ router.put('/:id', protect, updateUser);
 // @desc    Toggle user active/inactive status
 // @access  Private (Admin)
 router.patch('/:id/status', protect, authorize('Admin'), toggleUserStatus);
+
+// @route   PATCH /api/users/:id/approve
+// @desc    Approve a pending user
+// @access  Private (Admin)
+router.patch('/:id/approve', protect, authorize('Admin'), approveUser);
+
+// @route   PATCH /api/users/:id/reject
+// @desc    Reject a pending user
+// @access  Private (Admin)
+router.patch('/:id/reject', protect, authorize('Admin'), rejectUser);
 
 // @route   DELETE /api/users/:id
 // @desc    Delete a user permanently

@@ -1,16 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-<<<<<<< HEAD
-import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
-=======
-import 'package:http/http.dart' as http;
->>>>>>> origin/main
+
 import '../models/models.dart';
 import '../services/storage_service.dart';
 import '../services/auth_service.dart';
@@ -126,10 +122,6 @@ class AppState extends ChangeNotifier {
     }
   }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> register
   void _loadSettings() {
     darkMode = storage.getDarkMode();
     autoSync = storage.getAutoSync();
@@ -167,17 +159,11 @@ class AppState extends ChangeNotifier {
     if (result['success']) {
       final user = result['user'];
       isLoggedIn = true;
-<<<<<<< HEAD
-      userName = user['username'] ?? 'User';
-      userInitials = userName.length >= 2 ? userName.substring(0, 2).toUpperCase() : userName.toUpperCase();
-      
-=======
       userName = user['username'] ?? 'Surveyor';
       userInitials = userName.length >= 2
           ? userName.substring(0, 2).toUpperCase()
           : userName.toUpperCase();
 
->>>>>>> register
       await storage.saveAuth({
         'loggedIn': true,
         'name': userName,
@@ -323,12 +309,7 @@ class AppState extends ChangeNotifier {
     if (!isOnline) return false;
     final pending = storage.getPending();
     if (pending.isEmpty) return true;
-<<<<<<< HEAD
-<<<<<<< HEAD
     
-=======
-
->>>>>>> register
     try {
       final token = await _authService.getToken();
 
@@ -374,83 +355,6 @@ class AppState extends ChangeNotifier {
           'longitude': r.longitude,
           'photos': base64Photos,
         });
-=======
-
-    final token = await _authService.getToken();
-    if (token == null) return false;
-
-    // Collect full respondent data for all pending items
-    final List<Map<String, dynamic>> responsesToSync = [];
-    for (final item in pending) {
-      final surveyId = item['surveyId'] as String;
-      final respondentId = item['id'] as String;
-      
-      final respondents = storage.getRespondents(surveyId);
-      final r = respondents.firstWhere((r) => r.id == respondentId);
-      
-      // Transform Map<String, dynamic> answers to List<Map<String, dynamic>>
-      final List<Map<String, dynamic>> answersList = [];
-      r.answers.forEach((qId, val) {
-        answersList.add({
-          'questionId': qId,
-          'value': val,
-        });
-      });
-
-      // Map to backend schema (Response controller expectations)
-      responsesToSync.add({
-        'surveyId': surveyId,
-        'deviceTimestamp': DateTime.fromMillisecondsSinceEpoch(r.completedAt ?? DateTime.now().millisecondsSinceEpoch).toIso8601String(),
-        'answers': answersList,
-        'customQuestions': [], // Placeholder for future use
-        'personalNotes': 'Respondent: ${r.name}, Age: ${r.age}, Gender: ${r.gender}, Phone: ${r.phone}',
-      });
-    }
-
-    try {
-      final response = await http.post(
-        Uri.parse('http://10.0.2.2:3000/api/responses/sync'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({'responses': responsesToSync}),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final now = DateTime.now().millisecondsSinceEpoch;
-        await storage.addSynced(pending);
-        await storage.clearPending();
-        await storage.setLastSyncTime(now);
-        await storage.addSyncHistory(SyncHistoryItem(count: pending.length, timestamp: now));
-        
-        _updateSurveyStatuses(pending);
-        
-        notifyListeners();
-        return true;
-      } else {
-        errorMessage = 'Sync failed: ${response.statusCode}';
-        notifyListeners();
-        return false;
-      }
-    } catch (e) {
-      errorMessage = 'Connection error during sync: $e';
-      notifyListeners();
-      return false;
-    }
-  }
-
-  void _updateSurveyStatuses(List<Map<String, dynamic>> syncedItems) {
-    final sids = syncedItems.map((e) => e['surveyId'] as String).toSet();
-    for (final sid in sids) {
-      final respondents = storage.getRespondents(sid);
-      final idx = surveys.indexWhere((s) => s.id == sid);
-      if (idx >= 0) {
-        final completedCount = respondents.where((r) => r.status == RespondentStatus.completed).length;
-        if (completedCount >= surveys[idx].targetResponses) {
-          surveys[idx].status = SurveyStatus.synced;
-        }
->>>>>>> origin/main
       }
 
       if (payload.isEmpty) return true;
@@ -600,7 +504,6 @@ class AppState extends ChangeNotifier {
 
   int get syncedCount => storage.getSynced().length;
 
-<<<<<<< HEAD
   Map<String, int> getSurveyStatusData() {
     final Map<String, int> data = {
       'Pending': surveys.where((s) => s.status == SurveyStatus.pending).length,
@@ -638,8 +541,6 @@ class AppState extends ChangeNotifier {
     return trend;
   }
 
-=======
->>>>>>> register
   int get todayCompleted {
     final today = DateTime.now();
     return surveys.fold(
@@ -656,179 +557,3 @@ class AppState extends ChangeNotifier {
             }).length);
   }
 }
-<<<<<<< HEAD
-
-<<<<<<< HEAD
-// Removed _buildAdminSurveys() mock data.
-=======
-// ── ADMIN-CREATED SURVEYS (simulated) ──
-List<Survey> _buildAdminSurveys() => [
-      Survey(
-        id: 'SRV-001',
-        title: 'Crop Health Assessment – Ward 4',
-        region: 'Northern Sector',
-        dueDate: 'Mar 10, 2026',
-        priority: 'high',
-        status: SurveyStatus.inProgress,
-        description:
-            'Evaluate crop health conditions across assigned plots in Ward 4.',
-        iconName: 'eco',
-        colorValue: 0xFF1A6B1A,
-        targetResponses: 10,
-        questions: [
-          const Question(
-              id: 'q1',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'What is the current crop stage?',
-              description: 'Select the most accurate phase.',
-              options: ['Sowing', 'Vegetative', 'Flowering', 'Harvesting']),
-          const Question(
-              id: 'q2',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Overall crop health?',
-              description: 'Rate the general health of the crops.',
-              options: ['Excellent', 'Good', 'Fair', 'Poor', 'Critical']),
-          const Question(
-              id: 'q3',
-              type: QuestionType.MultiChoiceMultiSelect,
-              text: 'Issues observed (select all):',
-              description: 'Mark all problems currently visible.',
-              options: [
-                'Pest infestation',
-                'Disease signs',
-                'Nutrient deficiency',
-                'Water stress',
-                'Weed overgrowth',
-                'None'
-              ]),
-          const Question(
-              id: 'q4',
-              type: QuestionType.OpenEnd,
-              text: 'Field Observations',
-              description: 'Note pests, soil moisture, weather impacts.',
-              placeholder: 'Describe what you observed...'),
-          const Question(
-              id: 'q5',
-              type: QuestionType.RatingScale,
-              text: 'Estimated yield potential (1–10)?',
-              description: '1 = very low, 10 = excellent yield.',
-              maxRating: 10),
-          const Question(
-              id: 'q6',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Irrigation status?',
-              description: 'Current irrigation situation.',
-              options: [
-                'Adequate',
-                'Insufficient',
-                'Over-irrigated',
-                'Rain-fed only'
-              ]),
-          const Question(
-              id: 'q7',
-              type: QuestionType.OpenEnd,
-              text: 'Recommended action?',
-              description: 'Suggest next steps or interventions.',
-              placeholder: 'e.g. Apply fertilizer, drain field...'),
-        ],
-      ),
-      Survey(
-        id: 'SRV-002',
-        title: 'Soil Moisture Survey – East Plains',
-        region: 'Eastern Plains',
-        dueDate: 'Mar 15, 2026',
-        priority: 'medium',
-        status: SurveyStatus.pending,
-        description:
-            'Measure and document soil moisture levels across Eastern Plains.',
-        iconName: 'water_drop',
-        colorValue: 0xFF0D47A1,
-        targetResponses: 8,
-        questions: [
-          const Question(
-              id: 'q1',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Soil moisture level?',
-              description: 'Visual and tactile estimation.',
-              options: ['Very Dry', 'Dry', 'Moist', 'Wet', 'Waterlogged']),
-          const Question(
-              id: 'q2',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Soil texture?',
-              description: 'Primary texture of the soil.',
-              options: ['Sandy', 'Loamy', 'Clay', 'Silt', 'Rocky']),
-          const Question(
-              id: 'q3',
-              type: QuestionType.MultiChoiceMultiSelect,
-              text: 'Observed soil issues:',
-              description: 'Select all issues currently visible.',
-              options: [
-                'Erosion',
-                'Compaction',
-                'Salinization',
-                'Drainage problem',
-                'None'
-              ]),
-          const Question(
-              id: 'q4',
-              type: QuestionType.RatingScale,
-              text: 'Soil quality rating (1–10)?',
-              description: 'Overall assessment of soil quality.',
-              maxRating: 10),
-          const Question(
-              id: 'q5',
-              type: QuestionType.OpenEnd,
-              text: 'Additional notes:',
-              description: 'Any other observations.',
-              placeholder: 'Enter details here...'),
-        ],
-      ),
-      Survey(
-        id: 'SRV-003',
-        title: 'Irrigation Audit – Zone B',
-        region: 'Central Hub',
-        dueDate: 'Feb 28, 2026',
-        priority: 'low',
-        status: SurveyStatus.synced,
-        description:
-            'Verify irrigation infrastructure and water distribution in Zone B.',
-        iconName: 'water',
-        colorValue: 0xFF2E7D32,
-        targetResponses: 5,
-        questions: [
-          const Question(
-              id: 'q1',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'Irrigation system type?',
-              description: 'Primary irrigation method.',
-              options: ['Drip', 'Sprinkler', 'Flood', 'Canal', 'None']),
-          const Question(
-              id: 'q2',
-              type: QuestionType.MultiChoiceSingleSelect,
-              text: 'System condition?',
-              description: 'Overall condition of the infrastructure.',
-              options: ['Excellent', 'Good', 'Needs repair', 'Broken']),
-          const Question(
-              id: 'q3',
-              type: QuestionType.MultiChoiceMultiSelect,
-              text: 'Issues with irrigation:',
-              description: 'Select all issues observed.',
-              options: [
-                'Leaking pipes',
-                'Clogged nozzles',
-                'Uneven distribution',
-                'Low pressure',
-                'None'
-              ]),
-          const Question(
-              id: 'q4',
-              type: QuestionType.OpenEnd,
-              text: 'Maintenance notes:',
-              description: 'Describe needed repairs.',
-              placeholder: 'Describe issues in detail...'),
-        ],
-      ),
-    ];
->>>>>>> origin/main
-=======
->>>>>>> register

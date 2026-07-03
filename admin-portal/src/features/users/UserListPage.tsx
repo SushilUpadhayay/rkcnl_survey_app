@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { apiClient } from '../../api/client';
-import type { User, Role } from '../../types';
+import type { User, Role, UserStatus } from '../../types';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable } from '../../components/DataTable';
 import type { Column } from '../../components/DataTable';
@@ -31,6 +31,8 @@ import {
   Visibility as ViewIcon,
   Block as BlockIcon,
   CheckCircle as ActiveIcon,
+  ThumbUp as ApproveIcon,
+  ThumbDown as RejectIcon,
 } from '@mui/icons-material';
 
 const userSchema = z.object({
@@ -45,6 +47,13 @@ const userSchema = z.object({
 
 type UserFormValues = z.infer<typeof userSchema>;
 
+const getStatusColor = (status: UserStatus): 'warning' | 'success' | 'error' | 'default' => {
+  if (status === 'Pending') return 'warning';
+  if (status === 'Approved') return 'success';
+  if (status === 'Rejected') return 'error';
+  return 'default';
+};
+
 export const UserListPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
@@ -55,6 +64,7 @@ export const UserListPage: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [activeFilter, setActiveFilter] = useState<string>('all');
 
   // Modal / Dialogue states
   const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -64,6 +74,7 @@ export const UserListPage: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [errorAlert, setErrorAlert] = useState<string | null>(null);
+  const [successAlert, setSuccessAlert] = useState<string | null>(null);
 
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
@@ -71,7 +82,7 @@ export const UserListPage: React.FC = () => {
 
   // Query users
   const { data, isLoading } = useQuery({
-    queryKey: ['users', page, rowsPerPage, search, roleFilter, statusFilter],
+    queryKey: ['users', page, rowsPerPage, search, roleFilter, statusFilter, activeFilter],
     queryFn: async () => {
       const params: any = {
         page: page + 1,
@@ -82,7 +93,10 @@ export const UserListPage: React.FC = () => {
         params.role = roleFilter;
       }
       if (statusFilter !== 'all') {
-        params.isActive = statusFilter === 'active';
+        params.status = statusFilter;
+      }
+      if (activeFilter !== 'all') {
+        params.isActive = activeFilter === 'active';
       }
 
       const response = await apiClient.get('/users', { params });
@@ -90,7 +104,7 @@ export const UserListPage: React.FC = () => {
     },
   });
 
-  // Toggle user status mutation
+  // Toggle user active/inactive mutation
   const toggleStatusMutation = useMutation({
     mutationFn: async (id: string) => {
       return apiClient.patch(`/users/${id}/status`);
@@ -100,6 +114,37 @@ export const UserListPage: React.FC = () => {
     },
     onError: (err: any) => {
       setErrorAlert(err.response?.data?.message || 'Failed to update user status.');
+    },
+  });
+
+  // Approve user mutation
+  const approveMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiClient.patch(`/users/${id}/approve`);
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setSuccessAlert('User approved successfully.');
+      // If detail dialog is open, update the selectedUser
+      setSelectedUser(prev => prev?.id === id ? { ...prev, status: 'Approved' } : prev);
+    },
+    onError: (err: any) => {
+      setErrorAlert(err.response?.data?.message || 'Failed to approve user.');
+    },
+  });
+
+  // Reject user mutation
+  const rejectMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiClient.patch(`/users/${id}/reject`);
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setSuccessAlert('User rejected.');
+      setSelectedUser(prev => prev?.id === id ? { ...prev, status: 'Rejected' } : prev);
+    },
+    onError: (err: any) => {
+      setErrorAlert(err.response?.data?.message || 'Failed to reject user.');
     },
   });
 
@@ -193,23 +238,37 @@ export const UserListPage: React.FC = () => {
       ),
     },
     {
+      id: 'status',
+      label: 'Approval',
+      minWidth: 120,
+      render: (val: UserStatus) => (
+        <Chip
+          label={val ?? 'Unknown'}
+          size="small"
+          color={getStatusColor(val)}
+          sx={{ fontWeight: 600 }}
+        />
+      ),
+    },
+    {
       id: 'isActive',
-      label: 'Status',
-      minWidth: 100,
+      label: 'Active',
+      minWidth: 90,
       render: (val) => (
         <Chip
           label={val ? 'Active' : 'Disabled'}
           size="small"
           color={val ? 'success' : 'default'}
+          variant="outlined"
           sx={{ fontWeight: 600 }}
         />
       ),
     },
-    { id: 'location', label: 'Location', minWidth: 150, render: (val) => val || 'N/A' },
+    { id: 'location', label: 'Location', minWidth: 130, render: (val) => val || 'N/A' },
     {
       id: 'actions',
       label: 'Actions',
-      minWidth: 180,
+      minWidth: 200,
       align: 'right',
       render: (_, row) => (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
@@ -223,6 +282,28 @@ export const UserListPage: React.FC = () => {
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
+          {row.status === 'Pending' && (
+            <>
+              <Tooltip title="Approve Registration">
+                <IconButton
+                  color="success"
+                  onClick={() => approveMutation.mutate(row.id)}
+                  disabled={approveMutation.isPending}
+                >
+                  <ApproveIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Reject Registration">
+                <IconButton
+                  color="error"
+                  onClick={() => rejectMutation.mutate(row.id)}
+                  disabled={rejectMutation.isPending}
+                >
+                  <RejectIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
           <Tooltip title={row.isActive ? 'Deactivate Account' : 'Activate Account'}>
             <IconButton
               color={row.isActive ? 'warning' : 'success'}
@@ -247,6 +328,12 @@ export const UserListPage: React.FC = () => {
         title="User Management"
         subtitle="Manage surveyor profiles, permissions, roles, and administrative statuses."
       />
+
+      {successAlert && (
+        <Alert severity="success" onClose={() => setSuccessAlert(null)} sx={{ mb: 3, borderRadius: 2 }}>
+          {successAlert}
+        </Alert>
+      )}
 
       {errorAlert && (
         <Alert severity="error" onClose={() => setErrorAlert(null)} sx={{ mb: 3, borderRadius: 2 }}>
@@ -294,13 +381,27 @@ export const UserListPage: React.FC = () => {
 
         <TextField
           select
-          label="Account Status"
+          label="Approval Status"
           size="small"
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }}
-          sx={{ minWidth: 140, bgcolor: 'background.paper', borderRadius: 1 }}
+          sx={{ minWidth: 160, bgcolor: 'background.paper', borderRadius: 1 }}
         >
           <MenuItem value="all">All Statuses</MenuItem>
+          <MenuItem value="Pending">Pending</MenuItem>
+          <MenuItem value="Approved">Approved</MenuItem>
+          <MenuItem value="Rejected">Rejected</MenuItem>
+        </TextField>
+
+        <TextField
+          select
+          label="Account"
+          size="small"
+          value={activeFilter}
+          onChange={(e) => { setActiveFilter(e.target.value); setPage(0); }}
+          sx={{ minWidth: 130, bgcolor: 'background.paper', borderRadius: 1 }}
+        >
+          <MenuItem value="all">All Accounts</MenuItem>
           <MenuItem value="active">Active Only</MenuItem>
           <MenuItem value="disabled">Disabled Only</MenuItem>
         </TextField>
@@ -354,8 +455,20 @@ export const UserListPage: React.FC = () => {
                 <Typography variant="body2">{selectedUser.location || 'Not specified'}</Typography>
               </Grid>
               <Grid size={6}>
-                <Typography variant="caption" color="text.secondary">Status</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: selectedUser.isActive ? 'success.main' : 'text.disabled' }}>
+                <Typography variant="caption" color="text.secondary">Approval Status</Typography>
+                <Chip
+                  label={selectedUser.status}
+                  size="small"
+                  color={getStatusColor(selectedUser.status)}
+                  sx={{ fontWeight: 600, mt: 0.5 }}
+                />
+              </Grid>
+              <Grid size={6}>
+                <Typography variant="caption" color="text.secondary">Account</Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 600, color: selectedUser.isActive ? 'success.main' : 'text.disabled' }}
+                >
                   {selectedUser.isActive ? 'Active' : 'Disabled'}
                 </Typography>
               </Grid>
@@ -363,6 +476,32 @@ export const UserListPage: React.FC = () => {
                 <Typography variant="caption" color="text.secondary">Created Date</Typography>
                 <Typography variant="body2">{new Date(selectedUser.createdAt).toLocaleDateString()}</Typography>
               </Grid>
+              {selectedUser.status === 'Pending' && (
+                <Grid size={12}>
+                  <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      size="small"
+                      startIcon={<ApproveIcon />}
+                      onClick={() => approveMutation.mutate(selectedUser.id)}
+                      disabled={approveMutation.isPending}
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      startIcon={<RejectIcon />}
+                      onClick={() => rejectMutation.mutate(selectedUser.id)}
+                      disabled={rejectMutation.isPending}
+                    >
+                      Reject
+                    </Button>
+                  </Box>
+                </Grid>
+              )}
             </Grid>
           )}
         </DialogContent>

@@ -34,6 +34,22 @@ class _SyncScreenState extends State<SyncScreen> {
     }
   }
 
+  void _handleExport(AppState appState) async {
+    setState(() => _isExporting = true);
+    final success = await appState.exportSyncedData();
+    if (mounted) {
+      setState(() => _isExporting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success
+              ? 'CSV ready — choose an app to share.'
+              : 'Export failed. Please try again.'),
+          backgroundColor: success ? AppColors.green : AppColors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
@@ -43,6 +59,7 @@ class _SyncScreenState extends State<SyncScreen> {
 
     return Scaffold(
       appBar: _buildAppBar(context, appState),
+      backgroundColor: tc.bg,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -52,13 +69,9 @@ class _SyncScreenState extends State<SyncScreen> {
               const SizedBox(height: 32),
               _buildPendingSection(pending, tc),
               const SizedBox(height: 32),
-<<<<<<< HEAD
-              _buildHistorySection(history),
-              const SizedBox(height: 32),
-              _buildExportSection(appState),
-=======
               _buildHistorySection(history, tc),
->>>>>>> origin/main
+              const SizedBox(height: 32),
+              _buildExportSection(appState, tc),
               const SizedBox(height: 80),
             ],
           ),
@@ -192,7 +205,7 @@ class _SyncScreenState extends State<SyncScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Pending UploadQueue',
+        Text('Pending Upload Queue',
             style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
@@ -265,31 +278,53 @@ class _SyncScreenState extends State<SyncScreen> {
     );
   }
 
-<<<<<<< HEAD
-  Widget _buildExportSection(AppState appState) {
+  Widget _buildHistoryItem(SyncHistoryItem h, AppThemeColors tc) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          const Icon(Icons.check_circle_outline,
+              color: AppColors.green, size: 18),
+          const SizedBox(width: 12),
+          Text('Synced ${h.count} record${h.count != 1 ? 's' : ''}',
+              style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: tc.textPrimary)),
+          const Spacer(),
+          Text(
+              DateFormat('MMM d, h:mm a')
+                  .format(DateTime.fromMillisecondsSinceEpoch(h.timestamp)),
+              style: TextStyle(color: tc.textMuted, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExportSection(AppState appState, AppThemeColors tc) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: tc.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: tc.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.download_outlined, size: 18, color: AppColors.textPrimary),
-              SizedBox(width: 8),
+              Icon(Icons.download_outlined, size: 18, color: tc.textPrimary),
+              const SizedBox(width: 8),
               Text('Export Data',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: tc.textPrimary)),
             ],
           ),
           const SizedBox(height: 8),
           Text(
             '${appState.totalResponses} respondent record${appState.totalResponses != 1 ? 's' : ''} available for export.',
-            style: const TextStyle(color: AppColors.textSub, fontSize: 13),
+            style: TextStyle(color: tc.textSub, fontSize: 13),
           ),
           const SizedBox(height: 16),
           SizedBox(
@@ -316,48 +351,6 @@ class _SyncScreenState extends State<SyncScreen> {
     );
   }
 
-  void _handleExport(AppState appState) async {
-    setState(() => _isExporting = true);
-    final success = await appState.exportSyncedData();
-    if (mounted) {
-      setState(() => _isExporting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(success
-              ? 'CSV ready — choose an app to share.'
-              : 'Export failed. Please try again.'),
-          backgroundColor: success ? AppColors.green : AppColors.red,
-        ),
-      );
-    }
-  }
-
-  Widget _buildHistoryItem(SyncHistoryItem h) {
-=======
-  Widget _buildHistoryItem(SyncHistoryItem h, AppThemeColors tc) {
->>>>>>> origin/main
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        children: [
-          const Icon(Icons.check_circle_outline,
-              color: AppColors.green, size: 18),
-          const SizedBox(width: 12),
-          Text('Synced ${h.count} record${h.count != 1 ? 's' : ''}',
-              style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  color: tc.textPrimary)),
-          const Spacer(),
-          Text(
-              DateFormat('MMM d, h:mm a')
-                  .format(DateTime.fromMillisecondsSinceEpoch(h.timestamp)),
-              style: TextStyle(color: tc.textMuted, fontSize: 12)),
-        ],
-      ),
-    );
-  }
-
   Widget _buildBottomNav(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: 2,
@@ -365,6 +358,7 @@ class _SyncScreenState extends State<SyncScreen> {
         if (i == 0) context.go('/dashboard');
         if (i == 1) context.go('/surveys');
         if (i == 2) context.go('/sync');
+        if (i == 3) context.go('/analytics');
       },
       items: const [
         BottomNavigationBarItem(
@@ -379,6 +373,10 @@ class _SyncScreenState extends State<SyncScreen> {
             icon: Icon(Icons.sync),
             activeIcon: Icon(Icons.sync),
             label: 'Sync'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.insights),
+            activeIcon: Icon(Icons.insights),
+            label: 'Analytics'),
       ],
     );
   }

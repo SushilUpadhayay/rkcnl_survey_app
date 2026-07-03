@@ -1,4 +1,5 @@
 export type Role = 'Admin' | 'FieldStaff';
+export type UserStatus = 'Pending' | 'Approved' | 'Rejected';
 
 export type SurveyStatus = 'Draft' | 'Active' | 'Closed';
 
@@ -11,6 +12,7 @@ export interface User {
   phone?: string | null;
   location?: string | null;
   role: Role;
+  status: UserStatus;
   isActive: boolean;
   isDeleted: boolean;
   createdAt: string;

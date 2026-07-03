@@ -298,37 +298,35 @@ class DashboardScreen extends StatelessWidget {
         const SizedBox(height: 12),
         _buildActionTile(context, Icons.cloud_sync, 'Sync Data',
             'Upload saved offline responses', AppColors.blue, '/sync'),
-<<<<<<< HEAD
         const SizedBox(height: 12),
         _buildExportActionTile(context),
-=======
->>>>>>> register
       ],
     );
   }
 
   Widget _buildExportActionTile(BuildContext context) {
+    final tc = context.appColors;
     return InkWell(
       onTap: () => _handleExport(context),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: tc.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: tc.border),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               decoration: BoxDecoration(
-                  color: AppColors.purple.withValues(alpha: 0.1),
+                  color: AppColors.purple.withValues(alpha: tc.isDark ? 0.2 : 0.1),
                   borderRadius: BorderRadius.circular(8)),
               child: const Icon(Icons.download_outlined, color: AppColors.purple, size: 24),
             ),
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -336,14 +334,14 @@ class DashboardScreen extends StatelessWidget {
                       style: TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 15,
-                          color: AppColors.textPrimary)),
-                  SizedBox(height: 2),
+                          color: tc.textPrimary)),
+                  const SizedBox(height: 2),
                   Text('Download collected responses as CSV',
-                      style: TextStyle(color: AppColors.textSub, fontSize: 13)),
+                      style: TextStyle(color: tc.textSub, fontSize: 13)),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.textMuted),
+            Icon(Icons.chevron_right, color: tc.textMuted),
           ],
         ),
       ),
@@ -504,6 +502,7 @@ class DashboardScreen extends StatelessWidget {
         if (i == 0) context.go('/dashboard');
         if (i == 1) context.go('/surveys');
         if (i == 2) context.go('/sync');
+        if (i == 3) context.go('/analytics');
       },
       items: const [
         BottomNavigationBarItem(
@@ -518,6 +517,10 @@ class DashboardScreen extends StatelessWidget {
             icon: Icon(Icons.sync),
             activeIcon: Icon(Icons.sync),
             label: 'Sync'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.insights),
+            activeIcon: Icon(Icons.insights),
+            label: 'Analytics'),
       ],
     );
   }

@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../widgets/questions/question_factory.dart';
-import '../models/models.dart';
-import '../services/survey_engine_core.dart';
-import '../theme/app_theme.dart';
-<<<<<<< HEAD
-import '../services/app_state.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-=======
+import '../models/models.dart';
+import '../services/survey_engine_core.dart';
+import '../theme/app_theme.dart';
+import '../services/app_state.dart';
 import '../widgets/questions/question_widgets.dart';
->>>>>>> origin/main
 
 class SurveyFormScreen extends StatefulWidget {
   final String surveyId;
@@ -47,33 +43,6 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
   void _initData() {
     final appState = context.read<AppState>();
     _survey = appState.surveys.firstWhere((s) => s.id == widget.surveyId);
-<<<<<<< HEAD
-    _respondent = appState
-        .getRespondents(widget.surveyId)
-        .firstWhere((r) => r.id == widget.respondentId);
-    _answers.addAll(_respondent.answers);
-    _photos = List<String>.from(_respondent.photos);
-    _latitude = _respondent.latitude;
-    _longitude = _respondent.longitude;
-    _initialized = true;
-  }
-
-  void _nextStep() {
-    if (_currentStep < _survey.questions.length) {
-      setState(() => _currentStep++);
-      context
-          .read<AppState>()
-          .saveRespondentDraft(widget.surveyId, _respondent, _answers, photos: _photos, latitude: _latitude, longitude: _longitude);
-    }
-  }
-
-  void _prevStep() {
-    if (_currentStep > 0) {
-      setState(() => _currentStep--);
-    }
-  }
-
-=======
     _respondent = appState.getRespondents(widget.surveyId).firstWhere((r) => r.id == widget.respondentId);
     
     _surveyController = SurveyController(
@@ -81,11 +50,14 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
       initialAnswers: _respondent.answers,
     );
     
+    _photos = List<String>.from(_respondent.photos);
+    _latitude = _respondent.latitude;
+    _longitude = _respondent.longitude;
+
     _surveyController.addListener(() => setState(() {}));
     _initialized = true;
   }
 
->>>>>>> origin/main
   void _submit() async {
     if (!_surveyController.validateAll()) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -100,14 +72,15 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
       builder: (_) => const Center(child: CircularProgressIndicator()),
     );
 
-<<<<<<< HEAD
-    await context
-        .read<AppState>()
-        .submitRespondent(widget.surveyId, _respondent, _answers, photos: _photos, latitude: _latitude, longitude: _longitude);
-=======
     final finalAnswers = _surveyController.getAllAnswers();
-    await context.read<AppState>().submitRespondent(widget.surveyId, _respondent, finalAnswers);
->>>>>>> origin/main
+    await context.read<AppState>().submitRespondent(
+      widget.surveyId, 
+      _respondent, 
+      finalAnswers,
+      photos: _photos,
+      latitude: _latitude,
+      longitude: _longitude,
+    );
 
     if (mounted) {
       Navigator.pop(context);
@@ -122,7 +95,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
       barrierDismissible: false,
       builder: (context) => PopScope(
         canPop: false,
-        onPopInvoked: (didPop) {
+        onPopInvokedWithResult: (didPop, _) {
           if (didPop) return;
           context.go('/respondents/${widget.surveyId}');
         },
@@ -168,22 +141,19 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-<<<<<<< HEAD
-              icon: const Icon(Icons.save_outlined),
-              onPressed: () {
-                context.read<AppState>().saveRespondentDraft(
-                    widget.surveyId, _respondent, _answers, photos: _photos, latitude: _latitude, longitude: _longitude);
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Draft saved successfully')));
-              }),
-=======
             icon: const Icon(Icons.save_outlined),
             onPressed: () {
-              context.read<AppState>().saveRespondentDraft(widget.surveyId, _respondent, _surveyController.getAllAnswers());
+              context.read<AppState>().saveRespondentDraft(
+                widget.surveyId, 
+                _respondent, 
+                _surveyController.getAllAnswers(),
+                photos: _photos,
+                latitude: _latitude,
+                longitude: _longitude,
+              );
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Draft saved successfully')));
             },
           ),
->>>>>>> origin/main
         ],
       ),
       body: SafeArea(
@@ -225,50 +195,6 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
     );
   }
 
-<<<<<<< HEAD
-  Widget _buildQuestionScreen(Question q) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-              color: AppColors.greenLight,
-              borderRadius: BorderRadius.circular(4)),
-          child: Text('Question ${_currentStep + 1}',
-              style: const TextStyle(
-                  color: AppColors.green,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 11)),
-        ),
-        const SizedBox(height: 16),
-        Text(q.text,
-            style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary)),
-        if (q.description != null) ...[
-          const SizedBox(height: 8),
-          Text(q.description!,
-              style: const TextStyle(fontSize: 14, color: AppColors.textSub)),
-        ],
-        const SizedBox(height: 32),
-        _buildInput(q),
-      ],
-    );
-  }
-
-  Widget _buildInput(Question q) {
-    return QuestionFactory.build(
-      question: q,
-      value: _answers[q.id],
-      onChanged: (val) {
-        setState(() {
-          _answers[q.id] = val;
-        });
-      },
-    );
-=======
   Widget _buildQuestion(AppThemeColors tc) {
     final qc = _surveyController.currentQuestion;
     
@@ -294,7 +220,6 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
       case QuestionType.Matrix:
         return MatrixWidget(controller: qc);
     }
->>>>>>> origin/main
   }
 
   Widget _buildReviewScreen(AppThemeColors tc) {
@@ -319,13 +244,6 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-<<<<<<< HEAD
-            )),
-        const SizedBox(height: 16),
-        _buildLocationSection(),
-        const SizedBox(height: 32),
-        _buildPhotoSection(),
-=======
               if (qc.error != null) 
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
@@ -335,37 +253,39 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
             ],
           ),
         )),
->>>>>>> origin/main
+        const SizedBox(height: 16),
+        _buildLocationSection(tc),
+        const SizedBox(height: 32),
+        _buildPhotoSection(tc),
       ],
     );
   }
 
-<<<<<<< HEAD
-  Widget _buildLocationSection() {
+  Widget _buildLocationSection(AppThemeColors tc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Location', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+        Text('Location', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: tc.textPrimary)),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: tc.border),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: [
-              Icon(Icons.location_on, color: _latitude != null ? AppColors.green : AppColors.textSub),
+              Icon(Icons.location_on, color: _latitude != null ? AppColors.green : tc.textSub),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(_latitude != null ? 'Location Captured' : 'Location Required', 
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                      style: TextStyle(fontWeight: FontWeight.w600, color: tc.textPrimary)),
                     if (_latitude != null) 
                       Text('Lat: ${_latitude!.toStringAsFixed(4)}, Lng: ${_longitude!.toStringAsFixed(4)}', 
-                        style: const TextStyle(fontSize: 12, color: AppColors.textSub)),
+                        style: TextStyle(fontSize: 12, color: tc.textSub)),
                   ],
                 ),
               ),
@@ -414,14 +334,14 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
     }
   }
 
-  Widget _buildPhotoSection() {
+  Widget _buildPhotoSection(AppThemeColors tc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Attachments (Photos)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            Text('Attachments (Photos)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: tc.textPrimary)),
             TextButton.icon(
               onPressed: _photos.length < 3 ? _addPhoto : null,
               icon: const Icon(Icons.camera_alt, size: 16),
@@ -431,7 +351,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
         ),
         const SizedBox(height: 8),
         if (_photos.isEmpty)
-          const Text('No photos attached.', style: TextStyle(color: AppColors.textSub, fontStyle: FontStyle.italic))
+          Text('No photos attached.', style: TextStyle(color: tc.textSub, fontStyle: FontStyle.italic))
         else
           SizedBox(
             height: 120,
@@ -483,25 +403,8 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
     }
   }
 
-  String _formatAnswer(Question q, dynamic ans) {
-    if (ans == null) return 'No answer provided';
-    if (q.type == QuestionType.Matrix) {
-      if (ans is! Map) return 'Invalid data';
-      return ans.entries.map((e) => '${e.key}: ${e.value}').join(', ');
-    }
-    if (q.type == QuestionType.ChoiceWithFreeWriting) {
-      if (ans is! Map) return 'Invalid data';
-      return 'Choice: ${ans['choice']}, Notes: ${ans['notes']}';
-    }
-    if (ans is List) return ans.isEmpty ? 'No answer provided' : ans.join(', ');
-    return ans.toString();
-  }
-
-  Widget _buildFooter(bool isReview) {
-=======
   Widget _buildFooter(AppThemeColors tc) {
     final isReview = _surveyController.isReview;
->>>>>>> origin/main
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       decoration: BoxDecoration(color: tc.surface, border: Border(top: BorderSide(color: tc.border))),
@@ -535,26 +438,20 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           TextButton(
-<<<<<<< HEAD
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
-          TextButton(
-              onPressed: () {
-                context.read<AppState>().saveRespondentDraft(
-                    widget.surveyId, _respondent, _answers, photos: _photos, latitude: _latitude, longitude: _longitude);
-                Navigator.pop(context); // Close dialog
-                context.pop(); // Go back
-              },
-              child: const Text('Save & Exit')),
-=======
             onPressed: () {
-              context.read<AppState>().saveRespondentDraft(widget.surveyId, _respondent, _surveyController.getAllAnswers());
+              context.read<AppState>().saveRespondentDraft(
+                widget.surveyId, 
+                _respondent, 
+                _surveyController.getAllAnswers(),
+                photos: _photos,
+                latitude: _latitude,
+                longitude: _longitude,
+              );
               Navigator.pop(context);
               context.go('/respondents/${widget.surveyId}');
             },
             child: const Text('Save & Exit'),
           ),
->>>>>>> origin/main
         ],
       ),
     );

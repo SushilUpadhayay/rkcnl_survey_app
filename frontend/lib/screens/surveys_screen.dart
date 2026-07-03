@@ -345,36 +345,13 @@ class _SurveysScreenState extends State<SurveysScreen> {
         if (i == 0) context.go('/dashboard');
         if (i == 1) context.go('/surveys');
         if (i == 2) context.go('/sync');
+        if (i == 3) context.go('/analytics');
       },
-<<<<<<< HEAD
-      items: [
-        const BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
-        const BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), activeIcon: Icon(Icons.assignment), label: 'Surveys'),
-        const BottomNavigationBarItem(icon: Icon(Icons.sync), activeIcon: Icon(Icons.sync), label: 'Sync'),
-<<<<<<< HEAD
-        if (Provider.of<AppState>(context, listen: false).userRole == 'Admin')
-          const BottomNavigationBarItem(icon: Icon(Icons.insights), activeIcon: Icon(Icons.insights), label: 'Analytics'),
-=======
       items: const [
-        BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.assignment_outlined),
-            activeIcon: Icon(Icons.assignment),
-            label: 'Surveys'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.sync),
-            activeIcon: Icon(Icons.sync),
-            label: 'Sync'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.insights),
-            activeIcon: Icon(Icons.insights),
-            label: 'Analytics'),
->>>>>>> origin/main
-=======
->>>>>>> register
+        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
+        BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), activeIcon: Icon(Icons.assignment), label: 'Surveys'),
+        BottomNavigationBarItem(icon: Icon(Icons.sync), activeIcon: Icon(Icons.sync), label: 'Sync'),
+        BottomNavigationBarItem(icon: Icon(Icons.insights), activeIcon: Icon(Icons.insights), label: 'Analytics'),
       ],
     );
   }

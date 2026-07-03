@@ -11,19 +11,36 @@ class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
 
   @override
-<<<<<<< HEAD
   State<AnalyticsScreen> createState() => _AnalyticsScreenState();
 }
 
 class _AnalyticsScreenState extends State<AnalyticsScreen> {
   bool _isExporting = false;
-=======
+
+  void _handleExport(AppState appState) async {
+    setState(() => _isExporting = true);
+    final success = await appState.exportSyncedData();
+    if (mounted) {
+      setState(() => _isExporting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success
+              ? 'CSV ready — choose an app to share.'
+              : 'Export failed. Please try again.'),
+          backgroundColor: success ? AppColors.green : AppColors.red,
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final tc = context.appColors;
 
     return Scaffold(
       appBar: _buildAppBar(context, appState),
+      backgroundColor: tc.bg,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -35,6 +52,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               _buildChartSection(appState, tc),
               const SizedBox(height: 32),
               _buildRecentActivity(appState, tc),
+              const SizedBox(height: 32),
+              _buildExportButton(appState),
               const SizedBox(height: 80),
             ],
           ),
@@ -43,7 +62,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       bottomNavigationBar: _buildBottomNav(context),
     );
   }
->>>>>>> origin/main
 
   PreferredSizeWidget _buildAppBar(BuildContext context, AppState appState) {
     return AppBar(
@@ -67,44 +85,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-<<<<<<< HEAD
-  @override
-  Widget build(BuildContext context) {
-    final appState = context.watch<AppState>();
-
-    return Scaffold(
-      appBar: _buildAppBar(context, appState),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildOverviewCards(appState),
-              const SizedBox(height: 32),
-              const Text('Collection Progress',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 16),
-              _buildChartSection(appState),
-              const SizedBox(height: 32),
-              const Text('Survey Breakdown',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 16),
-              ...appState.surveys.map((s) => _buildSurveyProgress(s, appState)),
-              const SizedBox(height: 24),
-              _buildExportButton(appState),
-              const SizedBox(height: 80),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: _buildBottomNav(context),
-    );
-  }
-
-  Widget _buildOverviewCards(AppState appState) {
-    return Column(
-=======
   Widget _buildKPISection(AppState appState, AppThemeColors tc) {
     return GridView.count(
       crossAxisCount: 2,
@@ -113,7 +93,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
       childAspectRatio: 1.4,
->>>>>>> origin/main
       children: [
         _buildKPICard('Total Surveys', appState.totalResponses.toString(), Icons.assignment, AppColors.blue, tc),
         _buildKPICard('Today', appState.todayCompleted.toString(), Icons.today, AppColors.green, tc),
@@ -145,6 +124,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   Widget _buildChartSection(AppState appState, AppThemeColors tc) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('Survey Completion Status', tc),
         const SizedBox(height: 16),
@@ -196,27 +176,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-<<<<<<< HEAD
-  Widget _buildExportButton(AppState appState) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: appState.totalResponses > 0 && !_isExporting
-            ? () => _handleExport(appState)
-            : null,
-        icon: _isExporting
-            ? const SizedBox(
-                height: 16,
-                width: 16,
-                child: CircularProgressIndicator(strokeWidth: 2))
-            : const Icon(Icons.ios_share_outlined, size: 18),
-        label: Text(_isExporting ? 'Preparing CSV...' : 'Export All Data as CSV'),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.green,
-          side: const BorderSide(color: AppColors.green),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-        ),
-=======
   Widget _buildBarChart(AppState appState, AppThemeColors tc) {
     final trendData = appState.getWeeklyTrendData();
     
@@ -251,27 +210,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         ),
         gridData: const FlGridData(show: false),
         borderData: FlBorderData(show: false),
->>>>>>> origin/main
       ),
     );
   }
 
-<<<<<<< HEAD
-  void _handleExport(AppState appState) async {
-    setState(() => _isExporting = true);
-    final success = await appState.exportSyncedData();
-    if (mounted) {
-      setState(() => _isExporting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(success
-              ? 'CSV ready — choose an app to share.'
-              : 'Export failed. Please try again.'),
-          backgroundColor: success ? AppColors.green : AppColors.red,
-        ),
-      );
-    }
-=======
   Widget _buildRecentActivity(AppState appState, AppThemeColors tc) {
     final history = appState.syncHistory;
     
@@ -313,43 +255,47 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
+  Widget _buildExportButton(AppState appState) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: appState.totalResponses > 0 && !_isExporting
+            ? () => _handleExport(appState)
+            : null,
+        icon: _isExporting
+            ? const SizedBox(
+                height: 16,
+                width: 16,
+                child: CircularProgressIndicator(strokeWidth: 2))
+            : const Icon(Icons.ios_share_outlined, size: 18),
+        label: Text(_isExporting ? 'Preparing CSV...' : 'Export All Data as CSV'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.green,
+          side: const BorderSide(color: AppColors.green),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSectionTitle(String title, AppThemeColors tc) {
     return Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: tc.textPrimary));
->>>>>>> origin/main
   }
 
   Widget _buildBottomNav(BuildContext context) {
     return BottomNavigationBar(
-<<<<<<< HEAD
-      currentIndex: 2,
-=======
       currentIndex: 3,
->>>>>>> origin/main
       onTap: (i) {
         if (i == 0) context.go('/dashboard');
         if (i == 1) context.go('/surveys');
         if (i == 2) context.go('/sync');
+        if (i == 3) context.go('/analytics');
       },
       items: const [
-<<<<<<< HEAD
-        BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.assignment_outlined),
-            activeIcon: Icon(Icons.assignment),
-            label: 'Surveys'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.sync),
-            activeIcon: Icon(Icons.sync),
-            label: 'Sync'),
-=======
         BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), activeIcon: Icon(Icons.assignment), label: 'Surveys'),
         BottomNavigationBarItem(icon: Icon(Icons.sync), activeIcon: Icon(Icons.sync), label: 'Sync'),
         BottomNavigationBarItem(icon: Icon(Icons.insights), activeIcon: Icon(Icons.insights), label: 'Analytics'),
->>>>>>> origin/main
       ],
     );
   }

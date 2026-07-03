@@ -23,9 +23,7 @@ class Question {
   final List<String>? matrixColumns;
   final int? maxRating;
   final String? placeholder;
-
-  /// Additional properties for specific question types (e.g. matrix rows, rating icons).
-  /// This ensures the system is "greater or less than 10" types and easily extendable.
+  final bool isRequired;
   final Map<String, dynamic> extras;
 
   const Question({
@@ -38,20 +36,14 @@ class Question {
     this.matrixColumns,
     this.maxRating,
     this.placeholder,
-<<<<<<< HEAD
     this.isRequired = false,
-    this.matrixColumns,
-    this.matrixRows,
     this.extras = const {},
-=======
->>>>>>> origin/main
   });
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'type': type.name,
         'text': text,
-<<<<<<< HEAD
         if (description != null) 'description': description,
         if (options != null) 'options': options,
         if (maxRating != null) 'maxRating': maxRating,
@@ -60,14 +52,6 @@ class Question {
         if (matrixColumns != null) 'matrixColumns': matrixColumns,
         if (matrixRows != null) 'matrixRows': matrixRows,
         'extras': extras,
-=======
-        'description': description,
-        'options': options,
-        'matrixRows': matrixRows,
-        'matrixColumns': matrixColumns,
-        'maxRating': maxRating,
-        'placeholder': placeholder,
->>>>>>> origin/main
       };
 
   factory Question.fromJson(Map<String, dynamic> j) => Question(
@@ -81,15 +65,13 @@ class Question {
         matrixRows: j['matrixRows'] != null
             ? (j['matrixRows'] as List).map((e) => e.toString()).toList()
             : null,
-<<<<<<< HEAD
-        extras: Map<String, dynamic>.from(j['extras'] ?? {}),
-=======
         matrixColumns: j['matrixColumns'] != null
             ? (j['matrixColumns'] as List).map((e) => e.toString()).toList()
             : null,
         maxRating: (j['maxRating'] as int?) ?? 5,
         placeholder: j['placeholder']?.toString(),
->>>>>>> origin/main
+        isRequired: j['isRequired'] as bool? ?? false,
+        extras: Map<String, dynamic>.from(j['extras'] ?? {}),
       );
 }
 

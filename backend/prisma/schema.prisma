@@ -14,6 +14,12 @@ enum SurveyStatus {
   Closed
 }
 
+enum UserStatus {
+  Pending
+  Approved
+  Rejected
+}
+
 enum Role {
   Admin
   FieldStaff
@@ -29,6 +35,7 @@ model User {
   phone        String?
   location     String?
   role         Role     @default(FieldStaff)
+  status       UserStatus @default(Pending)
   isActive     Boolean  @default(true)
   isDeleted    Boolean  @default(false)
   createdAt    DateTime @default(now())

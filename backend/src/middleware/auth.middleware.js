@@ -12,7 +12,7 @@ const protect = async (req, res, next) => {
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            // Fetch fresh user from DB — includes role for RBAC
+            // Fetch fresh user from DB — includes role and status for RBAC
             req.user = await prisma.user.findUnique({
                 where: { id: decoded.id },
                 select: {
@@ -20,6 +20,7 @@ const protect = async (req, res, next) => {
                     username: true,
                     email: true,
                     role: true,
+                    status: true,
                     isActive: true
                 }
             });
@@ -28,6 +29,13 @@ const protect = async (req, res, next) => {
                 return res.status(401).json({
                     success: false,
                     message: 'Not authorized, user not found'
+                });
+            }
+
+            if (req.user.status !== 'Approved') {
+                return res.status(401).json({
+                    success: false,
+                    message: `Not authorized, account status is ${req.user.status.toLowerCase()}`
                 });
             }
 
