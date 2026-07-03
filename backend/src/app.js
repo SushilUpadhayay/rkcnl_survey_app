@@ -14,6 +14,10 @@ const cors = require('cors');
 // Import routes
 const authRoutes = require('./routes/auth.routes');
 const surveyRoutes = require('./routes/survey.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
+const userRoutes = require('./routes/user.routes');
+const responseRoutes = require('./routes/response.routes');
+const categoryRoutes = require('./routes/category.routes');
 
 const app = express();
 
@@ -22,9 +26,12 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-// Using /v1 API versioning strategy as requested
-app.use('/v1/auth', authRoutes);
-app.use('/v1/surveys', surveyRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/surveys', surveyRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/responses', responseRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // Health check endpoint
 app.get('/', (req, res) => {

@@ -10,11 +10,11 @@
 
 require('dotenv').config();
 const app = require('./src/app');
-const connectDB = require('./src/config/db');
+const { connectDB } = require('./src/config/db');
 
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB
+// Connect to PostgreSQL via Prisma
 connectDB();
 
 // Start the server
