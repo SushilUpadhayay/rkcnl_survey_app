@@ -13,7 +13,7 @@ const getAllUsers = async (req, res) => {
         if (status) where.status = status;
         if (search) {
             where.OR = [
-                { username: { contains: search, mode: 'insensitive' } },
+                { fullName: { contains: search, mode: 'insensitive' } },
                 { email: { contains: search, mode: 'insensitive' } }
             ];
         }
@@ -26,7 +26,7 @@ const getAllUsers = async (req, res) => {
                 where,
                 select: {
                     id: true,
-                    username: true,
+                    fullName: true,
                     email: true,
                     gender: true,
                     dateOfBirth: true,
@@ -79,7 +79,7 @@ const getUserById = async (req, res) => {
             where: { id: req.params.id, isDeleted: false },
             select: {
                 id: true,
-                username: true,
+                fullName: true,
                 email: true,
                 gender: true,
                 dateOfBirth: true,
@@ -123,7 +123,7 @@ const getUserById = async (req, res) => {
     }
 };
 
-// @desc    Update user (Admin: any field; Self: only username)
+// @desc    Update user (Admin: profile fields only; Self: fullName only)
 // @route   PUT /api/users/:id
 // @access  Private
 const updateUser = async (req, res) => {
@@ -142,36 +142,19 @@ const updateUser = async (req, res) => {
         const updateData = {};
 
         if (isAdmin) {
-            // Admins can update any field
-            const { username, role, isActive, status, phone, location, gender, dateOfBirth } = req.body;
-            if (username !== undefined) updateData.username = username;
-            if (role !== undefined) {
-                if (!['Admin', 'FieldStaff'].includes(role)) {
-                    return res.status(400).json({
-                        success: false,
-                        message: 'Invalid role. Must be Admin or FieldStaff'
-                    });
-                }
-                updateData.role = role;
-            }
+            // Admins can update profile fields only (not status or password)
+            const { fullName, isActive, phone, location, gender, dateOfBirth, email } = req.body;
+            if (fullName !== undefined) updateData.fullName = fullName;
+            if (email !== undefined) updateData.email = email;
             if (isActive !== undefined) updateData.isActive = isActive;
-            if (status !== undefined) {
-                if (!['Pending', 'Approved', 'Rejected'].includes(status)) {
-                    return res.status(400).json({
-                        success: false,
-                        message: 'Invalid status. Must be Pending, Approved, or Rejected'
-                    });
-                }
-                updateData.status = status;
-            }
             if (phone !== undefined) updateData.phone = phone;
             if (location !== undefined) updateData.location = location;
             if (gender !== undefined) updateData.gender = gender;
             if (dateOfBirth !== undefined) updateData.dateOfBirth = dateOfBirth;
         } else {
-            // FieldStaff can only update their own username
-            const { username } = req.body;
-            if (username !== undefined) updateData.username = username;
+            // FieldStaff can only update their own full name
+            const { fullName } = req.body;
+            if (fullName !== undefined) updateData.fullName = fullName;
         }
 
         if (Object.keys(updateData).length === 0) {
@@ -186,7 +169,7 @@ const updateUser = async (req, res) => {
             data: updateData,
             select: {
                 id: true,
-                username: true,
+                fullName: true,
                 email: true,
                 role: true,
                 status: true,
@@ -222,7 +205,7 @@ const toggleUserStatus = async (req, res) => {
     try {
         const user = await prisma.user.findUnique({
             where: { id: req.params.id },
-            select: { id: true, isActive: true, username: true }
+            select: { id: true, isActive: true, fullName: true }
         });
 
         if (!user) {
@@ -237,7 +220,7 @@ const toggleUserStatus = async (req, res) => {
             data: { isActive: !user.isActive },
             select: {
                 id: true,
-                username: true,
+                fullName: true,
                 email: true,
                 role: true,
                 isActive: true
@@ -322,7 +305,7 @@ const approveUser = async (req, res) => {
             data: { status: 'Approved' },
             select: {
                 id: true,
-                username: true,
+                fullName: true,
                 email: true,
                 role: true,
                 status: true,
@@ -364,7 +347,7 @@ const rejectUser = async (req, res) => {
             data: { status: 'Rejected' },
             select: {
                 id: true,
-                username: true,
+                fullName: true,
                 email: true,
                 role: true,
                 status: true,

@@ -17,16 +17,16 @@ const prisma = new PrismaClient();
 async function main() {
     const email = process.env.ADMIN_EMAIL;
     const password = process.env.ADMIN_PASSWORD;
-    const username = process.env.ADMIN_USERNAME || 'RKCNL Admin';
+    const adminName = process.env.ADMIN_USERNAME || 'Sushil Upadhayay';
 
-    if (!email || !password) {
-        console.error('❌ Missing ADMIN_EMAIL or ADMIN_PASSWORD in .env file.');
+    if (!adminName || !email || !password) {
+        console.error('❌ Missing ADMIN_EMAIL or ADMIN_PASSWORD or ADMIN_USERNAME in .env file.');
         process.exit(1);
     }
 
     console.log('🌱 Seeding database...\n');
 
-    // ── Admin User ──────────────────────────────────────────────────
+    // Admin User
     const existingAdmin = await prisma.user.findUnique({ where: { email } });
 
     if (existingAdmin) {
@@ -41,7 +41,7 @@ async function main() {
 
         const admin = await prisma.user.create({
             data: {
-                username,
+                fullName: adminName,
                 email,
                 passwordHash,
                 role: 'Admin',
@@ -57,12 +57,12 @@ async function main() {
         console.log('✅ Admin user created:');
         console.log(`   ID:       ${admin.id}`);
         console.log(`   Email:    ${admin.email}`);
-        console.log(`   Username: ${admin.username}`);
+        console.log(`   Name:     ${admin.fullName}`);
         console.log(`   Role:     ${admin.role}`);
         console.log(`   Password: ${password}  ← change this after first login!\n`);
     }
 
-    // ── Sample Categories ───────────────────────────────────────────
+    // Sample Categories
     const categories = [
         { name: 'Agriculture', description: 'Agricultural surveys and field data collection' },
         { name: 'Health', description: 'Health and sanitation related surveys' },

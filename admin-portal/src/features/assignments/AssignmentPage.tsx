@@ -162,7 +162,7 @@ export const AssignmentPage: React.FC = () => {
       render: (val) => (
         <Box>
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
-            {val?.username || 'Unknown User'}
+            {val?.fullName || 'Unknown User'}
           </Typography>
           <Typography variant="caption" color="text.secondary">
             {val?.email || 'N/A'}
@@ -265,7 +265,7 @@ export const AssignmentPage: React.FC = () => {
           <MenuItem value="all">All Surveyors</MenuItem>
           {users?.map((user) => (
             <MenuItem key={user.id} value={user.id}>
-              {user.username} ({user.email})
+              {user.fullName} ({user.email})
             </MenuItem>
           ))}
         </TextField>
@@ -320,7 +320,7 @@ export const AssignmentPage: React.FC = () => {
           >
             {users?.map((u) => (
               <MenuItem key={u.id} value={u.id}>
-                {u.username} ({u.location || 'No location'})
+                {u.fullName} ({u.location || 'No location'})
               </MenuItem>
             ))}
             {(!users || users.length === 0) && (
@@ -350,7 +350,7 @@ export const AssignmentPage: React.FC = () => {
           {assignmentToUnassign && (
             <Typography>
               Are you sure you want to unassign survey "{assignmentToUnassign.survey?.title}" 
-              from surveyor "{assignmentToUnassign.user?.username}"? 
+              from surveyor "{assignmentToUnassign.user?.fullName}"? 
               They will no longer be able to submit responses for this survey on their mobile device.
             </Typography>
           )}

@@ -216,9 +216,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
           const SizedBox(height: 28),
           
-          // Username Input
+          // Email Input
           Text(
-            'Email or Username',
+            'Email Address',
             style: TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: 14,
@@ -229,9 +229,10 @@ class _LoginScreenState extends State<LoginScreen> {
           TextField(
             controller: _userController,
             textInputAction: TextInputAction.next,
+            keyboardType: TextInputType.emailAddress,
             decoration: _buildInputDecoration(
-              hint: 'Enter your email or username',
-              icon: Icons.person_outline,
+              hint: 'Enter your email address',
+              icon: Icons.email_outlined,
               tc: tc,
             ),
             style: TextStyle(color: tc.textPrimary, fontWeight: FontWeight.w600, fontSize: 15),

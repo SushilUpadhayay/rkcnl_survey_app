@@ -1,11 +1,6 @@
-/* ══════════════════════════════════════════════════
-   RKCNL Rastriye Krishi – app.js
-   Field Survey Mobile App
-   ══════════════════════════════════════════════════ */
 
-/* ────────────────────────────────────
-   STATE & STORAGE
-──────────────────────────────────── */
+STATE & STORAGE
+
 const STATE = {
     currentScreen: 'screen-splash',
     prevScreen: null,
@@ -15,7 +10,7 @@ const STATE = {
     formStep: 0,
     formAnswers: {},
     filterMode: 'all',
-    user: { name: 'John Doe', initials: 'JD', phone: '+977 9801234567', empId: 'EMP-0042', region: 'Ward 4, Northern Sector', email: 'j.doe@rkcnl.gov.np' },
+    user: { name: 'Rubi Adhikari', initials: 'RA', phone: '+977 9800000000', empId: 'EMP-0042', region: 'Ward 4, Northern Sector', email: 'r.adhi@rkcnl.np' },
     notifications: [
         { id: 1, title: 'New Survey Assigned', msg: 'Crop Health Assessment – Ward 6 has been assigned to you.', time: '2 hrs ago', read: false, icon: 'assignment', color: 'green' },
         { id: 2, title: 'Sync Reminder', msg: 'You have 3 responses pending upload. Please sync when online.', time: '5 hrs ago', read: false, icon: 'cloud_sync', color: 'orange' },
@@ -37,77 +32,8 @@ const LS_KEY_AUTH = 'rkcnl_auth';
 function lsGet(key, def = null) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; } }
 function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch { console.warn('LS write failed'); } }
 
-/* ────────────────────────────────────
-   SURVEY DATA (from admin / simulated)
-──────────────────────────────────── */
-const SURVEYS = [
-    {
-        id: 'SRV-001', title: 'Crop Health Assessment – Ward 4', region: 'Northern Sector',
-        due: 'Mar 10, 2026', priority: 'high', status: 'in_progress',
-        icon: 'grass', color: '#1a6b1a',
-        description: 'Evaluate crop health conditions across assigned plots in Ward 4.',
-        questions: [
-            { id: 'q1', type: 'radio', text: 'What is the current crop stage?', desc: 'Select the most accurate phase for the observation area.', options: ['Sowing', 'Vegetative', 'Flowering', 'Harvesting'] },
-            { id: 'q2', type: 'radio', text: 'Overall crop health?', desc: 'Rate the general health condition of the crops observed.', options: ['Excellent', 'Good', 'Fair', 'Poor', 'Critical'] },
-            { id: 'q3', type: 'checkbox', text: 'Issues observed (select all that apply):', desc: 'Mark all problems currently visible in the field.', options: ['Pest infestation', 'Disease signs', 'Nutrient deficiency', 'Water stress', 'Weed overgrowth', 'None'] },
-            { id: 'q4', type: 'text', text: 'Field Observations', desc: 'Note any pests, soil moisture, weather impacts or additional details.', placeholder: 'Describe what you observed...' },
-            { id: 'q5', type: 'rating', text: 'Estimated yield potential (1–10)?', desc: '1 = very low, 10 = excellent expected yield.', max: 10 },
-            { id: 'q6', type: 'radio', text: 'Irrigation status?', desc: 'Current irrigation situation of the plot.', options: ['Adequate', 'Insufficient', 'Over-irrigated', 'Rain-fed only'] },
-            { id: 'q7', type: 'text', text: 'Recommended action?', desc: 'Suggest the next steps or interventions needed.', placeholder: 'e.g. Apply fertilizer, drain field...' },
-        ]
-    },
-    {
-        id: 'SRV-002', title: 'Soil Moisture Survey – East Plains', region: 'Eastern Plains',
-        due: 'Mar 15, 2026', priority: 'medium', status: 'pending',
-        icon: 'water_drop', color: '#0d47a1',
-        description: 'Measure and document soil moisture levels across Eastern Plains plots.',
-        questions: [
-            { id: 'q1', type: 'radio', text: 'Soil moisture level?', desc: 'Visual and tactile estimation of the soil moisture.', options: ['Very Dry', 'Dry', 'Moist', 'Wet', 'Waterlogged'] },
-            { id: 'q2', type: 'radio', text: 'Soil texture?', desc: 'Primary texture of the soil in this plot.', options: ['Sandy', 'Loamy', 'Clay', 'Silt', 'Rocky'] },
-            { id: 'q3', type: 'checkbox', text: 'Observed soil issues:', desc: 'Select all issues currently visible.', options: ['Erosion', 'Compaction', 'Salinization', 'Drainage problem', 'None'] },
-            { id: 'q4', type: 'rating', text: 'Soil quality rating (1–10)?', desc: 'Your overall assessment of soil quality.', max: 10 },
-            { id: 'q5', type: 'text', text: 'Additional notes:', desc: 'Any other observations about the soil condition.', placeholder: 'Enter details here...' },
-        ]
-    },
-    {
-        id: 'SRV-003', title: 'Irrigation Audit – Zone B', region: 'Central Hub',
-        due: 'Feb 28, 2026', priority: 'low', status: 'synced',
-        icon: 'water', color: '#2e7d32',
-        description: 'Verify irrigation infrastructure and water distribution in Zone B.',
-        questions: [
-            { id: 'q1', type: 'radio', text: 'Irrigation system type?', desc: 'Primary irrigation method used in this zone.', options: ['Drip', 'Sprinkler', 'Flood', 'Canal', 'None'] },
-            { id: 'q2', type: 'radio', text: 'System condition?', desc: 'Overall condition of the irrigation infrastructure.', options: ['Excellent', 'Good', 'Needs repair', 'Broken'] },
-            { id: 'q3', type: 'checkbox', text: 'Issues with irrigation:', desc: 'Select all issues observed.', options: ['Leaking pipes', 'Clogged nozzles', 'Uneven distribution', 'Low pressure', 'None'] },
-            { id: 'q4', type: 'text', text: 'Maintenance notes:', desc: 'Describe needed repairs or observations.', placeholder: 'Describe issues in detail...' },
-        ]
-    },
-    {
-        id: 'SRV-004', title: 'Livestock & Fodder Assessment – Ward 6', region: 'Western Zone',
-        due: 'Mar 20, 2026', priority: 'high', status: 'pending',
-        icon: 'pets', color: '#4e342e',
-        description: 'Survey livestock count, fodder availability and animal health in Ward 6.',
-        questions: [
-            { id: 'q1', type: 'radio', text: 'Primary livestock species?', desc: 'Main animals being kept in this farm.', options: ['Cattle', 'Goats', 'Poultry', 'Pigs', 'Mixed'] },
-            { id: 'q2', type: 'rating', text: 'Animal health rating (1–10)?', desc: 'General condition and vitality of the animals.', max: 10 },
-            { id: 'q3', type: 'radio', text: 'Fodder availability?', desc: 'Current availability of animal feed and fodder.', options: ['Abundant', 'Adequate', 'Scarce', 'Critical shortage'] },
-            { id: 'q4', type: 'checkbox', text: 'Issues observed:', desc: 'Select all concerns noted.', options: ['Disease signs', 'Malnutrition', 'Water shortage', 'Overcrowding', 'None'] },
-            { id: 'q5', type: 'text', text: 'Additional notes:', desc: 'Any other observations about the livestock condition.', placeholder: 'Enter notes here...' },
-        ]
-    },
-    {
-        id: 'SRV-005', title: 'Post-harvest Loss Assessment', region: 'All Sectors',
-        due: 'Mar 25, 2026', priority: 'medium', status: 'pending',
-        icon: 'warehouse', color: '#6a1b9a',
-        description: 'Estimate and document post-harvest losses for major crops.',
-        questions: [
-            { id: 'q1', type: 'radio', text: 'Primary crop assessed?', desc: 'The main crop being evaluated for harvest loss.', options: ['Rice', 'Wheat', 'Maize', 'Vegetables', 'Fruits', 'Other'] },
-            { id: 'q2', type: 'rating', text: 'Estimated harvest loss (%)?', desc: 'Rate from 1 (very low <5%) to 10 (severe >50%).', max: 10 },
-            { id: 'q3', type: 'checkbox', text: 'Causes of post-harvest loss:', desc: 'Select all relevant causes.', options: ['Pest damage', 'Moisture/mold', 'Poor storage', 'Transport damage', 'Market delay', 'None'] },
-            { id: 'q4', type: 'radio', text: 'Storage facility used?', desc: 'Where is the harvested produce being stored?', options: ['Home storage', 'Community warehouse', 'Cooperative store', 'Cold storage', 'None – sold immediately'] },
-            { id: 'q5', type: 'text', text: 'Recommendations:', desc: 'Suggest improvements to reduce post-harvest losses.', placeholder: 'e.g. Better storage containers, cold chain...' },
-        ]
-    },
-];
+/* SURVEY DATA (from admin / simulated) */
+const SURVEYS = [];
 
 /* Respondents storage */
 function getRespondents(surveyId) { return lsGet('rkcnl_respondents_' + surveyId, []); }
@@ -118,9 +44,7 @@ function saveRespondent(surveyId, respondent) {
     lsSet('rkcnl_respondents_' + surveyId, list);
 }
 
-/* ────────────────────────────────────
-   NAVIGATION / ROUTER
-──────────────────────────────────── */
+/* NAVIGATION / ROUTER */
 function showScreen(id) {
     const prev = STATE.currentScreen;
     const screens = document.querySelectorAll('.screen');
@@ -150,9 +74,7 @@ function switchTab(tab) {
     document.querySelectorAll('.nav-item').forEach(el => { el.classList.toggle('active', el.dataset.tab === tab); });
 }
 
-/* ────────────────────────────────────
-   SPLASH SCREEN
-──────────────────────────────────── */
+/* SPLASH SCREEN */
 function runSplash() {
     const fill = document.getElementById('splashLoader');
     let w = 0;
@@ -172,9 +94,7 @@ function afterSplash() {
     }
 }
 
-/* ────────────────────────────────────
-   AUTH
-──────────────────────────────────── */
+/* AUTH */
 function doLogin() {
     const u = document.getElementById('loginUser').value.trim();
     const p = document.getElementById('loginPass').value;
@@ -232,9 +152,7 @@ function verifyOTP() {
     showToast('Login successful!');
 }
 
-/* ────────────────────────────────────
-   DASHBOARD
-──────────────────────────────────── */
+/* DASHBOARD */
 function refreshDashboard() {
     const pending = lsGet(LS_KEY_PENDING, []);
     const synced = lsGet(LS_KEY_SYNCED, []);
@@ -262,9 +180,7 @@ function renderRecentActivity() {
     el.innerHTML = allR.map(r => `<div class="recent-item"><div class="recent-dot ${r.status === 'completed' ? 'green' : r.status === 'draft' ? 'blue' : 'orange'}"></div><div class="recent-text"><strong>${r.name || 'Respondent'}</strong><br><span style="font-size:12px;color:var(--text-sub)">${r.surveyTitle}</span></div><div class="recent-time">${timeAgo(r.completedAt || r.startedAt)}</div></div>`).join('');
 }
 
-/* ────────────────────────────────────
-   SURVEYS LIST
-──────────────────────────────────── */
+/* SURVEYS LIST */
 let surveyFilterActive = 'all';
 function renderSurveys() {
     const container = document.getElementById('surveysContainer');
@@ -322,9 +238,7 @@ function filterSurveys() {
 }
 function clearSurveySearch() { document.getElementById('surveySearch').value = ''; document.getElementById('clearSearch').style.display = 'none'; renderSurveys(); }
 
-/* ────────────────────────────────────
-   RESPONDENTS SCREEN
-──────────────────────────────────── */
+/* RESPONDENTS SCREEN */
 function openRespondents(surveyId) {
     const survey = SURVEYS.find(s => s.id === surveyId);
     if (!survey) return;
@@ -381,9 +295,7 @@ function editRespondent(idx) {
     startSurveyForm(STATE.currentSurvey, r);
 }
 
-/* ────────────────────────────────────
-   SURVEY FORM (multi-step)
-──────────────────────────────────── */
+/* SURVEY FORM (multi-step) */
 function startSurveyForm(survey, respondent) {
     STATE.currentSurvey = survey;
     STATE.formStep = 0;
@@ -494,9 +406,7 @@ function submitForm() {
     if (STATE.isOnline) { setTimeout(() => { autoSyncOne(pending[pending.length - 1]); }, 1500); }
 }
 
-/* ────────────────────────────────────
-   SYNC
-──────────────────────────────────── */
+/* SYNC */
 function renderSync() {
     const pending = lsGet(LS_KEY_PENDING, []);
     const lastSync = lsGet(LS_KEY_SYNC_TIME);
@@ -572,9 +482,7 @@ function clearCache() { ['rkcnl_responses', 'rkcnl_pending'].forEach(k => localS
 function updateStorageUsed() { const el = document.getElementById('storageUsed'); if (!el) return; try { let total = 0; for (let k in localStorage) { if (k.startsWith('rkcnl')) total += localStorage[k].length; }; el.textContent = (total / 1024).toFixed(1) + ' KB used'; } catch { el.textContent = 'Unable to calculate'; } }
 function toggleDarkMode(cb) { document.body.classList.toggle('dark-mode', cb.checked); }
 
-/* ────────────────────────────────────
-   ANALYTICS
-──────────────────────────────────── */
+/* ANALYTICS */
 function renderAnalytics() {
     const allRespondents = SURVEYS.flatMap(s => getRespondents(s.id).map(r => ({ ...r, surveyTitle: s.title, surveyId: s.id })));
     const total = allRespondents.length;
@@ -612,9 +520,7 @@ function renderAnalytics() {
   `;
 }
 
-/* ────────────────────────────────────
-   NOTIFICATIONS
-──────────────────────────────────── */
+/* NOTIFICATIONS */
 function renderNotifications() {
     const el = document.getElementById('notifList'); if (!el) return;
     el.innerHTML = STATE.notifications.map((n, i) => `
@@ -627,9 +533,7 @@ function renderNotifications() {
 function markRead(i) { STATE.notifications[i].read = true; renderNotifications(); }
 function markAllRead() { STATE.notifications.forEach(n => n.read = true); renderNotifications(); showToast('All notifications marked as read.'); }
 
-/* ────────────────────────────────────
-   MODAL
-──────────────────────────────────── */
+/* MODAL */
 function openModal() {
     document.getElementById('modal-overlay').classList.remove('hidden');
     document.getElementById('modal').classList.remove('hidden');
@@ -639,9 +543,7 @@ function closeModal() {
     document.getElementById('modal').classList.add('hidden');
 }
 
-/* ────────────────────────────────────
-   TOAST
-──────────────────────────────────── */
+/* TOAST */
 let toastTimer;
 function showToast(msg) {
     const t = document.getElementById('toast');
@@ -651,9 +553,7 @@ function showToast(msg) {
     toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-/* ────────────────────────────────────
-   TIME UTILS
-──────────────────────────────────── */
+/* TIME UTILS */
 function timeAgo(ts) {
     if (!ts) return 'Unknown';
     const diff = Date.now() - ts;
@@ -663,9 +563,7 @@ function timeAgo(ts) {
     return Math.floor(diff / 86400000) + ' day' + (Math.floor(diff / 86400000) > 1 ? 's' : '') + ' ago';
 }
 
-/* ────────────────────────────────────
-   ONLINE / OFFLINE DETECTION
-──────────────────────────────────── */
+/* ONLINE / OFFLINE DETECTION */
 window.addEventListener('online', () => {
     STATE.isOnline = true;
     document.getElementById('offlineBanner')?.classList.add('hidden');
@@ -679,9 +577,7 @@ window.addEventListener('offline', () => {
     showToast('You are offline. Responses will be saved locally.');
 });
 
-/* ────────────────────────────────────
-   INIT
-──────────────────────────────────── */
+/* INIT */
 document.addEventListener('DOMContentLoaded', () => {
     updateStorageUsed();
     runSplash();

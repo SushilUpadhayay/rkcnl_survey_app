@@ -49,7 +49,12 @@ server.stdout.on('data', async (d) => {
 
       // 4. Create and Login as FieldStaff
       const fsEmail = `fs_${Date.now()}@test.com`;
-      await request('POST', '/auth/register', { username: `fs_${Date.now()}`, email: fsEmail, password: 'password123' });
+      const regRes = await request('POST', '/auth/register', { fullName: `Field Staff ${Date.now()}`, email: fsEmail, password: 'password123' });
+      const fsId = regRes.body.data.id;
+
+      // Approve the newly created FieldStaff user
+      await request('PATCH', `/users/${fsId}/approve`, null, adminToken);
+
       r = await request('POST', '/auth/login', { email: fsEmail, password: 'password123' });
       const fsToken = r.body.token;
 

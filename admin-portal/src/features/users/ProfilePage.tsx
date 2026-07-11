@@ -21,7 +21,7 @@ import {
 import { Save as SaveIcon } from '@mui/icons-material';
 
 const profileSchema = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters'),
+  fullName: z.string().min(3, 'Full Name must be at least 3 characters'),
   email: z.string().email('Please enter a valid email address'),
   phone: z.string().optional().nullable(),
   gender: z.string().optional().nullable(),
@@ -40,7 +40,7 @@ export const ProfilePage: React.FC = () => {
   const { register, handleSubmit, formState: { errors, isDirty } } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      username: user?.username || '',
+      fullName: user?.fullName || '',
       email: user?.email || '',
       phone: user?.phone || '',
       gender: user?.gender || '',
@@ -107,11 +107,11 @@ export const ProfilePage: React.FC = () => {
                   boxShadow: (theme) => `0 8px 24px ${theme.palette.primary.main}30`,
                 }}
               >
-                {user?.username?.substring(0, 2).toUpperCase()}
+                {user?.fullName?.substring(0, 2).toUpperCase()}
               </Avatar>
 
               <Typography variant="h5" sx={{ fontWeight: 700, fontFamily: 'Outfit' }}>
-                {user?.username}
+                {user?.fullName}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {user?.email}
@@ -152,12 +152,12 @@ export const ProfilePage: React.FC = () => {
                 <Grid container spacing={3} sx={{ mb: 4 }}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      {...register('username')}
-                      label="Username"
+                      {...register('fullName')}
+                      label="Full Name"
                       fullWidth
                       required
-                      error={!!errors.username}
-                      helperText={errors.username?.message}
+                      error={!!errors.fullName}
+                      helperText={errors.fullName?.message}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>

@@ -36,13 +36,12 @@ import {
 } from '@mui/icons-material';
 
 const userSchema = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters'),
+  fullName: z.string().min(3, 'Full Name must be at least 3 characters'),
   email: z.string().email('Please enter a valid email address'),
   gender: z.string().optional().nullable(),
   dateOfBirth: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
-  role: z.enum(['Admin', 'FieldStaff']),
 });
 
 type UserFormValues = z.infer<typeof userSchema>;
@@ -183,13 +182,12 @@ export const UserListPage: React.FC = () => {
 
   const handleOpenEdit = (user: User) => {
     setEditingUser(user);
-    setValue('username', user.username);
+    setValue('fullName', user.fullName);
     setValue('email', user.email);
     setValue('gender', user.gender);
     setValue('dateOfBirth', user.dateOfBirth);
     setValue('phone', user.phone);
     setValue('location', user.location);
-    setValue('role', user.role);
     setErrorAlert(null);
     setOpenEditDialog(true);
   };
@@ -222,7 +220,7 @@ export const UserListPage: React.FC = () => {
   };
 
   const columns: Column<User>[] = [
-    { id: 'username', label: 'Username', minWidth: 150, render: (val) => <Typography sx={{ fontWeight: 600 }}>{val}</Typography> },
+    { id: 'fullName', label: 'Full Name', minWidth: 170, render: (val) => <Typography sx={{ fontWeight: 600 }}>{val}</Typography> },
     { id: 'email', label: 'Email Address', minWidth: 200 },
     {
       id: 'role',
@@ -345,7 +343,7 @@ export const UserListPage: React.FC = () => {
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3, alignItems: 'center' }}>
         <Box component="form" onSubmit={handleSearchSubmit} sx={{ display: 'flex', gap: 1 }}>
           <TextField
-            placeholder="Search username/email..."
+            placeholder="Search by name or email..."
             size="small"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
@@ -427,8 +425,8 @@ export const UserListPage: React.FC = () => {
           {selectedUser && (
             <Grid container spacing={2} sx={{ mt: 0.5 }}>
               <Grid size={6}>
-                <Typography variant="caption" color="text.secondary">Username</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>{selectedUser.username}</Typography>
+                <Typography variant="caption" color="text.secondary">Full Name</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>{selectedUser.fullName}</Typography>
               </Grid>
               <Grid size={6}>
                 <Typography variant="caption" color="text.secondary">Role</Typography>
@@ -518,28 +516,15 @@ export const UserListPage: React.FC = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogContent>
             <Grid container spacing={2} sx={{ pt: 1 }}>
-              <Grid size={6}>
+              <Grid size={12}>
                 <TextField
-                  {...register('username')}
-                  label="Username"
+                  {...register('fullName')}
+                  label="Full Name"
                   fullWidth
                   required
-                  error={!!errors.username}
-                  helperText={errors.username?.message}
+                  error={!!errors.fullName}
+                  helperText={errors.fullName?.message}
                 />
-              </Grid>
-              <Grid size={6}>
-                <TextField
-                  {...register('role')}
-                  select
-                  label="Role"
-                  fullWidth
-                  required
-                  defaultValue="FieldStaff"
-                >
-                  <MenuItem value="Admin">Admin</MenuItem>
-                  <MenuItem value="FieldStaff">FieldStaff</MenuItem>
-                </TextField>
               </Grid>
               <Grid size={12}>
                 <TextField
@@ -604,7 +589,7 @@ export const UserListPage: React.FC = () => {
         <DialogTitle sx={{ fontWeight: 600 }}>Soft Delete User?</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to soft delete the user "{userToDelete?.username}"?
+            Are you sure you want to soft delete the user "{userToDelete?.fullName}"?
             This will disable their account login and hide them from active lists.
             All historical survey assignments and response records remain intact.
           </Typography>

@@ -96,7 +96,7 @@ export const ResponseListPage: React.FC = () => {
       id: 'submittedBy',
       label: 'Submitted By',
       minWidth: 150,
-      render: (val) => val?.username || 'Unknown surveyor',
+      render: (val) => val?.fullName || 'Unknown surveyor',
     },
     {
       id: 'answers',
@@ -195,7 +195,7 @@ export const ResponseListPage: React.FC = () => {
           <MenuItem value="all">All Surveyors</MenuItem>
           {users?.map((user) => (
             <MenuItem key={user.id} value={user.id}>
-              {user.username}
+              {user.fullName}
             </MenuItem>
           ))}
         </TextField>
@@ -241,7 +241,7 @@ export const ResponseListPage: React.FC = () => {
                   <Paper sx={{ p: 2, bgcolor: 'background.subtle' }}>
                     <Typography variant="caption" color="text.secondary">Submitted By</Typography>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                      {selectedResponse.submittedBy?.username || 'Unknown surveyor'}
+                      {selectedResponse.submittedBy?.fullName || 'Unknown surveyor'}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                       Time Collected: {new Date(selectedResponse.deviceTimestamp).toLocaleString()}

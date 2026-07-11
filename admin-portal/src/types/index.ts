@@ -5,7 +5,7 @@ export type SurveyStatus = 'Draft' | 'Active' | 'Closed';
 
 export interface User {
   id: string;
-  username: string;
+  fullName: string;
   email: string;
   gender?: string | null;
   dateOfBirth?: string | null;

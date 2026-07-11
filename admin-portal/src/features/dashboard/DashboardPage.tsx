@@ -252,7 +252,7 @@ export const DashboardPage: React.FC = () => {
                             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                               Submitted by{' '}
                               <Box component="span" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                                {res.submittedBy?.username || 'Anonymous enumerator'}
+                                {res.submittedBy?.fullName || 'Anonymous enumerator'}
                               </Box>{' '}
                               ({res.submittedBy?.email || 'N/A'}) with {res.answers?.length || 0} answer(s).
                             </Typography>

@@ -138,7 +138,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ mode, setMode 
                     fontWeight: 600,
                   }}
                 >
-                  {user?.username?.substring(0, 2).toUpperCase()}
+                  {user?.fullName?.substring(0, 2).toUpperCase()}
                 </Avatar>
               </IconButton>
             </Tooltip>
@@ -170,7 +170,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ mode, setMode 
             >
               <Box sx={{ px: 2, py: 1.5 }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                  {user?.username}
+                  {user?.fullName}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {user?.email}

@@ -93,7 +93,7 @@ const getAllResponses = async (req, res) => {
                 where,
                 include: {
                     survey: { select: { id: true, title: true } },
-                    submittedBy: { select: { id: true, username: true, email: true } }
+                    submittedBy: { select: { id: true, fullName: true, email: true } }
                 },
                 orderBy: { createdAt: 'desc' },
                 skip,
@@ -130,7 +130,7 @@ const getResponseById = async (req, res) => {
             where: { id: req.params.id },
             include: {
                 survey: { select: { id: true, title: true, questions: true } },
-                submittedBy: { select: { id: true, username: true, email: true } }
+                submittedBy: { select: { id: true, fullName: true, email: true } }
             }
         });
 

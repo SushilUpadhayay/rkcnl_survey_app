@@ -159,7 +159,7 @@ class AppState extends ChangeNotifier {
     if (result['success']) {
       final user = result['user'];
       isLoggedIn = true;
-      userName = user['username'] ?? 'Surveyor';
+      userName = user['fullName'] ?? 'Surveyor';
       userInitials = userName.length >= 2
           ? userName.substring(0, 2).toUpperCase()
           : userName.toUpperCase();

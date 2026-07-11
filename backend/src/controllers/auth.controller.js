@@ -7,7 +7,14 @@ const { prisma } = require('../config/db');
 // @access  Public
 const register = async (req, res) => {
     try {
-        const { username, gender, dateOfBirth, location, email, phone, password } = req.body;
+        const { fullName, gender, dateOfBirth, location, email, phone, password } = req.body;
+
+        if (!fullName) {
+            return res.status(400).json({
+                success: false,
+                message: 'Full Name is required'
+            });
+        }
 
         const existingUser = await prisma.user.findUnique({ where: { email } });
 
@@ -22,7 +29,7 @@ const register = async (req, res) => {
 
         const newUser = await prisma.user.create({
             data: {
-                username,
+                fullName,
                 email,
                 gender,
                 dateOfBirth,
@@ -33,7 +40,7 @@ const register = async (req, res) => {
             },
             select: {
                 id: true,
-                username: true,
+                fullName: true,
                 email: true,
                 gender: true,
                 dateOfBirth: true,
@@ -126,7 +133,7 @@ const login = async (req, res) => {
             token,
             data: {
                 id: user.id,
-                username: user.username,
+                fullName: user.fullName,
                 email: user.email,
                 role: user.role,
                 status: user.status,
@@ -153,7 +160,7 @@ const getProfile = async (req, res) => {
             where: { id: req.user.id },
             select: {
                 id: true,
-                username: true,
+                fullName: true,
                 email: true,
                 gender: true,
                 dateOfBirth: true,

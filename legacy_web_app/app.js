@@ -40,74 +40,7 @@ function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val));
 /* ────────────────────────────────────
    SURVEY DATA (from admin / simulated)
 ──────────────────────────────────── */
-const SURVEYS = [
-    {
-        id: 'SRV-001', title: 'Crop Health Assessment – Ward 4', region: 'Northern Sector',
-        due: 'Mar 10, 2026', priority: 'high', status: 'in_progress',
-        icon: 'grass', color: '#1a6b1a',
-        description: 'Evaluate crop health conditions across assigned plots in Ward 4.',
-        questions: [
-            { id: 'q1', type: 'radio', text: 'What is the current crop stage?', desc: 'Select the most accurate phase for the observation area.', options: ['Sowing', 'Vegetative', 'Flowering', 'Harvesting'] },
-            { id: 'q2', type: 'radio', text: 'Overall crop health?', desc: 'Rate the general health condition of the crops observed.', options: ['Excellent', 'Good', 'Fair', 'Poor', 'Critical'] },
-            { id: 'q3', type: 'checkbox', text: 'Issues observed (select all that apply):', desc: 'Mark all problems currently visible in the field.', options: ['Pest infestation', 'Disease signs', 'Nutrient deficiency', 'Water stress', 'Weed overgrowth', 'None'] },
-            { id: 'q4', type: 'text', text: 'Field Observations', desc: 'Note any pests, soil moisture, weather impacts or additional details.', placeholder: 'Describe what you observed...' },
-            { id: 'q5', type: 'rating', text: 'Estimated yield potential (1–10)?', desc: '1 = very low, 10 = excellent expected yield.', max: 10 },
-            { id: 'q6', type: 'radio', text: 'Irrigation status?', desc: 'Current irrigation situation of the plot.', options: ['Adequate', 'Insufficient', 'Over-irrigated', 'Rain-fed only'] },
-            { id: 'q7', type: 'text', text: 'Recommended action?', desc: 'Suggest the next steps or interventions needed.', placeholder: 'e.g. Apply fertilizer, drain field...' },
-        ]
-    },
-    {
-        id: 'SRV-002', title: 'Soil Moisture Survey – East Plains', region: 'Eastern Plains',
-        due: 'Mar 15, 2026', priority: 'medium', status: 'pending',
-        icon: 'water_drop', color: '#0d47a1',
-        description: 'Measure and document soil moisture levels across Eastern Plains plots.',
-        questions: [
-            { id: 'q1', type: 'radio', text: 'Soil moisture level?', desc: 'Visual and tactile estimation of the soil moisture.', options: ['Very Dry', 'Dry', 'Moist', 'Wet', 'Waterlogged'] },
-            { id: 'q2', type: 'radio', text: 'Soil texture?', desc: 'Primary texture of the soil in this plot.', options: ['Sandy', 'Loamy', 'Clay', 'Silt', 'Rocky'] },
-            { id: 'q3', type: 'checkbox', text: 'Observed soil issues:', desc: 'Select all issues currently visible.', options: ['Erosion', 'Compaction', 'Salinization', 'Drainage problem', 'None'] },
-            { id: 'q4', type: 'rating', text: 'Soil quality rating (1–10)?', desc: 'Your overall assessment of soil quality.', max: 10 },
-            { id: 'q5', type: 'text', text: 'Additional notes:', desc: 'Any other observations about the soil condition.', placeholder: 'Enter details here...' },
-        ]
-    },
-    {
-        id: 'SRV-003', title: 'Irrigation Audit – Zone B', region: 'Central Hub',
-        due: 'Feb 28, 2026', priority: 'low', status: 'synced',
-        icon: 'water', color: '#2e7d32',
-        description: 'Verify irrigation infrastructure and water distribution in Zone B.',
-        questions: [
-            { id: 'q1', type: 'radio', text: 'Irrigation system type?', desc: 'Primary irrigation method used in this zone.', options: ['Drip', 'Sprinkler', 'Flood', 'Canal', 'None'] },
-            { id: 'q2', type: 'radio', text: 'System condition?', desc: 'Overall condition of the irrigation infrastructure.', options: ['Excellent', 'Good', 'Needs repair', 'Broken'] },
-            { id: 'q3', type: 'checkbox', text: 'Issues with irrigation:', desc: 'Select all issues observed.', options: ['Leaking pipes', 'Clogged nozzles', 'Uneven distribution', 'Low pressure', 'None'] },
-            { id: 'q4', type: 'text', text: 'Maintenance notes:', desc: 'Describe needed repairs or observations.', placeholder: 'Describe issues in detail...' },
-        ]
-    },
-    {
-        id: 'SRV-004', title: 'Livestock & Fodder Assessment – Ward 6', region: 'Western Zone',
-        due: 'Mar 20, 2026', priority: 'high', status: 'pending',
-        icon: 'pets', color: '#4e342e',
-        description: 'Survey livestock count, fodder availability and animal health in Ward 6.',
-        questions: [
-            { id: 'q1', type: 'radio', text: 'Primary livestock species?', desc: 'Main animals being kept in this farm.', options: ['Cattle', 'Goats', 'Poultry', 'Pigs', 'Mixed'] },
-            { id: 'q2', type: 'rating', text: 'Animal health rating (1–10)?', desc: 'General condition and vitality of the animals.', max: 10 },
-            { id: 'q3', type: 'radio', text: 'Fodder availability?', desc: 'Current availability of animal feed and fodder.', options: ['Abundant', 'Adequate', 'Scarce', 'Critical shortage'] },
-            { id: 'q4', type: 'checkbox', text: 'Issues observed:', desc: 'Select all concerns noted.', options: ['Disease signs', 'Malnutrition', 'Water shortage', 'Overcrowding', 'None'] },
-            { id: 'q5', type: 'text', text: 'Additional notes:', desc: 'Any other observations about the livestock condition.', placeholder: 'Enter notes here...' },
-        ]
-    },
-    {
-        id: 'SRV-005', title: 'Post-harvest Loss Assessment', region: 'All Sectors',
-        due: 'Mar 25, 2026', priority: 'medium', status: 'pending',
-        icon: 'warehouse', color: '#6a1b9a',
-        description: 'Estimate and document post-harvest losses for major crops.',
-        questions: [
-            { id: 'q1', type: 'radio', text: 'Primary crop assessed?', desc: 'The main crop being evaluated for harvest loss.', options: ['Rice', 'Wheat', 'Maize', 'Vegetables', 'Fruits', 'Other'] },
-            { id: 'q2', type: 'rating', text: 'Estimated harvest loss (%)?', desc: 'Rate from 1 (very low <5%) to 10 (severe >50%).', max: 10 },
-            { id: 'q3', type: 'checkbox', text: 'Causes of post-harvest loss:', desc: 'Select all relevant causes.', options: ['Pest damage', 'Moisture/mold', 'Poor storage', 'Transport damage', 'Market delay', 'None'] },
-            { id: 'q4', type: 'radio', text: 'Storage facility used?', desc: 'Where is the harvested produce being stored?', options: ['Home storage', 'Community warehouse', 'Cooperative store', 'Cold storage', 'None – sold immediately'] },
-            { id: 'q5', type: 'text', text: 'Recommendations:', desc: 'Suggest improvements to reduce post-harvest losses.', placeholder: 'e.g. Better storage containers, cold chain...' },
-        ]
-    },
-];
+const SURVEYS = [];
 
 /* Respondents storage */
 function getRespondents(surveyId) { return lsGet('rkcnl_respondents_' + surveyId, []); }

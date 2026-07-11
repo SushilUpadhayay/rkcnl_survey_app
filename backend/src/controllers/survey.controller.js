@@ -25,7 +25,7 @@ const createSurvey = async (req, res) => {
             },
             include: {
                 category: { select: { id: true, name: true } },
-                createdBy: { select: { id: true, username: true } }
+                createdBy: { select: { id: true, fullName: true } }
             }
         });
 
@@ -67,7 +67,7 @@ const getAllSurveys = async (req, res) => {
                 where,
                 include: {
                     category: { select: { id: true, name: true } },
-                    createdBy: { select: { id: true, username: true } },
+                    createdBy: { select: { id: true, fullName: true } },
                     _count: {
                         select: { responses: true, assignments: true }
                     }
@@ -107,7 +107,7 @@ const getSurveyById = async (req, res) => {
             where: { id: req.params.id },
             include: {
                 category: { select: { id: true, name: true } },
-                createdBy: { select: { id: true, username: true } },
+                createdBy: { select: { id: true, fullName: true } },
                 _count: {
                     select: { responses: true, assignments: true }
                 }
@@ -206,7 +206,7 @@ const assignSurvey = async (req, res) => {
             data: { surveyId, userId },
             include: {
                 survey: { select: { id: true, title: true } },
-                user: { select: { id: true, username: true, email: true } }
+                user: { select: { id: true, fullName: true, email: true } }
             }
         });
 
@@ -284,7 +284,7 @@ const getAssignments = async (req, res) => {
             where,
             include: {
                 survey: { select: { id: true, title: true, status: true } },
-                user: { select: { id: true, username: true, email: true } }
+                user: { select: { id: true, fullName: true, email: true } }
             },
             orderBy: { createdAt: 'desc' }
         });
@@ -335,8 +335,8 @@ const updateSurvey = async (req, res) => {
             },
             include: {
                 category: { select: { id: true, name: true } },
-                createdBy: { select: { id: true, username: true } },
-                updatedBy: { select: { id: true, username: true } }
+                createdBy: { select: { id: true, fullName: true } },
+                updatedBy: { select: { id: true, fullName: true } }
             }
         });
 

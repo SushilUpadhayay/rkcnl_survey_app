@@ -54,12 +54,12 @@ export const ReportsPage: React.FC = () => {
       const responsesList: Response[] = resResponses.data.data || [];
 
       // Compile stats
-      const userSubmissions: Record<string, { username: string; email: string; count: number }> = {};
+      const userSubmissions: Record<string, { fullName: string; email: string; count: number }> = {};
       const surveySubmissions: Record<string, { title: string; count: number }> = {};
       const dateSubmissions: Record<string, number> = {};
 
       responsesList.forEach((res) => {
-        const username = res.submittedBy?.username || 'Unknown surveyor';
+        const fullName = res.submittedBy?.fullName || 'Unknown surveyor';
         const email = res.submittedBy?.email || 'N/A';
         const userId = res.submittedById;
         const surveyTitle = res.survey?.title || 'Unknown Survey';
@@ -67,7 +67,7 @@ export const ReportsPage: React.FC = () => {
         const dateStr = new Date(res.deviceTimestamp || res.createdAt).toLocaleDateString();
 
         if (!userSubmissions[userId]) {
-          userSubmissions[userId] = { username, email, count: 0 };
+          userSubmissions[userId] = { fullName, email, count: 0 };
         }
         userSubmissions[userId].count += 1;
 
@@ -99,7 +99,7 @@ export const ReportsPage: React.FC = () => {
       const headers = [
         'Response ID',
         'Survey Title',
-        'Surveyor Username',
+        'Surveyor Name',
         'Surveyor Email',
         'Device Timestamp',
         'Latitude',
@@ -116,7 +116,7 @@ export const ReportsPage: React.FC = () => {
         return [
           res.id,
           res.survey?.title || 'N/A',
-          res.submittedBy?.username || 'N/A',
+          res.submittedBy?.fullName || 'N/A',
           res.submittedBy?.email || 'N/A',
           res.deviceTimestamp,
           res.latitude || 'N/A',
@@ -284,7 +284,7 @@ export const ReportsPage: React.FC = () => {
                   <TableBody>
                     {reportData?.userSubmissions?.map((item: any, idx: number) => (
                       <TableRow key={idx} hover>
-                        <TableCell sx={{ fontWeight: 500 }}>{item.username}</TableCell>
+                        <TableCell sx={{ fontWeight: 500 }}>{item.fullName}</TableCell>
                         <TableCell>{item.email}</TableCell>
                         <TableCell align="right" sx={{ fontWeight: 600, color: 'primary.main' }}>
                           {item.count}

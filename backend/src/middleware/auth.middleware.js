@@ -17,7 +17,7 @@ const protect = async (req, res, next) => {
                 where: { id: decoded.id },
                 select: {
                     id: true,
-                    username: true,
+                    fullName: true,
                     email: true,
                     role: true,
                     status: true,

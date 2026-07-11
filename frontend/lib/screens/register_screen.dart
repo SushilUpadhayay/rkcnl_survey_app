@@ -215,7 +215,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             controller: _nameController,
             textInputAction: TextInputAction.next,
             validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your full name' : null,
-            decoration: _buildInputDecoration(hint: 'John Doe', icon: Icons.badge_outlined, dark: dark),
+            decoration: _buildInputDecoration(hint: 'Rubi Adhikari', icon: Icons.badge_outlined, dark: dark),
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
           ),
           

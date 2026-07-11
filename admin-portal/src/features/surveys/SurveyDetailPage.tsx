@@ -277,7 +277,7 @@ export const SurveyDetailPage: React.FC = () => {
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2" color="text.secondary">Created By:</Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>{survey.createdBy?.username || 'Admin'}</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>{survey.createdBy?.fullName || 'Admin'}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2" color="text.secondary">Last Updated:</Typography>

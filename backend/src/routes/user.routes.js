@@ -22,7 +22,7 @@ router.get('/', protect, authorize('Admin'), getAllUsers);
 router.get('/:id', protect, authorize('Admin'), getUserById);
 
 // @route   PUT /api/users/:id
-// @desc    Update user (Admin: any field; FieldStaff: own username only)
+// @desc    Update user (Admin: profile fields only; FieldStaff: own fullName only)
 // @access  Private
 router.put('/:id', protect, updateUser);
 

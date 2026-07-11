@@ -45,9 +45,9 @@ class AuthService {
         Uri.parse('$baseUrl/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'full_name': fullName,
+          'fullName': fullName,
           'gender': gender,
-          'date_of_birth': dateOfBirth,
+          'dateOfBirth': dateOfBirth,
           'location': location,
           'email': email,
           'phone': phone,
