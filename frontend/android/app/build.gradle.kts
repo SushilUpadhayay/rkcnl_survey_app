@@ -43,6 +43,9 @@ flutter {
     source = "../.."
 }
 
+// Redirect build output to where Flutter tool expects to find the APK
+layout.buildDirectory.set(file("../../build/app"))
+
 tasks.configureEach {
     if (name.contains("AarMetadata")) {
         enabled = false
